@@ -1,0 +1,5 @@
+<linker>
+  <!-- PoC #4：保留 Google.Protobuf，避免 IL2CPP 裁剪导致热更反序列化失败 -->
+  <assembly fullname="Google.Protobuf" preserve="all"/>
+  <assembly fullname="Game.Shared" preserve="all"/>
+</linker>

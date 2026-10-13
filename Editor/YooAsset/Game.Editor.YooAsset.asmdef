@@ -1,0 +1,20 @@
+{
+    "name": "Game.Editor.YooAsset",
+    "rootNamespace": "Game.Editor.YooAssetTools",
+    "references": [
+        "YooAsset",
+        "YooAsset.Editor",
+        "Game.Framework"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

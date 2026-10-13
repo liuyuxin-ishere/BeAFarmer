@@ -1,0 +1,17 @@
+{
+    "name": "Game.Hotfix",
+    "rootNamespace": "Game.Hotfix",
+    "references": [
+        "Game.Framework",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

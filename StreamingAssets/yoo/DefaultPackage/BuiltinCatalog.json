@@ -1,0 +1,19 @@
+{
+    "FileVersion": 1,
+    "PackageName": "DefaultPackage",
+    "PackageVersion": "2",
+    "Entries": [
+        {
+            "BundleGuid": "18fce21787cc9a4034cd149a0eeb951e",
+            "FileName": "18fce21787cc9a4034cd149a0eeb951e.bundle"
+        },
+        {
+            "BundleGuid": "565b3d096f25cbeaeb792524d189cb71",
+            "FileName": "565b3d096f25cbeaeb792524d189cb71.bundle"
+        },
+        {
+            "BundleGuid": "9ed433d93b40aecb7c1439c137c5a5aa",
+            "FileName": "9ed433d93b40aecb7c1439c137c5a5aa.bundle"
+        }
+    ]
+}
