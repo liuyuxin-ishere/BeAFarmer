@@ -1,0 +1,20 @@
+-- 协议往返。Lua 不解析 Protobuf，只搬运 bytes 和 Lua 5.3 整数。
+
+local M = {}
+
+-- 无参数。成功返回 ok，整数被截成浮点时直接 error。
+function M.run()
+  local bridge = CS.Game.Framework.Lua.ProtoBridge
+  local heartbeat = bridge.BuildHeartbeatBytes()
+  local clientTime = bridge.ReadHeartbeatClientTime(heartbeat)
+  if math.type(clientTime) ~= "integer" then
+    error("int64 crossed as " .. tostring(math.type(clientTime)) .. " value=" .. tostring(clientTime))
+  end
+  local echoed = bridge.EchoInt64(clientTime)
+  local heartbeatBack = bridge.EchoBytes(heartbeat)
+  local avatar = bridge.BuildAvatarBytes()
+  local avatarBack = bridge.EchoBytes(avatar)
+  return bridge.VerifyAll(heartbeatBack, echoed, avatarBack)
+end
+
+return M

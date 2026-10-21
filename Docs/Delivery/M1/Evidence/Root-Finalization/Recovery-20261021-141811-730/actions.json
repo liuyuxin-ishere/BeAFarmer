@@ -1,0 +1,610 @@
+[
+  {
+    "utc": "2026-10-21T06:18:12.5000368Z",
+    "phase": "C01-R1",
+    "name": "atomic-version-pointer",
+    "actual": 100
+  },
+  {
+    "utc": "2026-10-21T06:18:13.8199239Z",
+    "phase": "C01-R1",
+    "name": "server-started",
+    "actual": {
+      "wrapperPid": 22448,
+      "database": "E:\\Workbench\\UnityWorkBench\\Farming\\Docs\\Acceptance\\M1\\20261020-xLua\\Root-Finalization\\Recovery-20261021-141811-730\\players.db",
+      "http": 17631,
+      "tcp": 17630
+    }
+  },
+  {
+    "utc": "2026-10-21T06:18:13.9031948Z",
+    "phase": "C01-R1",
+    "name": "player-started",
+    "actual": {
+      "exe": "E:\\Workbench\\UnityWorkBench\\Farming\\Docs\\Acceptance\\M1\\20261020-xLua\\Root Final 100 R2\\Player\\Farming.exe",
+      "pid": 31368,
+      "clientRoot": "E:\\Workbench\\UnityWorkBench\\Farming\\Docs\\Acceptance\\M1\\20261020-xLua\\Root-Finalization\\Recovery-20261021-141811-730\\client"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:18:18.0595606Z",
+    "phase": "C01-R1",
+    "name": "initial-login-ready",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:18:18.2790183Z",
+    "phase": "C01-R1",
+    "name": "ack-fill-creds",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:18:18.2862983Z",
+    "phase": "C01-R1",
+    "name": "command-fill-creds",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:18:18.5106251Z",
+    "phase": "C01-R1",
+    "name": "ack-login",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:18:18.5137439Z",
+    "phase": "C01-R1",
+    "name": "command-login",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:18:18.9616485Z",
+    "phase": "C01-R1",
+    "name": "initial-home",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:18:18.9767128Z",
+    "phase": "C01-R1",
+    "name": "C01-R1",
+    "actual": {
+      "patchRetryVisible": "False",
+      "resVersion": "100",
+      "auth": "True",
+      "disposeError": "",
+      "reconnectAttempt": "0",
+      "utc": "2026-10-21T06:18:18.9015209Z",
+      "winPatch": "False",
+      "committed": "True",
+      "lastBiz": "0",
+      "scene": "M1_Boot",
+      "registerMessage": "",
+      "loadedScenes": "M1_Boot,M1_Home",
+      "expectedNick": "",
+      "patchModule": "False",
+      "winHome": "True",
+      "bizSnap": "{ \"info\": { \"playerId\": \"1\", \"nickname\": \"FinalNick\", \"level\": 1, \"gold\": \"201\", \"gem\": \"300\", \"ticket\": \"5\", \"bagSlots\": 60 }, \"bag\": [ { \"itemId\": 1, \"count\": 7 } ] }",
+      "hasToken": "True",
+      "loginOpened": "True",
+      "lastKind": "ok",
+      "mask": "False",
+      "luaModel": "{\"activities\":{},\"bag\":[{\"count\":7,\"itemId\":1}],\"facilities\":{},\"gachaStates\":{},\"info\":{\"bagSlots\":60,\"exp\":0,\"gem\":\"300\",\"gold\":\"201\",\"guideStep\":0,\"level\":1,\"nickname\":\"FinalNick\",\"playerId\":\"1\",\"shard\":\"0\",\"ticket\":\"5\"},\"nodes\":{},\"orders\":{},\"plots\":{},\"tools\":{}}",
+      "globalPatch": "",
+      "reconnectRunning": "False",
+      "entry": "True",
+      "hudNick": "FinalNick",
+      "luaNick": "FinalNick",
+      "winLogin": "False",
+      "downloadFiles": "42"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:18:19.8501864Z",
+    "phase": "C02-C03-outage",
+    "name": "server-stopped",
+    "actual": 0
+  },
+  {
+    "utc": "2026-10-21T06:18:49.1475878Z",
+    "phase": "C02-C03-outage",
+    "name": "disconnect-mask",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:18:49.1538033Z",
+    "phase": "C02-C03-outage",
+    "name": "C02-mask",
+    "actual": {
+      "patchRetryVisible": "False",
+      "resVersion": "100",
+      "auth": "True",
+      "disposeError": "",
+      "reconnectAttempt": "0",
+      "utc": "2026-10-21T06:18:48.9490154Z",
+      "winPatch": "False",
+      "committed": "True",
+      "lastBiz": "0",
+      "scene": "M1_Boot",
+      "registerMessage": "",
+      "loadedScenes": "M1_Boot,M1_Home",
+      "expectedNick": "",
+      "patchModule": "False",
+      "winHome": "True",
+      "bizSnap": "{ \"info\": { \"playerId\": \"1\", \"nickname\": \"FinalNick\", \"level\": 1, \"gold\": \"201\", \"gem\": \"300\", \"ticket\": \"5\", \"bagSlots\": 60 }, \"bag\": [ { \"itemId\": 1, \"count\": 7 } ] }",
+      "hasToken": "True",
+      "loginOpened": "True",
+      "lastKind": "ok",
+      "mask": "True",
+      "luaModel": "{\"activities\":{},\"bag\":[{\"count\":7,\"itemId\":1}],\"facilities\":{},\"gachaStates\":{},\"info\":{\"bagSlots\":60,\"exp\":0,\"gem\":\"300\",\"gold\":\"201\",\"guideStep\":0,\"level\":1,\"nickname\":\"FinalNick\",\"playerId\":\"1\",\"shard\":\"0\",\"ticket\":\"5\"},\"nodes\":{},\"orders\":{},\"plots\":{},\"tools\":{}}",
+      "globalPatch": "",
+      "reconnectRunning": "True",
+      "entry": "True",
+      "hudNick": "FinalNick",
+      "luaNick": "FinalNick",
+      "winLogin": "False",
+      "downloadFiles": "42"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:18:49.3668705Z",
+    "phase": "C02-C03-outage",
+    "name": "ack-screenshot:reconnect_mask",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:18:49.3678959Z",
+    "phase": "C02-C03-outage",
+    "name": "command-screenshot:reconnect_mask",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:18:49.3767029Z",
+    "phase": "C02-C03-outage",
+    "name": "observed-reconnect-attempt",
+    "actual": {
+      "mask": "True",
+      "elapsedSeconds": 0.00651,
+      "attempt": 0,
+      "running": "True"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:18:51.4100697Z",
+    "phase": "C02-C03-outage",
+    "name": "observed-reconnect-attempt",
+    "actual": {
+      "mask": "True",
+      "elapsedSeconds": 2.0399561,
+      "attempt": 1,
+      "running": "True"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:18:55.4666229Z",
+    "phase": "C02-C03-outage",
+    "name": "observed-reconnect-attempt",
+    "actual": {
+      "mask": "True",
+      "elapsedSeconds": 6.0964485,
+      "attempt": 2,
+      "running": "True"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:18:57.9920551Z",
+    "phase": "C02-C03-outage",
+    "name": "observed-reconnect-attempt",
+    "actual": {
+      "mask": "True",
+      "elapsedSeconds": 8.6219057,
+      "attempt": 3,
+      "running": "True"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:19:04.1068438Z",
+    "phase": "C02-C03-outage",
+    "name": "observed-reconnect-attempt",
+    "actual": {
+      "mask": "True",
+      "elapsedSeconds": 14.7366977,
+      "attempt": 4,
+      "running": "True"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:19:14.2714321Z",
+    "phase": "C02-C03-outage",
+    "name": "observed-reconnect-attempt",
+    "actual": {
+      "mask": "True",
+      "elapsedSeconds": 24.9013037,
+      "attempt": 5,
+      "running": "True"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:19:32.0369348Z",
+    "phase": "C02-C03-outage",
+    "name": "observed-reconnect-attempt",
+    "actual": {
+      "mask": "True",
+      "elapsedSeconds": 42.6667561,
+      "attempt": 6,
+      "running": "True"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:20:04.0624050Z",
+    "phase": "C02-C03-outage",
+    "name": "observed-reconnect-attempt",
+    "actual": {
+      "mask": "True",
+      "elapsedSeconds": 74.6922837,
+      "attempt": 7,
+      "running": "True"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:20:05.8768502Z",
+    "phase": "C04-restore",
+    "name": "server-started",
+    "actual": {
+      "wrapperPid": 2872,
+      "database": "E:\\Workbench\\UnityWorkBench\\Farming\\Docs\\Acceptance\\M1\\20261020-xLua\\Root-Finalization\\Recovery-20261021-141811-730\\players.db",
+      "http": 17631,
+      "tcp": 17630
+    }
+  },
+  {
+    "utc": "2026-10-21T06:20:34.1812082Z",
+    "phase": "C04-restore",
+    "name": "token-auto-restore",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:20:34.1852186Z",
+    "phase": "C04-restore",
+    "name": "C04-restored",
+    "actual": {
+      "patchRetryVisible": "False",
+      "resVersion": "100",
+      "auth": "True",
+      "disposeError": "",
+      "reconnectAttempt": "7",
+      "utc": "2026-10-21T06:20:34.0476164Z",
+      "winPatch": "False",
+      "committed": "True",
+      "lastBiz": "0",
+      "scene": "M1_Boot",
+      "registerMessage": "",
+      "loadedScenes": "M1_Boot,M1_Home",
+      "expectedNick": "",
+      "patchModule": "False",
+      "winHome": "True",
+      "bizSnap": "{ \"info\": { \"playerId\": \"1\", \"nickname\": \"FinalNick\", \"level\": 1, \"gold\": \"201\", \"gem\": \"300\", \"ticket\": \"5\", \"bagSlots\": 60 }, \"bag\": [ { \"itemId\": 1, \"count\": 7 } ] }",
+      "hasToken": "True",
+      "loginOpened": "True",
+      "lastKind": "ok",
+      "mask": "False",
+      "luaModel": "{\"activities\":{},\"bag\":[{\"count\":7,\"itemId\":1}],\"facilities\":{},\"gachaStates\":{},\"info\":{\"bagSlots\":60,\"exp\":0,\"gem\":\"300\",\"gold\":\"201\",\"guideStep\":0,\"level\":1,\"nickname\":\"FinalNick\",\"playerId\":\"1\",\"shard\":\"0\",\"ticket\":\"5\"},\"nodes\":{},\"orders\":{},\"plots\":{},\"tools\":{}}",
+      "globalPatch": "",
+      "reconnectRunning": "False",
+      "entry": "True",
+      "hudNick": "FinalNick",
+      "luaNick": "FinalNick",
+      "winLogin": "False",
+      "downloadFiles": "42"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:20:34.3998022Z",
+    "phase": "C04-restore",
+    "name": "ack-screenshot:restored_home",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:20:34.4011392Z",
+    "phase": "C04-restore",
+    "name": "command-screenshot:restored_home",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:20:34.6314997Z",
+    "phase": "C04-restore",
+    "name": "C05-R2",
+    "actual": {
+      "patchRetryVisible": "False",
+      "resVersion": "100",
+      "auth": "True",
+      "disposeError": "",
+      "reconnectAttempt": "7",
+      "utc": "2026-10-21T06:20:34.5477847Z",
+      "winPatch": "False",
+      "committed": "True",
+      "lastBiz": "0",
+      "scene": "M1_Boot",
+      "registerMessage": "",
+      "loadedScenes": "M1_Boot,M1_Home",
+      "expectedNick": "",
+      "patchModule": "False",
+      "winHome": "True",
+      "bizSnap": "{ \"info\": { \"playerId\": \"1\", \"nickname\": \"FinalNick\", \"level\": 1, \"gold\": \"201\", \"gem\": \"300\", \"ticket\": \"5\", \"bagSlots\": 60 }, \"bag\": [ { \"itemId\": 1, \"count\": 7 } ] }",
+      "hasToken": "True",
+      "loginOpened": "True",
+      "lastKind": "ok",
+      "mask": "False",
+      "luaModel": "{\"activities\":{},\"bag\":[{\"count\":7,\"itemId\":1}],\"facilities\":{},\"gachaStates\":{},\"info\":{\"bagSlots\":60,\"exp\":0,\"gem\":\"300\",\"gold\":\"201\",\"guideStep\":0,\"level\":1,\"nickname\":\"FinalNick\",\"playerId\":\"1\",\"shard\":\"0\",\"ticket\":\"5\"},\"nodes\":{},\"orders\":{},\"plots\":{},\"tools\":{}}",
+      "globalPatch": "",
+      "reconnectRunning": "False",
+      "entry": "True",
+      "hudNick": "FinalNick",
+      "luaNick": "FinalNick",
+      "winLogin": "False",
+      "downloadFiles": "42"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:20:34.9108062Z",
+    "phase": "C06-crash-owned-server",
+    "name": "force-stop-owned-server",
+    "actual": {
+      "parent": 2872,
+      "pid": 30532,
+      "database": "E:\\Workbench\\UnityWorkBench\\Farming\\Docs\\Acceptance\\M1\\20261020-xLua\\Root-Finalization\\Recovery-20261021-141811-730\\players.db",
+      "expectedExe": "C:\\Program Files\\dotnet\\dotnet.exe"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:21:04.1075081Z",
+    "phase": "C06-crash-owned-server",
+    "name": "crash-disconnect-mask",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:21:05.3732016Z",
+    "phase": "C07-crash-restart",
+    "name": "server-started",
+    "actual": {
+      "wrapperPid": 10296,
+      "database": "E:\\Workbench\\UnityWorkBench\\Farming\\Docs\\Acceptance\\M1\\20261020-xLua\\Root-Finalization\\Recovery-20261021-141811-730\\players.db",
+      "http": 17631,
+      "tcp": 17630
+    }
+  },
+  {
+    "utc": "2026-10-21T06:21:05.7879635Z",
+    "phase": "C07-crash-restart",
+    "name": "crash-auto-restore",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:21:05.7908231Z",
+    "phase": "C07-crash-restart",
+    "name": "C07-restored-R2",
+    "actual": {
+      "patchRetryVisible": "False",
+      "resVersion": "100",
+      "auth": "True",
+      "disposeError": "",
+      "reconnectAttempt": "0",
+      "utc": "2026-10-21T06:21:05.5790316Z",
+      "winPatch": "False",
+      "committed": "True",
+      "lastBiz": "0",
+      "scene": "M1_Boot",
+      "registerMessage": "",
+      "loadedScenes": "M1_Boot,M1_Home",
+      "expectedNick": "",
+      "patchModule": "False",
+      "winHome": "True",
+      "bizSnap": "{ \"info\": { \"playerId\": \"1\", \"nickname\": \"FinalNick\", \"level\": 1, \"gold\": \"201\", \"gem\": \"300\", \"ticket\": \"5\", \"bagSlots\": 60 }, \"bag\": [ { \"itemId\": 1, \"count\": 7 } ] }",
+      "hasToken": "True",
+      "loginOpened": "True",
+      "lastKind": "ok",
+      "mask": "False",
+      "luaModel": "{\"activities\":{},\"bag\":[{\"count\":7,\"itemId\":1}],\"facilities\":{},\"gachaStates\":{},\"info\":{\"bagSlots\":60,\"exp\":0,\"gem\":\"300\",\"gold\":\"201\",\"guideStep\":0,\"level\":1,\"nickname\":\"FinalNick\",\"playerId\":\"1\",\"shard\":\"0\",\"ticket\":\"5\"},\"nodes\":{},\"orders\":{},\"plots\":{},\"tools\":{}}",
+      "globalPatch": "",
+      "reconnectRunning": "False",
+      "entry": "True",
+      "hudNick": "FinalNick",
+      "luaNick": "FinalNick",
+      "winLogin": "False",
+      "downloadFiles": "42"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:21:06.1951080Z",
+    "phase": "C08-C10-expiry",
+    "name": "ack-drop-socket",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:21:06.1962787Z",
+    "phase": "C08-C10-expiry",
+    "name": "command-drop-socket",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:21:06.2152273Z",
+    "phase": "C08-C10-expiry",
+    "name": "204-returns-login",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:21:06.2187882Z",
+    "phase": "C08-C10-expiry",
+    "name": "C09-expired-return-login",
+    "actual": {
+      "patchRetryVisible": "False",
+      "resVersion": "100",
+      "auth": "False",
+      "disposeError": "",
+      "reconnectAttempt": "0",
+      "utc": "2026-10-21T06:21:06.0802767Z",
+      "winPatch": "False",
+      "committed": "True",
+      "lastBiz": "204",
+      "scene": "M1_Boot",
+      "registerMessage": "",
+      "loadedScenes": "M1_Boot,M1_Login",
+      "expectedNick": "",
+      "patchModule": "False",
+      "winHome": "False",
+      "bizSnap": "{}",
+      "hasToken": "False",
+      "loginOpened": "True",
+      "lastKind": "biz",
+      "mask": "False",
+      "luaModel": "{\"activities\":{},\"bag\":{},\"facilities\":{},\"gachaStates\":{},\"info\":{\"bagSlots\":0,\"exp\":0,\"gem\":\"0\",\"gold\":\"0\",\"guideStep\":0,\"level\":0,\"nickname\":\"\",\"playerId\":\"0\",\"shard\":\"0\",\"ticket\":\"0\"},\"nodes\":{},\"orders\":{},\"plots\":{},\"tools\":{}}",
+      "globalPatch": "",
+      "reconnectRunning": "False",
+      "entry": "True",
+      "hudNick": "",
+      "luaNick": "",
+      "winLogin": "True",
+      "downloadFiles": "42"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:21:06.4304971Z",
+    "phase": "C08-C10-expiry",
+    "name": "ack-fill-creds",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:21:06.4315907Z",
+    "phase": "C08-C10-expiry",
+    "name": "command-fill-creds",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:21:06.6483584Z",
+    "phase": "C08-C10-expiry",
+    "name": "ack-login",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:21:06.6491466Z",
+    "phase": "C08-C10-expiry",
+    "name": "command-login",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:21:06.6504739Z",
+    "phase": "C08-C10-expiry",
+    "name": "new-login-after-expiry",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:21:06.6535351Z",
+    "phase": "C08-C10-expiry",
+    "name": "C10-relogin",
+    "actual": {
+      "patchRetryVisible": "False",
+      "resVersion": "100",
+      "auth": "True",
+      "disposeError": "",
+      "reconnectAttempt": "0",
+      "utc": "2026-10-21T06:21:06.5812034Z",
+      "winPatch": "False",
+      "committed": "True",
+      "lastBiz": "0",
+      "scene": "M1_Boot",
+      "registerMessage": "",
+      "loadedScenes": "M1_Boot,M1_Home",
+      "expectedNick": "",
+      "patchModule": "False",
+      "winHome": "True",
+      "bizSnap": "{ \"info\": { \"playerId\": \"1\", \"nickname\": \"FinalNick\", \"level\": 1, \"gold\": \"201\", \"gem\": \"300\", \"ticket\": \"5\", \"bagSlots\": 60 }, \"bag\": [ { \"itemId\": 1, \"count\": 7 } ] }",
+      "hasToken": "True",
+      "loginOpened": "True",
+      "lastKind": "ok",
+      "mask": "False",
+      "luaModel": "{\"activities\":{},\"bag\":[{\"count\":7,\"itemId\":1}],\"facilities\":{},\"gachaStates\":{},\"info\":{\"bagSlots\":60,\"exp\":0,\"gem\":\"300\",\"gold\":\"201\",\"guideStep\":0,\"level\":1,\"nickname\":\"FinalNick\",\"playerId\":\"1\",\"shard\":\"0\",\"ticket\":\"5\"},\"nodes\":{},\"orders\":{},\"plots\":{},\"tools\":{}}",
+      "globalPatch": "",
+      "reconnectRunning": "False",
+      "entry": "True",
+      "hudNick": "FinalNick",
+      "luaNick": "FinalNick",
+      "winLogin": "False",
+      "downloadFiles": "42"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:21:11.9058389Z",
+    "phase": "C11-replacement",
+    "name": "A-kicked-return-login",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:21:11.9091605Z",
+    "phase": "C11-replacement",
+    "name": "C11-A-kicked",
+    "actual": {
+      "patchRetryVisible": "False",
+      "resVersion": "100",
+      "auth": "False",
+      "disposeError": "",
+      "reconnectAttempt": "0",
+      "utc": "2026-10-21T06:21:11.5855659Z",
+      "winPatch": "False",
+      "committed": "True",
+      "lastBiz": "0",
+      "scene": "M1_Boot",
+      "registerMessage": "",
+      "loadedScenes": "M1_Boot,M1_Login",
+      "expectedNick": "",
+      "patchModule": "False",
+      "winHome": "False",
+      "bizSnap": "{}",
+      "hasToken": "False",
+      "loginOpened": "True",
+      "lastKind": "ok",
+      "mask": "False",
+      "luaModel": "{\"activities\":{},\"bag\":{},\"facilities\":{},\"gachaStates\":{},\"info\":{\"bagSlots\":0,\"exp\":0,\"gem\":\"0\",\"gold\":\"0\",\"guideStep\":0,\"level\":0,\"nickname\":\"\",\"playerId\":\"0\",\"shard\":\"0\",\"ticket\":\"0\"},\"nodes\":{},\"orders\":{},\"plots\":{},\"tools\":{}}",
+      "globalPatch": "",
+      "reconnectRunning": "False",
+      "entry": "True",
+      "hudNick": "",
+      "luaNick": "",
+      "winLogin": "True",
+      "downloadFiles": "42"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:21:12.1307593Z",
+    "phase": "C11-replacement",
+    "name": "ack-screenshot:kicked_login",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:21:12.1320201Z",
+    "phase": "C11-replacement",
+    "name": "command-screenshot:kicked_login",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:21:16.5429520Z",
+    "phase": "C12-old-token",
+    "name": "ack-quit",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:21:16.5434102Z",
+    "phase": "C12-old-token",
+    "name": "command-quit",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:21:17.1622468Z",
+    "phase": "C12-old-token",
+    "name": "player-stopped",
+    "actual": 0
+  },
+  {
+    "utc": "2026-10-21T06:21:17.3565263Z",
+    "phase": "C12-old-token",
+    "name": "server-stopped",
+    "actual": 0
+  }
+]

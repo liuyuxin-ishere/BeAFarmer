@@ -1,0 +1,92 @@
+[
+  {
+    "key": "ssr_rate",
+    "value": "0.01",
+    "desc": "SSR 基础概率"
+  },
+  {
+    "key": "sr_rate",
+    "value": "0.06",
+    "desc": "SR 基础概率"
+  },
+  {
+    "key": "r_rate",
+    "value": "0.28",
+    "desc": "R 基础概率"
+  },
+  {
+    "key": "n_rate",
+    "value": "0.65",
+    "desc": "N 基础概率"
+  },
+  {
+    "key": "soft_pity_start",
+    "value": "40",
+    "desc": "SSR 软保底起点（第 N 抽起概率递增）"
+  },
+  {
+    "key": "soft_pity_step",
+    "value": "0.04",
+    "desc": "SSR 软保底每抽增幅"
+  },
+  {
+    "key": "hard_pity",
+    "value": "60",
+    "desc": "SSR 硬保底（第 N 抽必出）"
+  },
+  {
+    "key": "sr_pity",
+    "value": "10",
+    "desc": "每 N 抽至少 1 个 SR 及以上"
+  },
+  {
+    "key": "up_rate",
+    "value": "0.5",
+    "desc": "出 SSR 时为 UP 的概率"
+  },
+  {
+    "key": "up_guarantee",
+    "value": "1",
+    "desc": "是否启用大保底（未中 UP 则下个 SSR 必为 UP，1=是）"
+  },
+  {
+    "key": "cost_ticket",
+    "value": "1",
+    "desc": "单抽消耗抽卡券"
+  },
+  {
+    "key": "cost_gem",
+    "value": "160",
+    "desc": "单抽消耗钻石"
+  },
+  {
+    "key": "shard_n",
+    "value": "1",
+    "desc": "重复 N 转碎片"
+  },
+  {
+    "key": "shard_r",
+    "value": "5",
+    "desc": "重复 R 转碎片"
+  },
+  {
+    "key": "shard_sr",
+    "value": "20",
+    "desc": "重复 SR 转碎片"
+  },
+  {
+    "key": "shard_ssr",
+    "value": "50",
+    "desc": "重复 SSR 转碎片"
+  },
+  {
+    "key": "log_keep",
+    "value": "100",
+    "desc": "抽卡记录保留条数"
+  },
+  {
+    "key": "pull_times_allowed",
+    "value": "1;10",
+    "desc": "允许的单次抽数"
+  }
+]

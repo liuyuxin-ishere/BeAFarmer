@@ -1,0 +1,1 @@
+[BotReport] requested=100 connected=100 enter=100 dropped=0 dur=604.7s connectRate=100.0% enterRate=100.0% dropRate=0.00% avgRtt=4.0ms p99Rtt=18.7ms sync=274597 correct=60 pass=True PoC#10

@@ -1,0 +1,76 @@
+syntax = "proto3";
+package cloudisle.poc;
+option csharp_namespace = "CloudIsle.Proto.Poc";
+
+// PoC #10：广场协议子集（字段对齐 05_协议与接口.md §4.7）
+
+message HeartbeatReq {
+  int64 client_time = 1;
+}
+
+message HeartbeatResp {
+  int64 server_time = 1;
+}
+
+message PlazaEntity {
+  int64 player_id = 1;
+  string nickname = 2;
+  int32 level = 3;
+  repeated int32 avatar_ids = 4;
+  int32 x = 5;
+  int32 y = 6;
+  int32 dir = 7;
+  int32 state = 8;
+}
+
+message PlazaEnterReq {
+  int32 prefer_line_id = 1;
+}
+
+message PlazaEnterResp {
+  int32 code = 1;
+  int32 line_id = 2;
+  PlazaEntity self = 3;
+  repeated PlazaEntity entities = 4;
+}
+
+message PlazaLeaveReq {}
+
+message PlazaLeaveResp {
+  int32 code = 1;
+}
+
+message PlazaMoveReq {
+  int32 x = 1;
+  int32 y = 2;
+  int32 dir = 3;
+  int32 state = 4;
+  int64 client_time = 5;
+}
+
+message EntityMove {
+  int64 player_id = 1;
+  int32 x = 2;
+  int32 y = 3;
+  int32 dir = 4;
+  int32 state = 5;
+}
+
+message PlazaSyncNtf {
+  int64 server_time = 1;
+  repeated EntityMove moves = 2;
+}
+
+message PlazaCorrectNtf {
+  int32 x = 1;
+  int32 y = 2;
+  int32 reason = 3;
+}
+
+message PlazaEntityEnterNtf {
+  repeated PlazaEntity entities = 1;
+}
+
+message PlazaEntityLeaveNtf {
+  repeated int64 player_ids = 1;
+}

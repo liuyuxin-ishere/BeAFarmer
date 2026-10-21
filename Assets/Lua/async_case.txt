@@ -1,0 +1,24 @@
+-- 异步用例。回调只由宿主在后续帧推进同一个租约时进入。
+
+local M = {}
+local calls = 0
+
+-- code：完成码。payload：完成说明。
+function M.on_done(code, payload)
+  calls = calls + 1
+  CS.Game.Framework.Lua.BridgeApi.NoteAsync(code, payload, calls)
+end
+
+-- 无参数。登记两个租约后返回 armed，不在本帧调用回调。
+function M.run()
+  local live = CS.Game.Framework.Lua.AsyncLease()
+  live:Subscribe(M.on_done)
+  rawset(_G, "async_live_lease", live)
+
+  local cancelled = CS.Game.Framework.Lua.AsyncLease()
+  cancelled:Subscribe(M.on_done)
+  rawset(_G, "async_cancel_lease", cancelled)
+  return "armed"
+end
+
+return M

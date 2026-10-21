@@ -1,0 +1,36 @@
+{
+  "schema": "m1.config-manifest.v1",
+  "configVersion": 100,
+  "globals": {
+    "file": "tbglobalkv.json",
+    "format": "luban-map",
+    "keyField": "key",
+    "valueField": "value",
+    "valueType": "string",
+    "typedGlobalFile": "tbglobal.json",
+    "aotTypes": ["CloudIsle.LubanCfg.GlobalKv", "CloudIsle.LubanCfg.TbGlobalKv"],
+    "snapshotShape": "ConfigSnapshot(int Version, IReadOnlyDictionary<string,string> Globals)",
+    "keyGrowth": "add rows only; generated GlobalKv/TbGlobalKv types stay unchanged",
+    "forbiddenBefore101": ["m1_patch_message"]
+  },
+  "files": [
+    {"name": "tbactivity.json", "sha256": "0d0609dc077e54ad22fdc5cf4f21628e50dad953902d268b096b0fcd75baf697", "length": 280},
+    {"name": "tbavataritem.json", "sha256": "4373ff17fd147563a175fa173ff995216873fb8f0555498c3cbb0773ab74d48f", "length": 5028},
+    {"name": "tbcrop.json", "sha256": "e6df8a5ed09f956d373d8d2662cb582b329233ec402ddd4ae497be4306c38060", "length": 2008},
+    {"name": "tbfacility.json", "sha256": "0fa23c27061dcdfc03e2f783a8a5297fe1da2054f91d273c51cbf21cf5f10b88", "length": 643},
+    {"name": "tbfacilitylevel.json", "sha256": "8fedb2eb640652d3b5361488dacb4baf87259ef8b5238d5a4e8346c541a2dbc5", "length": 459},
+    {"name": "tbfurniture.json", "sha256": "198ad4440a8f28f49d2cb22efc66fd5dd8077fe24a859fd36d7a3451ee43c7b4", "length": 1464},
+    {"name": "tbgachapool.json", "sha256": "e2360a812aa4fdba4d66124b8b929af4785ab2fcc4adf792a7a5d64e9be17ab6", "length": 312},
+    {"name": "tbgachapoolitem.json", "sha256": "7be50bc52ed39d66147a9d77a2ec65fc37a7f4698d41fbbcf7ed6c46d07c25a7", "length": 5807},
+    {"name": "tbgacharule.json", "sha256": "6a4c6ef8f196be9050e9bb20bd779ab87e6704786b09edeafcdefa336ed07cc7", "length": 1770},
+    {"name": "tbgathernode.json", "sha256": "a6d511bcf32f3ac19821db5268c0f35fa02b2693cf27e8f468debb26869017e2", "length": 1122},
+    {"name": "tbglobal.json", "sha256": "f1b8c3e752df8fe3368e52e9629dcbb4634719a846e1f7c5114781fb56e575c5", "length": 776},
+    {"name": "tbglobalkv.json", "sha256": "ffd517ee550c82c847b03985ded60f069a48bcc1770147f7e8912fb0e9351642", "length": 1408},
+    {"name": "tbitem.json", "sha256": "efd7440d55c7c344d95b684bb735a83f8380abbbbff08b25c0d8f903ebfdf1d3", "length": 7836},
+    {"name": "tblevel.json", "sha256": "b1d3c0ebea82390f9c655da4496633e6e5d2d7ecb2a77cecbbe35c61b8753ab5", "length": 923},
+    {"name": "tborderrule.json", "sha256": "2debbf3e492a6ffaa10b72581d3fedaf368a2d2c950ff88ba12b390aba76d0f2", "length": 1512},
+    {"name": "tbplot.json", "sha256": "6349f3786bcc8bd17880472062144c589236cf68a64dbbd236b5ccdd1225c2af", "length": 611},
+    {"name": "tbrecipe.json", "sha256": "799a12c7fd047096bde6d6d297f5363171a5f69ce04c8f447851ec3aba41bc4d", "length": 2295},
+    {"name": "tbtool.json", "sha256": "60b15c95d7663d8fa32110a3f3e45c8829da128a24551ae476a1664197fe46d4", "length": 1584}
+  ]
+}

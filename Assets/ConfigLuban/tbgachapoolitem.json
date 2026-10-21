@@ -1,0 +1,380 @@
+[
+  {
+    "poolId": 1,
+    "rarity": "SSR",
+    "itemId": 7005,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "SSR",
+    "itemId": 7024,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "SSR",
+    "itemId": 7030,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "SR",
+    "itemId": 7004,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "SR",
+    "itemId": 7010,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "SR",
+    "itemId": 7015,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "SR",
+    "itemId": 7019,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "SR",
+    "itemId": 7029,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "R",
+    "itemId": 7003,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "R",
+    "itemId": 7008,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "R",
+    "itemId": 7009,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "R",
+    "itemId": 7013,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "R",
+    "itemId": 7014,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "R",
+    "itemId": 7018,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "R",
+    "itemId": 7022,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "R",
+    "itemId": 7023,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "R",
+    "itemId": 7027,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "R",
+    "itemId": 7028,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "N",
+    "itemId": 7002,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "N",
+    "itemId": 7007,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "N",
+    "itemId": 7012,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "N",
+    "itemId": 7017,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "N",
+    "itemId": 7021,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 1,
+    "rarity": "N",
+    "itemId": 7026,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "SSR",
+    "itemId": 7101,
+    "isUp": true,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "SSR",
+    "itemId": 7102,
+    "isUp": true,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "SSR",
+    "itemId": 7005,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "SSR",
+    "itemId": 7024,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "SSR",
+    "itemId": 7030,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "SR",
+    "itemId": 7103,
+    "isUp": false,
+    "weight": 2
+  },
+  {
+    "poolId": 2,
+    "rarity": "SR",
+    "itemId": 7104,
+    "isUp": false,
+    "weight": 2
+  },
+  {
+    "poolId": 2,
+    "rarity": "SR",
+    "itemId": 7004,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "SR",
+    "itemId": 7010,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "SR",
+    "itemId": 7015,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "SR",
+    "itemId": 7019,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "SR",
+    "itemId": 7029,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "R",
+    "itemId": 7105,
+    "isUp": false,
+    "weight": 2
+  },
+  {
+    "poolId": 2,
+    "rarity": "R",
+    "itemId": 7106,
+    "isUp": false,
+    "weight": 2
+  },
+  {
+    "poolId": 2,
+    "rarity": "R",
+    "itemId": 7003,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "R",
+    "itemId": 7008,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "R",
+    "itemId": 7009,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "R",
+    "itemId": 7013,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "R",
+    "itemId": 7014,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "R",
+    "itemId": 7018,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "R",
+    "itemId": 7022,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "R",
+    "itemId": 7023,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "R",
+    "itemId": 7027,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "R",
+    "itemId": 7028,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "N",
+    "itemId": 7002,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "N",
+    "itemId": 7007,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "N",
+    "itemId": 7012,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "N",
+    "itemId": 7017,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "N",
+    "itemId": 7021,
+    "isUp": false,
+    "weight": 1
+  },
+  {
+    "poolId": 2,
+    "rarity": "N",
+    "itemId": 7026,
+    "isUp": false,
+    "weight": 1
+  }
+]

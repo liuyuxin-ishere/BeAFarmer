@@ -1,0 +1,41 @@
+[
+  {
+    "level": 1,
+    "needPlayerLevel": 1,
+    "slots": 2,
+    "speedFactor": 1.0,
+    "goldCost": 0,
+    "mat1_id": 0,
+    "mat1_n": 0,
+    "mat2_id": 0,
+    "mat2_n": 0,
+    "mat3_id": 0,
+    "mat3_n": 0
+  },
+  {
+    "level": 2,
+    "needPlayerLevel": 8,
+    "slots": 3,
+    "speedFactor": 0.9,
+    "goldCost": 1500,
+    "mat1_id": 3009,
+    "mat1_n": 10,
+    "mat2_id": 3010,
+    "mat2_n": 10,
+    "mat3_id": 0,
+    "mat3_n": 0
+  },
+  {
+    "level": 3,
+    "needPlayerLevel": 15,
+    "slots": 4,
+    "speedFactor": 0.8,
+    "goldCost": 6000,
+    "mat1_id": 3009,
+    "mat1_n": 30,
+    "mat2_id": 3010,
+    "mat2_n": 30,
+    "mat3_id": 4102,
+    "mat3_n": 3
+  }
+]

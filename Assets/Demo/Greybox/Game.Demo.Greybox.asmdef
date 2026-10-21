@@ -1,0 +1,17 @@
+{
+    "name": "Game.Demo.Greybox",
+    "rootNamespace": "Game.Demo.Greybox",
+    "references": [
+        "Game.Shared",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

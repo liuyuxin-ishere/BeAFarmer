@@ -1,0 +1,34 @@
+-- 正式入口模块。返回带 Start/Shutdown 的表，供 C# 的 ILuaEntry 调用。
+-- Shutdown 在 Env 关闭前关窗/退订，勿与 C# Dispose 混淆。
+
+local panel = require("panel_base")
+local proto = require("proto_case")
+local async_case = require("async_case")
+
+local Entry = {}
+
+-- phase：宿主传入的启动阶段名。返回汇总文本。
+-- 只登记异步租约，不在这里同步 Pump。正常返回后宿主才提交活动索引。
+function Entry.Start(self, phase)
+  local protoResult = proto.run()
+  local asyncResult = async_case.run()
+  panel.show_base()
+  local patch = "absent"
+  if CS.Game.Framework.Lua.BridgeApi.HasModule("m1_patch_message") then
+    local extra = require("m1_patch_message")
+    patch = extra.show()
+  end
+  CS.Game.Framework.Lua.BridgeApi.MarkEntryExecuted()
+  return string.format("phase=%s;proto=%s;async=%s;patch=%s", tostring(phase), tostring(protoResult), tostring(asyncResult), tostring(patch))
+end
+
+function Entry.Shutdown(self)
+  local ok, ui = pcall(function()
+    return require("UI/UIManager")
+  end)
+  if ok and ui and ui.shutdown then
+    ui.shutdown()
+  end
+end
+
+return Entry

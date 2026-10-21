@@ -1,0 +1,78 @@
+syntax = "proto3";
+package cloudisle;
+option csharp_namespace = "CloudIsle.Proto";
+import "common.proto";
+
+// 1001 心跳请求。client_time 为客户端本地 Unix 毫秒，供服务端观察时钟。
+message HeartbeatReq {
+  int64 client_time = 1;
+}
+
+// 1002 心跳响应。server_time 为服务端 Unix 毫秒，客户端用来计算时间偏移。
+message HeartbeatResp {
+  int32 code = 1;
+  int64 server_time = 2;
+}
+
+// 1003 注册请求。成功只表示账号已创建，不表示已经登录。
+message RegisterReq {
+  string username = 1;
+  string password = 2;
+  string nickname = 3;
+  int32 proto_version = 4;
+  string device_id = 5;
+}
+
+// 1004 注册响应。只有结果码，没有 Token，也没有玩家快照。
+message RegisterResp {
+  int32 code = 1;
+}
+
+// 1005 登录请求。版本字段用于判断安装包、资源和协议是否兼容。
+message LoginReq {
+  string username = 1;
+  string password = 2;
+  string app_version = 3;
+  int32 res_version = 4;
+  int32 proto_version = 5;
+  int32 config_version = 6;
+  string device_id = 7;
+}
+
+// 1006 登录响应。data 是全量玩家数据；token 只出现在这里，不写入日志。
+message LoginResp {
+  int32 code = 1;
+  string token = 2;
+  int64 server_time = 3;
+  int32 need_res_version = 4;
+  int32 need_config_version = 5;
+  PlayerFullData data = 6;
+}
+
+// 1007 重连请求。用已保存的 token 恢复会话，不再提交密码。
+message ReconnectReq {
+  string token = 1;
+  int32 proto_version = 2;
+}
+
+// 1008 重连响应。成功时 data 覆盖客户端当前玩家数据。
+message ReconnectResp {
+  int32 code = 1;
+  int64 server_time = 2;
+  PlayerFullData data = 3;
+}
+
+// 1009 登出请求。没有响应消息。
+message LogoutReq {}
+
+// 踢线原因。0 顶号，1 维护，2 违规。
+enum KickReason {
+  KICK_ELSEWHERE = 0;
+  KICK_MAINTENANCE = 1;
+  KICK_VIOLATION = 2;
+}
+
+// 1010 踢下线推送。由服务端主动发送，seq 为 0，不配对请求。
+message KickNtf {
+  KickReason reason = 1;
+}

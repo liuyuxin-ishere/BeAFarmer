@@ -1,0 +1,21 @@
+{
+    "name": "Game.Editor.XLua",
+    "rootNamespace": "Game.Editor.XLuaTools",
+    "references": [
+        "Game.Framework",
+        "Game.Framework.XLua.Editor",
+        "YooAsset",
+        "YooAsset.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

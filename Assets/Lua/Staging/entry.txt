@@ -1,0 +1,93 @@
+-- 正式入口：配置与账号模块注册完成后 ready，进入 Login。
+-- Shutdown 在 Env 关闭前关窗/退订。
+
+local AccountService = require("AccountService")
+local UI = require("UI/UIManager")
+
+local Entry = {}
+
+function Entry.Start(self, phase)
+  -- 端点由 Launcher.Configure；此处 bindHandlers（不二次 Configure）并只注册一次窗口。
+  AccountService.bindHandlers()
+  UI.register({
+    windowId = "Login",
+    prefabAddress = "LoginWindow",
+    layer = 2,
+    controllerModule = "UI/Windows/LoginWindow",
+    modal = false,
+    canGoBack = false,
+  })
+  UI.register({
+    windowId = "HomeHud",
+    prefabAddress = "HomeHudWindow",
+    layer = 1,
+    controllerModule = "UI/Windows/HomeHudWindow",
+    modal = false,
+    canGoBack = false,
+  })
+
+  AccountService.onKick(function(code, _)
+    -- EnterLogin → 场景完成后再开 Login；禁止在此抢先 Open 造成错窗。
+    if CS.Game.Framework.Account.AccountFlow ~= nil then
+      CS.Game.Framework.Account.AccountFlow.EnterLogin()
+    end
+  end)
+  AccountService.onExpired(function(code, payload)
+    -- code 保留真实业务码（204/106）；106 由 UI/上层显示更新引导。
+    if CS.Game.Framework.Account.AccountFlow ~= nil then
+      CS.Game.Framework.Account.AccountFlow.EnterLogin()
+    end
+    if code == 106 then
+      pcall(function()
+        CS.Game.Framework.UI.UiBridge.ShowToast("版本过旧，请更新客户端", 3.0)
+      end)
+    end
+  end)
+
+  -- 101：仅注册 PatchDemo；登录进 Home 后再由 accept/业务打开，避免挡住 Login。
+  local patch = "absent"
+  pcall(function()
+    if CS.Game.Framework.Lua.BridgeApi.HasModule("UI/Windows/PatchDemoWindow") then
+      UI.register({
+        windowId = "PatchDemo",
+        prefabAddress = "PatchDemoWindow",
+        layer = 2,
+        controllerModule = "UI/Windows/PatchDemoWindow",
+        modal = false,
+        canGoBack = true,
+      })
+      patch = "PatchDemo-registered"
+    elseif CS.Game.Framework.Lua.BridgeApi.HasModule("m1_patch_message") then
+      -- 迁移旧演示保留探测，非正式 T63。
+      local extra = require("m1_patch_message")
+      patch = extra.show()
+    end
+  end)
+
+  CS.Game.Framework.Lua.BridgeApi.MarkEntryExecuted()
+  return string.format("phase=%s;ready=login;patch=%s", tostring(phase), tostring(patch))
+end
+
+function Entry.Shutdown(self)
+  pcall(function()
+    AccountService.cancelAll()
+  end)
+  pcall(function()
+    local ui = require("UI/UIManager")
+    if ui.shutdown then ui.shutdown() end
+  end)
+  pcall(function()
+    if CS.Game.Framework.Account.AccountFlow ~= nil then
+      CS.Game.Framework.Account.AccountFlow.Shutdown()
+    end
+  end)
+  -- Dispose 异常不吞：交给外层 pcall 记录，便于 Env.Dispose 验收。
+  local ok, err = pcall(function()
+    CS.Game.Framework.Account.AccountBridge.Dispose()
+  end)
+  if not ok then
+    error(err)
+  end
+end
+
+return Entry

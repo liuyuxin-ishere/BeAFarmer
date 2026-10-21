@@ -1,0 +1,290 @@
+[
+  {
+    "id": 7001,
+    "name": "短发·黑",
+    "part": "Hair",
+    "rarity": "N",
+    "source": "Initial",
+    "price": 0
+  },
+  {
+    "id": 7002,
+    "name": "双马尾·棕",
+    "part": "Hair",
+    "rarity": "N",
+    "source": "Shop",
+    "price": 200
+  },
+  {
+    "id": 7003,
+    "name": "卷发·栗",
+    "part": "Hair",
+    "rarity": "R",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7004,
+    "name": "长发·樱粉",
+    "part": "Hair",
+    "rarity": "SR",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7005,
+    "name": "星光长发",
+    "part": "Hair",
+    "rarity": "SSR",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7006,
+    "name": "白色 T 恤",
+    "part": "Top",
+    "rarity": "N",
+    "source": "Initial",
+    "price": 0
+  },
+  {
+    "id": 7007,
+    "name": "条纹衫",
+    "part": "Top",
+    "rarity": "N",
+    "source": "Shop",
+    "price": 250
+  },
+  {
+    "id": 7008,
+    "name": "针织背心",
+    "part": "Top",
+    "rarity": "R",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7009,
+    "name": "工装外套",
+    "part": "Top",
+    "rarity": "R",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7010,
+    "name": "刺绣衬衫",
+    "part": "Top",
+    "rarity": "SR",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7011,
+    "name": "牛仔短裤",
+    "part": "Bottom",
+    "rarity": "N",
+    "source": "Initial",
+    "price": 0
+  },
+  {
+    "id": 7012,
+    "name": "格子裙",
+    "part": "Bottom",
+    "rarity": "N",
+    "source": "Shop",
+    "price": 250
+  },
+  {
+    "id": 7013,
+    "name": "工装长裤",
+    "part": "Bottom",
+    "rarity": "R",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7014,
+    "name": "百褶裙",
+    "part": "Bottom",
+    "rarity": "R",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7015,
+    "name": "灯笼裤",
+    "part": "Bottom",
+    "rarity": "SR",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7016,
+    "name": "帆布鞋",
+    "part": "Shoes",
+    "rarity": "N",
+    "source": "Initial",
+    "price": 0
+  },
+  {
+    "id": 7017,
+    "name": "小皮靴",
+    "part": "Shoes",
+    "rarity": "N",
+    "source": "Shop",
+    "price": 300
+  },
+  {
+    "id": 7018,
+    "name": "绒毛靴",
+    "part": "Shoes",
+    "rarity": "R",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7019,
+    "name": "云朵运动鞋",
+    "part": "Shoes",
+    "rarity": "SR",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7020,
+    "name": "无帽",
+    "part": "Hat",
+    "rarity": "N",
+    "source": "Initial",
+    "price": 0
+  },
+  {
+    "id": 7021,
+    "name": "贝雷帽",
+    "part": "Hat",
+    "rarity": "N",
+    "source": "Shop",
+    "price": 300
+  },
+  {
+    "id": 7022,
+    "name": "渔夫帽",
+    "part": "Hat",
+    "rarity": "R",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7023,
+    "name": "兔耳发箍",
+    "part": "Hat",
+    "rarity": "R",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7024,
+    "name": "月光皇冠",
+    "part": "Hat",
+    "rarity": "SSR",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7025,
+    "name": "无饰品",
+    "part": "Acc",
+    "rarity": "N",
+    "source": "Initial",
+    "price": 0
+  },
+  {
+    "id": 7026,
+    "name": "圆框眼镜",
+    "part": "Acc",
+    "rarity": "N",
+    "source": "Shop",
+    "price": 200
+  },
+  {
+    "id": 7027,
+    "name": "小背包",
+    "part": "Acc",
+    "rarity": "R",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7028,
+    "name": "蝴蝶结",
+    "part": "Acc",
+    "rarity": "R",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7029,
+    "name": "云朵翅膀",
+    "part": "Acc",
+    "rarity": "SR",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7030,
+    "name": "星河长裙",
+    "part": "Dress",
+    "rarity": "SSR",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7101,
+    "name": "春日野餐·连衣裙",
+    "part": "Dress",
+    "rarity": "SSR",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7102,
+    "name": "春日野餐·草帽",
+    "part": "Hat",
+    "rarity": "SSR",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7103,
+    "name": "春日野餐·格纹披肩",
+    "part": "Acc",
+    "rarity": "SR",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7104,
+    "name": "春日野餐·编织篮",
+    "part": "Acc",
+    "rarity": "SR",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7105,
+    "name": "春日野餐·凉鞋",
+    "part": "Shoes",
+    "rarity": "R",
+    "source": "Gacha",
+    "price": 0
+  },
+  {
+    "id": 7106,
+    "name": "春日野餐·丝带",
+    "part": "Hair",
+    "rarity": "R",
+    "source": "Gacha",
+    "price": 0
+  }
+]

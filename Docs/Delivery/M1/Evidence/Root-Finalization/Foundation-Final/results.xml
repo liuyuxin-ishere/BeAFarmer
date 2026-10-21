@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="69" result="Passed" total="69" passed="69" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-21 06:19:23Z" end-time="2026-10-21 06:19:37Z" duration="14.6234149">
+  <test-suite type="TestSuite" id="1000" name="Farming" fullname="Farming" runstate="Runnable" testcasecount="99" result="Passed" start-time="2026-10-21 06:19:23Z" end-time="2026-10-21 06:19:37Z" duration="14.623415" total="69" passed="69" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1113" name="Game.Framework.EditModeTests.dll" fullname="E:/Workbench/UnityWorkBench/Farming/Library/ScriptAssemblies/Game.Framework.EditModeTests.dll" runstate="Runnable" testcasecount="99" result="Passed" start-time="2026-10-21 06:19:23Z" end-time="2026-10-21 06:19:37Z" duration="14.611527" total="69" passed="69" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="8968" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1114" name="Game" fullname="Game" runstate="Runnable" testcasecount="99" result="Passed" start-time="2026-10-21 06:19:23Z" end-time="2026-10-21 06:19:37Z" duration="14.610577" total="69" passed="69" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1115" name="Framework" fullname="Game.Framework" runstate="Runnable" testcasecount="99" result="Passed" start-time="2026-10-21 06:19:23Z" end-time="2026-10-21 06:19:37Z" duration="14.609789" total="69" passed="69" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1116" name="EditModeTests" fullname="Game.Framework.EditModeTests" runstate="Runnable" testcasecount="99" result="Passed" start-time="2026-10-21 06:19:23Z" end-time="2026-10-21 06:19:37Z" duration="14.609015" total="69" passed="69" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1006" name="EventBusTests" fullname="Game.Framework.EditModeTests.EventBusTests" classname="Game.Framework.EditModeTests.EventBusTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-21 06:19:23Z" end-time="2026-10-21 06:19:23Z" duration="0.051866" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1008" name="Dispose_StopsOnlyThatSubscription" fullname="Game.Framework.EditModeTests.EventBusTests.Dispose_StopsOnlyThatSubscription" methodname="Dispose_StopsOnlyThatSubscription" classname="Game.Framework.EditModeTests.EventBusTests" runstate="Runnable" seed="1633482839" result="Passed" start-time="2026-10-21 06:19:23Z" end-time="2026-10-21 06:19:23Z" duration="0.023322" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1009" name="Dispose_Twice_DoesNotThrow" fullname="Game.Framework.EditModeTests.EventBusTests.Dispose_Twice_DoesNotThrow" methodname="Dispose_Twice_DoesNotThrow" classname="Game.Framework.EditModeTests.EventBusTests" runstate="Runnable" seed="1071597289" result="Passed" start-time="2026-10-21 06:19:23Z" end-time="2026-10-21 06:19:23Z" duration="0.001669" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1010" name="Publish_OnAnotherThread_Throws" fullname="Game.Framework.EditModeTests.EventBusTests.Publish_OnAnotherThread_Throws" methodname="Publish_OnAnotherThread_Throws" classname="Game.Framework.EditModeTests.EventBusTests" runstate="Runnable" seed="2004986455" result="Passed" start-time="2026-10-21 06:19:23Z" end-time="2026-10-21 06:19:23Z" duration="0.004056" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1007" name="SubscribeOnce_ReceivesEachPublish" fullname="Game.Framework.EditModeTests.EventBusTests.SubscribeOnce_ReceivesEachPublish" methodname="SubscribeOnce_ReceivesEachPublish" classname="Game.Framework.EditModeTests.EventBusTests" runstate="Runnable" seed="428811001" result="Passed" start-time="2026-10-21 06:19:23Z" end-time="2026-10-21 06:19:23Z" duration="0.000560" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1011" name="FileLoggerTests" fullname="Game.Framework.EditModeTests.FileLoggerTests" classname="Game.Framework.EditModeTests.FileLoggerTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-21 06:19:23Z" end-time="2026-10-21 06:19:23Z" duration="0.092638" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1013" name="Dispose_LeavesReadableFile" fullname="Game.Framework.EditModeTests.FileLoggerTests.Dispose_LeavesReadableFile" methodname="Dispose_LeavesReadableFile" classname="Game.Framework.EditModeTests.FileLoggerTests" runstate="Runnable" seed="927220045" result="Passed" start-time="2026-10-21 06:19:23Z" end-time="2026-10-21 06:19:23Z" duration="0.028259" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1012" name="Roll_KeepsOnlyRetainedFiles" fullname="Game.Framework.EditModeTests.FileLoggerTests.Roll_KeepsOnlyRetainedFiles" methodname="Roll_KeepsOnlyRetainedFiles" classname="Game.Framework.EditModeTests.FileLoggerTests" runstate="Runnable" seed="1543114244" result="Passed" start-time="2026-10-21 06:19:23Z" end-time="2026-10-21 06:19:23Z" duration="0.024866" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1015" name="Write_IncludesNumericContextOnly" fullname="Game.Framework.EditModeTests.FileLoggerTests.Write_IncludesNumericContextOnly" methodname="Write_IncludesNumericContextOnly" classname="Game.Framework.EditModeTests.FileLoggerTests" runstate="Runnable" seed="161328882" result="Passed" start-time="2026-10-21 06:19:23Z" end-time="2026-10-21 06:19:23Z" duration="0.017359" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1014" name="Write_RedactsPasswordAndToken" fullname="Game.Framework.EditModeTests.FileLoggerTests.Write_RedactsPasswordAndToken" methodname="Write_RedactsPasswordAndToken" classname="Game.Framework.EditModeTests.FileLoggerTests" runstate="Runnable" seed="1626420091" result="Passed" start-time="2026-10-21 06:19:23Z" end-time="2026-10-21 06:19:23Z" duration="0.016302" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1025" name="NetClientLifecycleTests" fullname="Game.Framework.EditModeTests.NetClientLifecycleTests" classname="Game.Framework.EditModeTests.NetClientLifecycleTests" runstate="Runnable" testcasecount="11" result="Passed" start-time="2026-10-21 06:19:23Z" end-time="2026-10-21 06:19:33Z" duration="9.917611" total="11" passed="11" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1027" name="Cancel_WhileSending_EndsRequest" fullname="Game.Framework.EditModeTests.NetClientLifecycleTests.Cancel_WhileSending_EndsRequest" methodname="Cancel_WhileSending_EndsRequest" classname="Game.Framework.EditModeTests.NetClientLifecycleTests" runstate="Runnable" seed="151685144" result="Passed" start-time="2026-10-21 06:19:23Z" end-time="2026-10-21 06:19:23Z" duration="0.054809" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1031" name="CancelAfterSend_ClearsPending" fullname="Game.Framework.EditModeTests.NetClientLifecycleTests.CancelAfterSend_ClearsPending" methodname="CancelAfterSend_ClearsPending" classname="Game.Framework.EditModeTests.NetClientLifecycleTests" runstate="Runnable" seed="1233659347" result="Passed" start-time="2026-10-21 06:19:23Z" end-time="2026-10-21 06:19:23Z" duration="0.045588" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1030" name="DefaultTimeout_FailsWithTimeoutAndClearsPending" fullname="Game.Framework.EditModeTests.NetClientLifecycleTests.DefaultTimeout_FailsWithTimeoutAndClearsPending" methodname="DefaultTimeout_FailsWithTimeoutAndClearsPending" classname="Game.Framework.EditModeTests.NetClientLifecycleTests" runstate="Runnable" seed="1078347431" result="Passed" start-time="2026-10-21 06:19:23Z" end-time="2026-10-21 06:19:31Z" duration="8.065284" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1032" name="Disconnect_FailsEveryPending_AndRepeatIsSafe" fullname="Game.Framework.EditModeTests.NetClientLifecycleTests.Disconnect_FailsEveryPending_AndRepeatIsSafe" methodname="Disconnect_FailsEveryPending_AndRepeatIsSafe" classname="Game.Framework.EditModeTests.NetClientLifecycleTests" runstate="Runnable" seed="1185163171" result="Passed" start-time="2026-10-21 06:19:31Z" end-time="2026-10-21 06:19:31Z" duration="0.047444" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1034" name="LatePacket_AfterDisconnect_DoesNotCompleteNewRequest" fullname="Game.Framework.EditModeTests.NetClientLifecycleTests.LatePacket_AfterDisconnect_DoesNotCompleteNewRequest" methodname="LatePacket_AfterDisconnect_DoesNotCompleteNewRequest" classname="Game.Framework.EditModeTests.NetClientLifecycleTests" runstate="Runnable" seed="2138752295" result="Passed" start-time="2026-10-21 06:19:31Z" end-time="2026-10-21 06:19:31Z" duration="0.098724" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1029" name="OldCleanup_DoesNotCloseReplacementConnection" fullname="Game.Framework.EditModeTests.NetClientLifecycleTests.OldCleanup_DoesNotCloseReplacementConnection" methodname="OldCleanup_DoesNotCloseReplacementConnection" classname="Game.Framework.EditModeTests.NetClientLifecycleTests" runstate="Runnable" seed="784776798" result="Passed" start-time="2026-10-21 06:19:31Z" end-time="2026-10-21 06:19:31Z" duration="0.149665" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1035" name="OldTimeout_DoesNotFailTheReplacementRequest" fullname="Game.Framework.EditModeTests.NetClientLifecycleTests.OldTimeout_DoesNotFailTheReplacementRequest" methodname="OldTimeout_DoesNotFailTheReplacementRequest" classname="Game.Framework.EditModeTests.NetClientLifecycleTests" runstate="Runnable" seed="1191222591" result="Passed" start-time="2026-10-21 06:19:31Z" end-time="2026-10-21 06:19:32Z" duration="0.550509" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1036" name="RemoteClose_EndsThePendingRequest" fullname="Game.Framework.EditModeTests.NetClientLifecycleTests.RemoteClose_EndsThePendingRequest" methodname="RemoteClose_EndsThePendingRequest" classname="Game.Framework.EditModeTests.NetClientLifecycleTests" runstate="Runnable" seed="1316095181" result="Passed" start-time="2026-10-21 06:19:32Z" end-time="2026-10-21 06:19:32Z" duration="0.150058" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1033" name="Success_IsNotTimedOutLater" fullname="Game.Framework.EditModeTests.NetClientLifecycleTests.Success_IsNotTimedOutLater" methodname="Success_IsNotTimedOutLater" classname="Game.Framework.EditModeTests.NetClientLifecycleTests" runstate="Runnable" seed="646174122" result="Passed" start-time="2026-10-21 06:19:32Z" end-time="2026-10-21 06:19:32Z" duration="0.600235" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1026" name="Timeout_WhileSending_EndsRequest" fullname="Game.Framework.EditModeTests.NetClientLifecycleTests.Timeout_WhileSending_EndsRequest" methodname="Timeout_WhileSending_EndsRequest" classname="Game.Framework.EditModeTests.NetClientLifecycleTests" runstate="Runnable" seed="1507437360" result="Passed" start-time="2026-10-21 06:19:32Z" end-time="2026-10-21 06:19:33Z" duration="0.101651" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1028" name="ZeroTimeout_WhileSending_EndsWithTimeout" fullname="Game.Framework.EditModeTests.NetClientLifecycleTests.ZeroTimeout_WhileSending_EndsWithTimeout" methodname="ZeroTimeout_WhileSending_EndsWithTimeout" classname="Game.Framework.EditModeTests.NetClientLifecycleTests" runstate="Runnable" seed="992996763" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.049562" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1037" name="NetClientPendingTests" fullname="Game.Framework.EditModeTests.NetClientPendingTests" classname="Game.Framework.EditModeTests.NetClientPendingTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.249511" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1042" name="DuplicateResponse_CompletesOnce" fullname="Game.Framework.EditModeTests.NetClientPendingTests.DuplicateResponse_CompletesOnce" methodname="DuplicateResponse_CompletesOnce" classname="Game.Framework.EditModeTests.NetClientPendingTests" runstate="Runnable" seed="133239605" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.047082" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1040" name="OldGeneration_DoesNotCompleteTheNewRequest" fullname="Game.Framework.EditModeTests.NetClientPendingTests.OldGeneration_DoesNotCompleteTheNewRequest" methodname="OldGeneration_DoesNotCompleteTheNewRequest" classname="Game.Framework.EditModeTests.NetClientPendingTests" runstate="Runnable" seed="689871973" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.051081" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1038" name="OutOfOrderResponses_CompleteTheirOwnRequests" fullname="Game.Framework.EditModeTests.NetClientPendingTests.OutOfOrderResponses_CompleteTheirOwnRequests" methodname="OutOfOrderResponses_CompleteTheirOwnRequests" classname="Game.Framework.EditModeTests.NetClientPendingTests" runstate="Runnable" seed="1013067408" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.051458" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1043" name="OversizeRequest_DoesNotLeavePending" fullname="Game.Framework.EditModeTests.NetClientPendingTests.OversizeRequest_DoesNotLeavePending" methodname="OversizeRequest_DoesNotLeavePending" classname="Game.Framework.EditModeTests.NetClientPendingTests" runstate="Runnable" seed="1432368458" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.003772" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1041" name="PushSeqZero_DoesNotTouchPending" fullname="Game.Framework.EditModeTests.NetClientPendingTests.PushSeqZero_DoesNotTouchPending" methodname="PushSeqZero_DoesNotTouchPending" classname="Game.Framework.EditModeTests.NetClientPendingTests" runstate="Runnable" seed="1366861132" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.046188" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1039" name="WrongMsgId_LeavesPending_UntilMatchingResponse" fullname="Game.Framework.EditModeTests.NetClientPendingTests.WrongMsgId_LeavesPending_UntilMatchingResponse" methodname="WrongMsgId_LeavesPending_UntilMatchingResponse" classname="Game.Framework.EditModeTests.NetClientPendingTests" runstate="Runnable" seed="987558085" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.047429" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1044" name="ObjectPoolTests" fullname="Game.Framework.EditModeTests.ObjectPoolTests" classname="Game.Framework.EditModeTests.ObjectPoolTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.005494" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1046" name="Rent_AfterReturn_HasNoDirtyState" fullname="Game.Framework.EditModeTests.ObjectPoolTests.Rent_AfterReturn_HasNoDirtyState" methodname="Rent_AfterReturn_HasNoDirtyState" classname="Game.Framework.EditModeTests.ObjectPoolTests" runstate="Runnable" seed="273375137" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.001396" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1048" name="Return_BeyondMaxRetained_DropsExtraInstance" fullname="Game.Framework.EditModeTests.ObjectPoolTests.Return_BeyondMaxRetained_DropsExtraInstance" methodname="Return_BeyondMaxRetained_DropsExtraInstance" classname="Game.Framework.EditModeTests.ObjectPoolTests" runstate="Runnable" seed="704379657" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.000603" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1045" name="Return_RunsReset" fullname="Game.Framework.EditModeTests.ObjectPoolTests.Return_RunsReset" methodname="Return_RunsReset" classname="Game.Framework.EditModeTests.ObjectPoolTests" runstate="Runnable" seed="804141783" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.000284" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1047" name="Return_Twice_Throws" fullname="Game.Framework.EditModeTests.ObjectPoolTests.Return_Twice_Throws" methodname="Return_Twice_Throws" classname="Game.Framework.EditModeTests.ObjectPoolTests" runstate="Runnable" seed="977707726" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.000739" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1049" name="OpIdStoreTests" fullname="Game.Framework.EditModeTests.OpIdStoreTests" classname="Game.Framework.EditModeTests.OpIdStoreTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.613452" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1056" name="CorruptFile_DoesNotResetToZero" fullname="Game.Framework.EditModeTests.OpIdStoreTests.CorruptFile_DoesNotResetToZero" methodname="CorruptFile_DoesNotResetToZero" classname="Game.Framework.EditModeTests.OpIdStoreTests" runstate="Runnable" seed="1151624159" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.029010" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1054" name="DifferentPlayers_AllocateIndependently" fullname="Game.Framework.EditModeTests.OpIdStoreTests.DifferentPlayers_AllocateIndependently" methodname="DifferentPlayers_AllocateIndependently" classname="Game.Framework.EditModeTests.OpIdStoreTests" runstate="Runnable" seed="1388190332" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.060786" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1057" name="LongMax_RefusesAnotherIdWithoutWrap" fullname="Game.Framework.EditModeTests.OpIdStoreTests.LongMax_RefusesAnotherIdWithoutWrap" methodname="LongMax_RefusesAnotherIdWithoutWrap" classname="Game.Framework.EditModeTests.OpIdStoreTests" runstate="Runnable" seed="977758576" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.050234" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1050" name="Next_IncrementsPerPlayer_AndReadLastDoesNotAllocate" fullname="Game.Framework.EditModeTests.OpIdStoreTests.Next_IncrementsPerPlayer_AndReadLastDoesNotAllocate" methodname="Next_IncrementsPerPlayer_AndReadLastDoesNotAllocate" classname="Game.Framework.EditModeTests.OpIdStoreTests" runstate="Runnable" seed="1624875569" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.013725" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1051" name="RecreatedStore_ReadsLastAndContinues" fullname="Game.Framework.EditModeTests.OpIdStoreTests.RecreatedStore_ReadsLastAndContinues" methodname="RecreatedStore_ReadsLastAndContinues" classname="Game.Framework.EditModeTests.OpIdStoreTests" runstate="Runnable" seed="378300140" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.019290" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1052" name="SamePlayer_ParallelNext_HasNoDuplicates" fullname="Game.Framework.EditModeTests.OpIdStoreTests.SamePlayer_ParallelNext_HasNoDuplicates" methodname="SamePlayer_ParallelNext_HasNoDuplicates" classname="Game.Framework.EditModeTests.OpIdStoreTests" runstate="Runnable" seed="1303637829" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.192861" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1053" name="TwoStores_SameDirectory_DoNotRepeat" fullname="Game.Framework.EditModeTests.OpIdStoreTests.TwoStores_SameDirectory_DoNotRepeat" methodname="TwoStores_SameDirectory_DoNotRepeat" classname="Game.Framework.EditModeTests.OpIdStoreTests" runstate="Runnable" seed="1417624589" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.226387" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1055" name="WriteFailure_ThrowsWithoutIssuing_ThenContinues" fullname="Game.Framework.EditModeTests.OpIdStoreTests.WriteFailure_ThrowsWithoutIssuing_ThenContinues" methodname="WriteFailure_ThrowsWithoutIssuing_ThenContinues" classname="Game.Framework.EditModeTests.OpIdStoreTests" runstate="Runnable" seed="800909583" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:33Z" duration="0.016912" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1070" name="TcpTransportReceiveTests" fullname="Game.Framework.EditModeTests.TcpTransportReceiveTests" classname="Game.Framework.EditModeTests.TcpTransportReceiveTests" runstate="Runnable" testcasecount="11" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:34Z" duration="0.456731" total="11" passed="11" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1076" name="CancelAndClose_StopTheLoop" fullname="Game.Framework.EditModeTests.TcpTransportReceiveTests.CancelAndClose_StopTheLoop" methodname="CancelAndClose_StopTheLoop" classname="Game.Framework.EditModeTests.TcpTransportReceiveTests" runstate="Runnable" seed="377850683" result="Passed" start-time="2026-10-21 06:19:33Z" end-time="2026-10-21 06:19:34Z" duration="0.049974" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1072" name="Coalesce_AndBoundarySplit_KeepOrder" fullname="Game.Framework.EditModeTests.TcpTransportReceiveTests.Coalesce_AndBoundarySplit_KeepOrder" methodname="Coalesce_AndBoundarySplit_KeepOrder" classname="Game.Framework.EditModeTests.TcpTransportReceiveTests" runstate="Runnable" seed="679017879" result="Passed" start-time="2026-10-21 06:19:34Z" end-time="2026-10-21 06:19:34Z" duration="0.005002" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1080" name="Dispatch_CallbackFailureKeepsUnconsumedPackets" fullname="Game.Framework.EditModeTests.TcpTransportReceiveTests.Dispatch_CallbackFailureKeepsUnconsumedPackets" methodname="Dispatch_CallbackFailureKeepsUnconsumedPackets" classname="Game.Framework.EditModeTests.TcpTransportReceiveTests" runstate="Runnable" seed="97190593" result="Passed" start-time="2026-10-21 06:19:34Z" end-time="2026-10-21 06:19:34Z" duration="0.000946" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1079" name="Dispatch_UpdatesModelOnlyOnOwnerThreadInOrder" fullname="Game.Framework.EditModeTests.TcpTransportReceiveTests.Dispatch_UpdatesModelOnlyOnOwnerThreadInOrder" methodname="Dispatch_UpdatesModelOnlyOnOwnerThreadInOrder" classname="Game.Framework.EditModeTests.TcpTransportReceiveTests" runstate="Runnable" seed="341259117" result="Passed" start-time="2026-10-21 06:19:34Z" end-time="2026-10-21 06:19:34Z" duration="0.044214" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1073" name="EmptyBody_IsOwnedEmptyArray" fullname="Game.Framework.EditModeTests.TcpTransportReceiveTests.EmptyBody_IsOwnedEmptyArray" methodname="EmptyBody_IsOwnedEmptyArray" classname="Game.Framework.EditModeTests.TcpTransportReceiveTests" runstate="Runnable" seed="639929702" result="Passed" start-time="2026-10-21 06:19:34Z" end-time="2026-10-21 06:19:34Z" duration="0.001722" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1075" name="Eof_CompletesWithoutPackets" fullname="Game.Framework.EditModeTests.TcpTransportReceiveTests.Eof_CompletesWithoutPackets" methodname="Eof_CompletesWithoutPackets" classname="Game.Framework.EditModeTests.TcpTransportReceiveTests" runstate="Runnable" seed="1982371302" result="Passed" start-time="2026-10-21 06:19:34Z" end-time="2026-10-21 06:19:34Z" duration="0.001624" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1074" name="InvalidLength_RetiresConnection" fullname="Game.Framework.EditModeTests.TcpTransportReceiveTests.InvalidLength_RetiresConnection" methodname="InvalidLength_RetiresConnection" classname="Game.Framework.EditModeTests.TcpTransportReceiveTests" runstate="Runnable" seed="1434628063" result="Passed" start-time="2026-10-21 06:19:34Z" end-time="2026-10-21 06:19:34Z" duration="0.001507" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1081" name="LocalTcp_DispatchesEmptyBodyThenPayload" fullname="Game.Framework.EditModeTests.TcpTransportReceiveTests.LocalTcp_DispatchesEmptyBodyThenPayload" methodname="LocalTcp_DispatchesEmptyBodyThenPayload" classname="Game.Framework.EditModeTests.TcpTransportReceiveTests" runstate="Runnable" seed="156262020" result="Passed" start-time="2026-10-21 06:19:34Z" end-time="2026-10-21 06:19:34Z" duration="0.244858" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1078" name="OldConnection_DoesNotDeliverIntoReplacement" fullname="Game.Framework.EditModeTests.TcpTransportReceiveTests.OldConnection_DoesNotDeliverIntoReplacement" methodname="OldConnection_DoesNotDeliverIntoReplacement" classname="Game.Framework.EditModeTests.TcpTransportReceiveTests" runstate="Runnable" seed="610638133" result="Passed" start-time="2026-10-21 06:19:34Z" end-time="2026-10-21 06:19:34Z" duration="0.049689" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1077" name="SecondReceive_WhileRunning_IsRejected" fullname="Game.Framework.EditModeTests.TcpTransportReceiveTests.SecondReceive_WhileRunning_IsRejected" methodname="SecondReceive_WhileRunning_IsRejected" classname="Game.Framework.EditModeTests.TcpTransportReceiveTests" runstate="Runnable" seed="2040470400" result="Passed" start-time="2026-10-21 06:19:34Z" end-time="2026-10-21 06:19:34Z" duration="0.050026" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1071" name="Split_EveryChunkSize_DecodesSamePacket" fullname="Game.Framework.EditModeTests.TcpTransportReceiveTests.Split_EveryChunkSize_DecodesSamePacket" methodname="Split_EveryChunkSize_DecodesSamePacket" classname="Game.Framework.EditModeTests.TcpTransportReceiveTests" runstate="Runnable" seed="821881419" result="Passed" start-time="2026-10-21 06:19:34Z" end-time="2026-10-21 06:19:34Z" duration="0.002136" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1082" name="TcpTransportTests" fullname="Game.Framework.EditModeTests.TcpTransportTests" classname="Game.Framework.EditModeTests.TcpTransportTests" runstate="Runnable" testcasecount="17" result="Passed" start-time="2026-10-21 06:19:34Z" end-time="2026-10-21 06:19:37Z" duration="3.202067" total="17" passed="17" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1086" name="Cancel_AfterPartialSend_RetiresConnection" fullname="Game.Framework.EditModeTests.TcpTransportTests.Cancel_AfterPartialSend_RetiresConnection" methodname="Cancel_AfterPartialSend_RetiresConnection" classname="Game.Framework.EditModeTests.TcpTransportTests" runstate="Runnable" seed="728864340" result="Passed" start-time="2026-10-21 06:19:34Z" end-time="2026-10-21 06:19:34Z" duration="0.045226" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1087" name="Cancel_BeforeAnyByte_KeepsConnection" fullname="Game.Framework.EditModeTests.TcpTransportTests.Cancel_BeforeAnyByte_KeepsConnection" methodname="Cancel_BeforeAnyByte_KeepsConnection" classname="Game.Framework.EditModeTests.TcpTransportTests" runstate="Runnable" seed="1205858585" result="Passed" start-time="2026-10-21 06:19:34Z" end-time="2026-10-21 06:19:34Z" duration="0.048880" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1098" name="Cancel_DuringSend_ObjectDisposed_IsCancellation" fullname="Game.Framework.EditModeTests.TcpTransportTests.Cancel_DuringSend_ObjectDisposed_IsCancellation" methodname="Cancel_DuringSend_ObjectDisposed_IsCancellation" classname="Game.Framework.EditModeTests.TcpTransportTests" runstate="Runnable" seed="749098263" result="Passed" start-time="2026-10-21 06:19:34Z" end-time="2026-10-21 06:19:34Z" duration="0.002706" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1092" name="Close_DuringConnect_DoesNotRevive" fullname="Game.Framework.EditModeTests.TcpTransportTests.Close_DuringConnect_DoesNotRevive" methodname="Close_DuringConnect_DoesNotRevive" classname="Game.Framework.EditModeTests.TcpTransportTests" runstate="Runnable" seed="851566479" result="Passed" start-time="2026-10-21 06:19:34Z" end-time="2026-10-21 06:19:34Z" duration="0.046439" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1089" name="Close_IsIdempotentAndFinishesPending" fullname="Game.Framework.EditModeTests.TcpTransportTests.Close_IsIdempotentAndFinishesPending" methodname="Close_IsIdempotentAndFinishesPending" classname="Game.Framework.EditModeTests.TcpTransportTests" runstate="Runnable" seed="315906789" result="Passed" start-time="2026-10-21 06:19:34Z" end-time="2026-10-21 06:19:34Z" duration="0.050014" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1085" name="ConcurrentSend_WritesWholeFramesInOrder" fullname="Game.Framework.EditModeTests.TcpTransportTests.ConcurrentSend_WritesWholeFramesInOrder" methodname="ConcurrentSend_WritesWholeFramesInOrder" classname="Game.Framework.EditModeTests.TcpTransportTests" runstate="Runnable" seed="790727027" result="Passed" start-time="2026-10-21 06:19:34Z" end-time="2026-10-21 06:19:34Z" duration="0.099712" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1094" name="Connect_CanceledCallerCannotAttachLateSocket" fullname="Game.Framework.EditModeTests.TcpTransportTests.Connect_CanceledCallerCannotAttachLateSocket" methodname="Connect_CanceledCallerCannotAttachLateSocket" classname="Game.Framework.EditModeTests.TcpTransportTests" runstate="Runnable" seed="1097988379" result="Passed" start-time="2026-10-21 06:19:34Z" end-time="2026-10-21 06:19:34Z" duration="0.050225" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1099" name="Connect_Refused_LeavesTransportClosed" fullname="Game.Framework.EditModeTests.TcpTransportTests.Connect_Refused_LeavesTransportClosed" methodname="Connect_Refused_LeavesTransportClosed" classname="Game.Framework.EditModeTests.TcpTransportTests" runstate="Runnable" seed="458745633" result="Passed" start-time="2026-10-21 06:19:34Z" end-time="2026-10-21 06:19:36Z" duration="2.052759" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1091" name="Connect_SendsToLocalListener_AndCloseBlocksFurtherSend" fullname="Game.Framework.EditModeTests.TcpTransportTests.Connect_SendsToLocalListener_AndCloseBlocksFurtherSend" methodname="Connect_SendsToLocalListener_AndCloseBlocksFurtherSend" classname="Game.Framework.EditModeTests.TcpTransportTests" runstate="Runnable" seed="321818051" result="Passed" start-time="2026-10-21 06:19:36Z" end-time="2026-10-21 06:19:37Z" duration="0.200395" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1083" name="Endpoint_RejectsEmptyHostAndOutOfRangePort" fullname="Game.Framework.EditModeTests.TcpTransportTests.Endpoint_RejectsEmptyHostAndOutOfRangePort" methodname="Endpoint_RejectsEmptyHostAndOutOfRangePort" classname="Game.Framework.EditModeTests.TcpTransportTests" runstate="Runnable" seed="881528676" result="Passed" start-time="2026-10-21 06:19:37Z" end-time="2026-10-21 06:19:37Z" duration="0.000546" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1088" name="Failure_AfterPartialSend_DropsQueuedFrame" fullname="Game.Framework.EditModeTests.TcpTransportTests.Failure_AfterPartialSend_DropsQueuedFrame" methodname="Failure_AfterPartialSend_DropsQueuedFrame" classname="Game.Framework.EditModeTests.TcpTransportTests" runstate="Runnable" seed="1701154602" result="Passed" start-time="2026-10-21 06:19:37Z" end-time="2026-10-21 06:19:37Z" duration="0.048947" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1093" name="LateConnect_DoesNotReplaceNewConnection" fullname="Game.Framework.EditModeTests.TcpTransportTests.LateConnect_DoesNotReplaceNewConnection" methodname="LateConnect_DoesNotReplaceNewConnection" classname="Game.Framework.EditModeTests.TcpTransportTests" runstate="Runnable" seed="793815169" result="Passed" start-time="2026-10-21 06:19:37Z" end-time="2026-10-21 06:19:37Z" duration="0.099630" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1090" name="OldConnection_DoesNotWriteIntoReplacement" fullname="Game.Framework.EditModeTests.TcpTransportTests.OldConnection_DoesNotWriteIntoReplacement" methodname="OldConnection_DoesNotWriteIntoReplacement" classname="Game.Framework.EditModeTests.TcpTransportTests" runstate="Runnable" seed="1699809886" result="Passed" start-time="2026-10-21 06:19:37Z" end-time="2026-10-21 06:19:37Z" duration="0.150041" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1084" name="PartialSend_KeepsEveryByte" fullname="Game.Framework.EditModeTests.TcpTransportTests.PartialSend_KeepsEveryByte" methodname="PartialSend_KeepsEveryByte" classname="Game.Framework.EditModeTests.TcpTransportTests" runstate="Runnable" seed="55862021" result="Passed" start-time="2026-10-21 06:19:37Z" end-time="2026-10-21 06:19:37Z" duration="0.099928" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1095" name="SecondConnect_WhileConnecting_IsRejected" fullname="Game.Framework.EditModeTests.TcpTransportTests.SecondConnect_WhileConnecting_IsRejected" methodname="SecondConnect_WhileConnecting_IsRejected" classname="Game.Framework.EditModeTests.TcpTransportTests" runstate="Runnable" seed="641462607" result="Passed" start-time="2026-10-21 06:19:37Z" end-time="2026-10-21 06:19:37Z" duration="0.100151" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1097" name="Send_CountAboveRequest_RetiresConnection" fullname="Game.Framework.EditModeTests.TcpTransportTests.Send_CountAboveRequest_RetiresConnection" methodname="Send_CountAboveRequest_RetiresConnection" classname="Game.Framework.EditModeTests.TcpTransportTests" runstate="Runnable" seed="1820112744" result="Passed" start-time="2026-10-21 06:19:37Z" end-time="2026-10-21 06:19:37Z" duration="0.050059" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1096" name="Send_ZeroBytes_RetiresConnection" fullname="Game.Framework.EditModeTests.TcpTransportTests.Send_ZeroBytes_RetiresConnection" methodname="Send_ZeroBytes_RetiresConnection" classname="Game.Framework.EditModeTests.TcpTransportTests" runstate="Runnable" seed="1845972418" result="Passed" start-time="2026-10-21 06:19:37Z" end-time="2026-10-21 06:19:37Z" duration="0.050143" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1100" name="TimerServiceTests" fullname="Game.Framework.EditModeTests.TimerServiceTests" classname="Game.Framework.EditModeTests.TimerServiceTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-21 06:19:37Z" end-time="2026-10-21 06:19:37Z" duration="0.006812" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1104" name="Cancel_OldGenerationDoesNotStopReplacement" fullname="Game.Framework.EditModeTests.TimerServiceTests.Cancel_OldGenerationDoesNotStopReplacement" methodname="Cancel_OldGenerationDoesNotStopReplacement" classname="Game.Framework.EditModeTests.TimerServiceTests" runstate="Runnable" seed="871338903" result="Passed" start-time="2026-10-21 06:19:37Z" end-time="2026-10-21 06:19:37Z" duration="0.002137" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1102" name="Cancel_PreventsCallback" fullname="Game.Framework.EditModeTests.TimerServiceTests.Cancel_PreventsCallback" methodname="Cancel_PreventsCallback" classname="Game.Framework.EditModeTests.TimerServiceTests" runstate="Runnable" seed="1547121191" result="Passed" start-time="2026-10-21 06:19:37Z" end-time="2026-10-21 06:19:37Z" duration="0.000317" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1103" name="Schedule_RejectsNonPositiveRepeatDelay" fullname="Game.Framework.EditModeTests.TimerServiceTests.Schedule_RejectsNonPositiveRepeatDelay" methodname="Schedule_RejectsNonPositiveRepeatDelay" classname="Game.Framework.EditModeTests.TimerServiceTests" runstate="Runnable" seed="1389607432" result="Passed" start-time="2026-10-21 06:19:37Z" end-time="2026-10-21 06:19:37Z" duration="0.000548" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1101" name="Tick_FiresWhileTimeScaleIsZero" fullname="Game.Framework.EditModeTests.TimerServiceTests.Tick_FiresWhileTimeScaleIsZero" methodname="Tick_FiresWhileTimeScaleIsZero" classname="Game.Framework.EditModeTests.TimerServiceTests" runstate="Runnable" seed="442015254" result="Passed" start-time="2026-10-21 06:19:37Z" end-time="2026-10-21 06:19:37Z" duration="0.001049" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Saving results to: C:/Users/Lenovo/AppData/LocalLow/DefaultCompany/Farming\TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

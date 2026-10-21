@@ -1,0 +1,19 @@
+{
+  "appVersion": "0.3.0",
+  "resVersion": 100,
+  "protoVersion": 1,
+  "bridgeContract": "m1-bridge-0.3",
+  "exeSha256": "29ab39aae700ec2503f7b7fe7de2d853e661c5588c5a225c540ad81474dcd0f1",
+  "gameAssemblySha256": "91b7d8f7a1fdc110e04f18b8ac6c21c1ddf390eba28a0f0dfac7456d7be5d079",
+  "globalMetadataSha256": "cd94d993b9f329d566ccf413dac999b5c78d816d0a0588310558227ef4c409a9",
+  "bridgeApiCs": "b81e1a9380c7f9dde5ebb1a6a961a20a8749bde771d2d2e15b5693812cf9162f",
+  "luaGenConfigCs": "47c1c1596346d2f8e02f3d739c10a14b3284798a8ad5d212dc3034a76d9058b8",
+  "accountBridgeCs": "17161ee00814866184ce16ac2539a256061e640247ab3892b7c92a44ffd5f56b",
+  "accountSessionCs": "e06677ee237525eef360218ac3a791e40024211bfa341ecc1a00048254e87f08",
+  "accountProto": "",
+  "linkXml": "0c6b0d8215a5ae4263930667d1fa8da186025985ddacdfccccbf548e5974122d",
+  "catalogSha256": "2657073866bc0a0ff06dac72990e9b815c83dc30c5758e393cc50d6ee4aae2bc",
+  "unityVersion": "6000.3.22f1",
+  "scriptingBackend": "IL2CPP",
+  "when": "2026-10-21T06:13:11.3562235Z"
+}

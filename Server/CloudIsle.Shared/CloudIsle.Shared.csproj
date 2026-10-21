@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <!-- 与 Unity 6000.3 能编译的共享代码对齐；不用 latest，避免 SDK 10 放进更高语法。 -->
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <RootNamespace>CloudIsle</RootNamespace>
+    <!-- 与 Unity asmdef 程序集名一致，便于对照 -->
+    <AssemblyName>Game.Shared</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <!-- 与客户端共用同一份源码：Assets/Shared -->
+  <ItemGroup>
+    <Compile Include="..\..\Assets\Shared\**\*.cs" LinkBase="Shared" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 版本与 Assets/Plugins/Google.Protobuf/Google.Protobuf.dll (3.21.12) 对齐 -->
+    <PackageReference Include="Google.Protobuf" Version="3.21.12" />
+  </ItemGroup>
+</Project>

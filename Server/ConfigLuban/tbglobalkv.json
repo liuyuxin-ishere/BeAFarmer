@@ -1,0 +1,90 @@
+[
+  {
+    "key": "bag_init_slots",
+    "value": "60"
+  },
+  {
+    "key": "bag_expand_step",
+    "value": "10"
+  },
+  {
+    "key": "bag_expand_costs",
+    "value": "[500,1000,2000,4000,8000]"
+  },
+  {
+    "key": "stack_default",
+    "value": "99"
+  },
+  {
+    "key": "water_ratio",
+    "value": "0.1"
+  },
+  {
+    "key": "fertilize_ratio",
+    "value": "0.3"
+  },
+  {
+    "key": "speedup_sec_per_gem",
+    "value": "300"
+  },
+  {
+    "key": "daily_reset_hour",
+    "value": "0"
+  },
+  {
+    "key": "order_daily_count",
+    "value": "6"
+  },
+  {
+    "key": "order_reroll_free",
+    "value": "1"
+  },
+  {
+    "key": "order_reroll_costs",
+    "value": "[50,100,150,300]"
+  },
+  {
+    "key": "order_ticket_at_3",
+    "value": "1"
+  },
+  {
+    "key": "order_ticket_at_6",
+    "value": "1"
+  },
+  {
+    "key": "order_all_done_gem",
+    "value": "20"
+  },
+  {
+    "key": "rare_bonus_chance",
+    "value": "0.1"
+  },
+  {
+    "key": "plaza_unlock_level",
+    "value": "7"
+  },
+  {
+    "key": "gacha_unlock_level",
+    "value": "9"
+  },
+  {
+    "key": "plaza_line_capacity",
+    "value": "100"
+  },
+  {
+    "key": "chat_interval_sec",
+    "value": "3"
+  },
+  {
+    "key": "new_player_gold",
+    "value": "200"
+  },
+  {
+    "key": "new_player_gem",
+    "value": "300"
+  },
+  {
+    "key": "new_player_ticket",
+    "value": "5"
+  }
+]

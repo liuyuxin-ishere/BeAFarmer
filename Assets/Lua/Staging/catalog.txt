@@ -1,0 +1,23 @@
+{
+  "resVersion": "101",
+  "entryModule": "entry",
+  "configAddress": "cfg_runtime",
+  "configSha256": "0e0665c96d589a0d6fd5c4d002ac84af6994a1d29bd8c8649bbfd59be4da69c6",
+  "bridgeContract": "m1-bridge-0.3",
+  "requiredAppVersion": "0.3.0",
+  "protoVersion": 1,
+  "modules": [
+    {"name":"entry","address":"entry","sha256":"6f35f1dcb9b4c7ae3f31a96040a5ae892e205808f29efc636803276d9cbad894"},
+    {"name":"AccountService","address":"AccountService","sha256":"b6580e36b9ed4f6191cb6c472524ce38a849554609af93c3375dcc7eb68eea4c"},
+    {"name":"PlayerModel","address":"PlayerModel","sha256":"6a478f682d67a0904a2d7774eb88903666e96ea04bf14d6bfd225c2df286b642"},
+    {"name":"Json","address":"Json","sha256":"d87d7d3e1924c72aa6b54b6ad6f30163ceca66aa00e58a5f6df644d1e31dbae2"},
+    {"name":"panel_base","address":"panel_base","sha256":"b8cf93c31a84eccf1527089a9c419cea158f416813bade10dd7cbd90d5a116b8"},
+    {"name":"UI/UIManager","address":"UIManager","sha256":"54332ba12a3951d17d6975a606dcc66a3cb8169e0a41d103e9c4419b26b75ecf"},
+    {"name":"UI/UIWindow","address":"UIWindow","sha256":"f3cf1d8b62be9ca40715493d4ad939e99a6e6817e739a741468634f77cef8615"},
+    {"name":"UI/DialogService","address":"DialogService","sha256":"e508854d40e809590de11c7025314bcda046f16c50e82f9d7a43e98758a71a6d"},
+    {"name":"UI/ToastService","address":"ToastService","sha256":"46f8a3466d691f1b93738377af82b313e0a589ae5ff2c7a132dc2f12335211aa"},
+    {"name":"UI/Windows/LoginWindow","address":"LoginWindow","sha256":"d636e9aff926f3b834e56d4840a5dba12905b6d556d3ad7bb5019cffebb112cf"},
+    {"name":"UI/Windows/HomeHudWindow","address":"HomeHudWindow","sha256":"afd9d1493bdb9a1e52d61414eb222174e624ec2f2786664b0c7cc890395c09da"},
+    {"name":"UI/Windows/PatchDemoWindow","address":"PatchDemoWindow","sha256":"cf4b3eb0dfc73f09f0602127577d1d7f18edbaaa7257401024be5def78fb73f4"}
+  ]
+}

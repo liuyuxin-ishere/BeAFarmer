@@ -1,0 +1,102 @@
+[
+  {
+    "key": "bag_init_slots",
+    "value": "60",
+    "desc": "背包初始格数"
+  },
+  {
+    "key": "bag_expand_step",
+    "value": "10",
+    "desc": "每次扩容格数"
+  },
+  {
+    "key": "bag_expand_costs",
+    "value": "500;1000;2000;4000;8000",
+    "desc": "第 1~5 次扩容金币（最高 110 格）"
+  },
+  {
+    "key": "stack_default",
+    "value": "99",
+    "desc": "默认堆叠上限"
+  },
+  {
+    "key": "water_ratio",
+    "value": "0.1",
+    "desc": "浇水缩短剩余时间比例（每块地限 1 次）"
+  },
+  {
+    "key": "fertilize_ratio",
+    "value": "0.3",
+    "desc": "施肥缩短剩余时间比例（每块地限 1 次）"
+  },
+  {
+    "key": "speedup_sec_per_gem",
+    "value": "300",
+    "desc": "加工加速：每 300 秒剩余时间 1 钻石，向上取整，最少 1"
+  },
+  {
+    "key": "daily_reset_hour",
+    "value": "0",
+    "desc": "每日刷新时刻（服务器时区 UTC+8）"
+  },
+  {
+    "key": "order_daily_count",
+    "value": "6",
+    "desc": "日常订单数"
+  },
+  {
+    "key": "order_reroll_free",
+    "value": "1",
+    "desc": "每日免费刷新次数"
+  },
+  {
+    "key": "order_reroll_costs",
+    "value": "50;100;150;300",
+    "desc": "第 2 次起刷新费用（第 4 次及以后均为 300）"
+  },
+  {
+    "key": "order_ticket_reward",
+    "value": "3:1;6:1",
+    "desc": "每日完成 3 / 6 条订单各得 1 抽卡券（完成数:券数）"
+  },
+  {
+    "key": "order_all_done_gem",
+    "value": "20",
+    "desc": "每日 6 条全部完成额外钻石"
+  },
+  {
+    "key": "plaza_unlock_level",
+    "value": "7",
+    "desc": "广场开放等级"
+  },
+  {
+    "key": "gacha_unlock_level",
+    "value": "9",
+    "desc": "抽卡开放等级"
+  },
+  {
+    "key": "plaza_line_capacity",
+    "value": "100",
+    "desc": "分线人数上限"
+  },
+  {
+    "key": "chat_interval_sec",
+    "value": "3",
+    "desc": "聊天最短间隔（秒）"
+  },
+  {
+    "key": "new_player_gold",
+    "value": "200",
+    "desc": "新手初始金币"
+  },
+  {
+    "key": "new_player_gem",
+    "value": "300",
+    "desc": "新手初始钻石"
+  },
+  {
+    "key": "new_player_ticket",
+    "value": "5",
+    "desc": "新手初始抽卡券"
+  }
+]

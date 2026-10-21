@@ -1,0 +1,25 @@
+-- Lua 窗口控制器基类约定（普通表钩子，由 UiManager 单点调用）。
+
+local UIWindow = {}
+UIWindow.__index = UIWindow
+
+function UIWindow.new()
+  return setmetatable({}, UIWindow)
+end
+
+function UIWindow:OnCreate(view)
+  self.view = view
+end
+
+function UIWindow:OnOpen(argsJson)
+  self.argsJson = argsJson
+end
+
+function UIWindow:OnClose()
+end
+
+function UIWindow:OnDestroy()
+  self.view = nil
+end
+
+return UIWindow

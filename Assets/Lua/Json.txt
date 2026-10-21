@@ -1,0 +1,221 @@
+-- 最小 JSON 解码：对象/数组/字符串转义/数字/bool/null。不依赖 C#。
+
+local M = {}
+
+local function skip_ws(s, i)
+  local _, j = s:find("^[ \t\r\n]*", i)
+  return (j or i - 1) + 1
+end
+
+local function utf8_char(code)
+  code = code or 0
+  if code < 0x80 then
+    return string.char(code)
+  elseif code < 0x800 then
+    return string.char(0xC0 + math.floor(code / 0x40), 0x80 + (code % 0x40))
+  elseif code < 0x10000 then
+    return string.char(
+      0xE0 + math.floor(code / 0x1000),
+      0x80 + (math.floor(code / 0x40) % 0x40),
+      0x80 + (code % 0x40))
+  end
+  return "?"
+end
+
+local parse_value
+
+local function parse_string(s, i)
+  i = i + 1
+  local out = {}
+  while i <= #s do
+    local ch = s:sub(i, i)
+    if ch == '"' then
+      return table.concat(out), i + 1
+    elseif ch == '\\' then
+      local n = s:sub(i + 1, i + 1)
+      if n == '"' or n == '\\' or n == '/' then
+        out[#out + 1] = n
+        i = i + 2
+      elseif n == 'b' then out[#out + 1] = '\b'; i = i + 2
+      elseif n == 'f' then out[#out + 1] = '\f'; i = i + 2
+      elseif n == 'n' then out[#out + 1] = '\n'; i = i + 2
+      elseif n == 'r' then out[#out + 1] = '\r'; i = i + 2
+      elseif n == 't' then out[#out + 1] = '\t'; i = i + 2
+      elseif n == 'u' then
+        local hex = s:sub(i + 2, i + 5)
+        out[#out + 1] = utf8_char(tonumber(hex, 16) or 0)
+        i = i + 6
+      else
+        error('json: bad escape')
+      end
+    else
+      out[#out + 1] = ch
+      i = i + 1
+    end
+  end
+  error('json: unterminated string')
+end
+
+local function parse_number(s, i)
+  local j = i
+  if s:sub(j, j) == '-' then j = j + 1 end
+  while s:sub(j, j):match('%d') do j = j + 1 end
+  if s:sub(j, j) == '.' then
+    j = j + 1
+    while s:sub(j, j):match('%d') do j = j + 1 end
+  end
+  local e = s:sub(j, j)
+  if e == 'e' or e == 'E' then
+    j = j + 1
+    local sig = s:sub(j, j)
+    if sig == '+' or sig == '-' then j = j + 1 end
+    while s:sub(j, j):match('%d') do j = j + 1 end
+  end
+  local literal = s:sub(i, j - 1)
+  local digits = literal:gsub('^-', '')
+  if literal:match('^-?%d+$') and #digits >= 16 then
+    return literal, j
+  end
+  return tonumber(literal), j
+end
+
+local function parse_array(s, i)
+  i = i + 1
+  local arr = {}
+  i = skip_ws(s, i)
+  if s:sub(i, i) == ']' then
+    return arr, i + 1
+  end
+  while true do
+    local v
+    v, i = parse_value(s, i)
+    arr[#arr + 1] = v
+    i = skip_ws(s, i)
+    local c = s:sub(i, i)
+    if c == ']' then
+      return arr, i + 1
+    elseif c == ',' then
+      i = i + 1
+    else
+      error('json: expected , or ]')
+    end
+  end
+end
+
+local function parse_object(s, i)
+  i = i + 1
+  local obj = {}
+  i = skip_ws(s, i)
+  if s:sub(i, i) == '}' then
+    return obj, i + 1
+  end
+  while true do
+    i = skip_ws(s, i)
+    if s:sub(i, i) ~= '"' then
+      error('json: object key')
+    end
+    local key
+    key, i = parse_string(s, i)
+    i = skip_ws(s, i)
+    if s:sub(i, i) ~= ':' then
+      error('json: expected :')
+    end
+    i = i + 1
+    local val
+    val, i = parse_value(s, i)
+    obj[key] = val
+    i = skip_ws(s, i)
+    local c = s:sub(i, i)
+    if c == '}' then
+      return obj, i + 1
+    elseif c == ',' then
+      i = i + 1
+    else
+      error('json: expected , or }')
+    end
+  end
+end
+
+parse_value = function(s, i)
+  i = skip_ws(s, i)
+  local c = s:sub(i, i)
+  if c == '"' then
+    return parse_string(s, i)
+  elseif c == '{' then
+    return parse_object(s, i)
+  elseif c == '[' then
+    return parse_array(s, i)
+  elseif c == 't' and s:sub(i, i + 3) == 'true' then
+    return true, i + 4
+  elseif c == 'f' and s:sub(i, i + 4) == 'false' then
+    return false, i + 5
+  elseif c == 'n' and s:sub(i, i + 3) == 'null' then
+    return nil, i + 4
+  elseif c == '-' or c:match('%d') then
+    return parse_number(s, i)
+  end
+  error('json: unexpected at ' .. tostring(i))
+end
+
+function M.decode(str)
+  if type(str) ~= 'string' or str == '' then
+    return {}
+  end
+  local v, i = parse_value(str, 1)
+  i = skip_ws(str, i)
+  if i <= #str then
+    error('json: trailing')
+  end
+  return v
+end
+
+-- Encode the plain business snapshot used by diagnostics. int64 values remain
+-- strings; deterministic object ordering makes restart comparisons meaningful.
+function M.encode(value)
+  local active = {}
+  local escapes = { ['"']='\\"', ['\\']='\\\\', ['\b']='\\b', ['\f']='\\f',
+                    ['\n']='\\n', ['\r']='\\r', ['\t']='\\t' }
+  local function quote(s)
+    return '"' .. s:gsub('[%z\1-\31\\"]', function(c)
+      return escapes[c] or string.format('\\u%04x', string.byte(c))
+    end) .. '"'
+  end
+  local encode
+  encode = function(v)
+    local kind = type(v)
+    if kind == 'nil' then return 'null' end
+    if kind == 'boolean' then return v and 'true' or 'false' end
+    if kind == 'string' then return quote(v) end
+    if kind == 'number' then
+      if v ~= v or v == math.huge or v == -math.huge then error('json: non-finite number') end
+      return tostring(v)
+    end
+    if kind ~= 'table' then error('json: unsupported type ' .. kind) end
+    if active[v] then error('json: cyclic table') end
+    active[v] = true
+    local count, max, is_array = 0, 0, true
+    for key in pairs(v) do
+      count = count + 1
+      if type(key) ~= 'number' or key < 1 or key % 1 ~= 0 then is_array = false
+      else max = math.max(max, key) end
+    end
+    local out = {}
+    if is_array and count > 0 and max == count then
+      for i = 1, count do out[i] = encode(v[i]) end
+      active[v] = nil
+      return '[' .. table.concat(out, ',') .. ']'
+    end
+    local keys = {}
+    for key in pairs(v) do
+      if type(key) ~= 'string' then error('json: object key must be a string') end
+      keys[#keys + 1] = key
+    end
+    table.sort(keys)
+    for _, key in ipairs(keys) do out[#out + 1] = quote(key) .. ':' .. encode(v[key]) end
+    active[v] = nil
+    return '{' .. table.concat(out, ',') .. '}'
+  end
+  return encode(value)
+end
+
+return M

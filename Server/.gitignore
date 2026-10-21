@@ -1,0 +1,11 @@
+**/bin/
+**/obj/
+*.user
+*.userosscache
+*.suo
+.vs/
+
+# Only the Server root runtime directory. CloudIsle.Server/Data contains source.
+/data/
+*.db
+

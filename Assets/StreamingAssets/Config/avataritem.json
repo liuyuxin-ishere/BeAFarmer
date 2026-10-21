@@ -1,0 +1,362 @@
+[
+  {
+    "id": 7001,
+    "name": "短发·黑",
+    "part": "hair",
+    "rarity": "N",
+    "source": "初始",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7002,
+    "name": "双马尾·棕",
+    "part": "hair",
+    "rarity": "N",
+    "source": "商店",
+    "price": 200,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7003,
+    "name": "卷发·栗",
+    "part": "hair",
+    "rarity": "R",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7004,
+    "name": "长发·樱粉",
+    "part": "hair",
+    "rarity": "SR",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7005,
+    "name": "星光长发",
+    "part": "hair",
+    "rarity": "SSR",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7006,
+    "name": "白色 T 恤",
+    "part": "top",
+    "rarity": "N",
+    "source": "初始",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7007,
+    "name": "条纹衫",
+    "part": "top",
+    "rarity": "N",
+    "source": "商店",
+    "price": 250,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7008,
+    "name": "针织背心",
+    "part": "top",
+    "rarity": "R",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7009,
+    "name": "工装外套",
+    "part": "top",
+    "rarity": "R",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7010,
+    "name": "刺绣衬衫",
+    "part": "top",
+    "rarity": "SR",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7011,
+    "name": "牛仔短裤",
+    "part": "bottom",
+    "rarity": "N",
+    "source": "初始",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7012,
+    "name": "格子裙",
+    "part": "bottom",
+    "rarity": "N",
+    "source": "商店",
+    "price": 250,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7013,
+    "name": "工装长裤",
+    "part": "bottom",
+    "rarity": "R",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7014,
+    "name": "百褶裙",
+    "part": "bottom",
+    "rarity": "R",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7015,
+    "name": "灯笼裤",
+    "part": "bottom",
+    "rarity": "SR",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7016,
+    "name": "帆布鞋",
+    "part": "shoes",
+    "rarity": "N",
+    "source": "初始",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7017,
+    "name": "小皮靴",
+    "part": "shoes",
+    "rarity": "N",
+    "source": "商店",
+    "price": 300,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7018,
+    "name": "绒毛靴",
+    "part": "shoes",
+    "rarity": "R",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7019,
+    "name": "云朵运动鞋",
+    "part": "shoes",
+    "rarity": "SR",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7020,
+    "name": "无帽",
+    "part": "hat",
+    "rarity": "N",
+    "source": "初始",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7021,
+    "name": "贝雷帽",
+    "part": "hat",
+    "rarity": "N",
+    "source": "商店",
+    "price": 300,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7022,
+    "name": "渔夫帽",
+    "part": "hat",
+    "rarity": "R",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7023,
+    "name": "兔耳发箍",
+    "part": "hat",
+    "rarity": "R",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7024,
+    "name": "月光皇冠",
+    "part": "hat",
+    "rarity": "SSR",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7025,
+    "name": "无饰品",
+    "part": "acc",
+    "rarity": "N",
+    "source": "初始",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7026,
+    "name": "圆框眼镜",
+    "part": "acc",
+    "rarity": "N",
+    "source": "商店",
+    "price": 200,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7027,
+    "name": "小背包",
+    "part": "acc",
+    "rarity": "R",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7028,
+    "name": "蝴蝶结",
+    "part": "acc",
+    "rarity": "R",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7029,
+    "name": "云朵翅膀",
+    "part": "acc",
+    "rarity": "SR",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7030,
+    "name": "星河长裙",
+    "part": "dress",
+    "rarity": "SSR",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "常驻",
+    "isUp": 0
+  },
+  {
+    "id": 7101,
+    "name": "春日野餐·连衣裙",
+    "part": "dress",
+    "rarity": "SSR",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "P02",
+    "isUp": 1
+  },
+  {
+    "id": 7102,
+    "name": "春日野餐·草帽",
+    "part": "hat",
+    "rarity": "SSR",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "P02",
+    "isUp": 1
+  },
+  {
+    "id": 7103,
+    "name": "春日野餐·格纹披肩",
+    "part": "acc",
+    "rarity": "SR",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "P02",
+    "isUp": 0
+  },
+  {
+    "id": 7104,
+    "name": "春日野餐·编织篮",
+    "part": "acc",
+    "rarity": "SR",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "P02",
+    "isUp": 0
+  },
+  {
+    "id": 7105,
+    "name": "春日野餐·凉鞋",
+    "part": "shoes",
+    "rarity": "R",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "P02",
+    "isUp": 0
+  },
+  {
+    "id": 7106,
+    "name": "春日野餐·丝带",
+    "part": "hair",
+    "rarity": "R",
+    "source": "抽卡",
+    "price": 0,
+    "poolGroup": "P02",
+    "isUp": 0
+  }
+]

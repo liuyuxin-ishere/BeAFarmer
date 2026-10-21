@@ -1,0 +1,19 @@
+﻿
+
+<linker>
+
+	<assembly fullname="Game.Framework">
+	    <type fullname="Game.Framework.Lua.ProtoBridge" preserve="all"/>
+		<type fullname="Game.Framework.Lua.BridgeApi" preserve="all"/>
+		<type fullname="Game.Framework.Lua.AsyncLease" preserve="all"/>
+		<type fullname="Game.Framework.UI.ViewHost" preserve="all"/>
+		<type fullname="Game.Framework.UI.ClickSubscription" preserve="all"/>
+		<type fullname="Game.Framework.UI.CallbackLease" preserve="all"/>
+		<type fullname="Game.Framework.UI.UiBridge" preserve="all"/>
+		<type fullname="Game.Framework.UI.UILayer" preserve="all"/>
+		<type fullname="Game.Framework.Account.AccountBridge" preserve="all"/>
+		<type fullname="Game.Framework.Account.AccountFlow" preserve="all"/>
+		
+	</assembly>
+
+</linker>

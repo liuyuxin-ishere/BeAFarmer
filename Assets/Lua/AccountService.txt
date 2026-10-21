@@ -1,0 +1,194 @@
+-- 账号服务：register / login / restore / logout / onKick。
+-- 登录成功且快照应用成功后才 CommitLoginToken；注册成功不自动授权。
+
+local PlayerModel = require("PlayerModel")
+local Json = require("Json")
+
+local M = {
+  _busy = false,
+  _onKick = nil,
+  _onExpired = nil,
+  _onRestored = nil,
+}
+
+local Bridge = CS.Game.Framework.Account.AccountBridge
+
+local function apply_and_commit(snapshotJson)
+  local tableSnap = Json.decode(snapshotJson or "{}")
+  PlayerModel.applySnapshot(tableSnap)
+  local ok = Bridge.CommitLoginToken()
+  if not ok then
+    Bridge.DiscardPendingToken()
+    error("token-commit-failed")
+  end
+  return true
+end
+
+local function wire_bridge_handlers()
+  Bridge.SetKickHandler(function(code, payload)
+    PlayerModel.clear()
+    Bridge.ClearToken()
+    Bridge.StopReconnect()
+    if CS.Game.Framework.Account.AccountFlow ~= nil then
+      CS.Game.Framework.Account.AccountFlow.EnterLogin()
+    end
+    if M._onKick then M._onKick(code, payload) end
+  end)
+  Bridge.SetExpiredHandler(function(code, payload)
+    PlayerModel.clear()
+    Bridge.ClearToken()
+    Bridge.StopReconnect()
+    if CS.Game.Framework.Account.AccountFlow ~= nil then
+      CS.Game.Framework.Account.AccountFlow.EnterLogin()
+    end
+    if M._onExpired then M._onExpired(code, payload) end
+  end)
+  Bridge.SetRestoredHandler(function(code, snapshotJson)
+    if code ~= 0 then
+      return
+    end
+    -- 自动重连：C# 仅写入 pending；须本处应用快照后再 Commit（启心跳/解遮罩）。
+    local ok, err = pcall(function()
+      apply_and_commit(snapshotJson)
+    end)
+    if not ok then
+      Bridge.DiscardPendingToken()
+      PlayerModel.clear()
+      Bridge.ClearToken()
+      Bridge.StopReconnect()
+      Bridge.HideDisconnectMask()
+      if CS.Game.Framework.Account.AccountFlow ~= nil then
+        CS.Game.Framework.Account.AccountFlow.EnterLogin()
+      end
+      return
+    end
+    if M._onRestored then M._onRestored(0, snapshotJson) end
+  end)
+end
+
+function M.configure(opts)
+  opts = opts or {}
+  Bridge.Configure(
+    tostring(opts.tcpHost or "127.0.0.1"),
+    tonumber(opts.tcpPort) or 17780,
+    tostring(opts.appVersion or CS.UnityEngine.Application.version),
+    tonumber(opts.resVersion) or 100,
+    tonumber(opts.configVersion) or 100,
+    tostring(opts.deviceId or "m1-editor"),
+    tostring(opts.tokenDirectory or "")
+  )
+  wire_bridge_handlers()
+end
+
+--- 仅绑定事件（Launcher 已 Configure 时用，避免 DisposeSession）。
+function M.bindHandlers()
+  wire_bridge_handlers()
+end
+
+function M.pump()
+  Bridge.Pump(64)
+end
+
+function M.onKick(handler)
+  M._onKick = handler
+  wire_bridge_handlers()
+end
+
+function M.onExpired(handler)
+  M._onExpired = handler
+  wire_bridge_handlers()
+end
+
+function M.onRestored(handler)
+  M._onRestored = handler
+  wire_bridge_handlers()
+end
+
+-- done(code, payload)；返回 CallbackLease
+function M.register(username, password, nickname, done)
+  local lease
+  lease = Bridge.Connect(function(code, payload)
+    if code ~= 0 then
+      if done then done(code, payload) end
+      return
+    end
+    lease = Bridge.Register(tostring(username or ""), tostring(password or ""), tostring(nickname or ""), done)
+  end)
+  return lease
+end
+
+function M.login(username, password, done)
+  local lease
+  lease = Bridge.Connect(function(ccode, cpayload)
+    if ccode ~= 0 then
+      if done then done(ccode, cpayload) end
+      return
+    end
+    lease = Bridge.Login(tostring(username or ""), tostring(password or ""), function(code, payload)
+      if code == 0 then
+        local ok, err = pcall(function()
+          apply_and_commit(payload)
+        end)
+        if not ok then
+          -- 仅本成功回调的快照失败才丢弃；C# 已按代次管理 pending。
+          Bridge.DiscardPendingToken()
+          PlayerModel.clear()
+          if done then done(107, "snapshot-apply-failed") end
+          return
+        end
+      end
+      -- 非0（含旧失败/取消）：不得无条件 DiscardPendingToken，以免清掉新尝试的 pending。
+      if done then done(code, payload) end
+    end)
+  end)
+  return lease
+end
+
+function M.restore(done)
+  return Bridge.Restore(function(code, payload)
+    if code == 0 then
+      local ok = pcall(function()
+        apply_and_commit(payload)
+      end)
+      if not ok then
+        Bridge.DiscardPendingToken()
+        PlayerModel.clear()
+        Bridge.ClearToken()
+        if done then done(107, "snapshot-apply-failed") end
+        return
+      end
+    end
+    if done then done(code, payload) end
+  end)
+end
+
+function M.logout(done)
+  Bridge.CancelAll()
+  Bridge.StopReconnect()
+  if CS.Game.Framework.Account.AccountFlow ~= nil then
+    CS.Game.Framework.Account.AccountFlow.EnterLogin()
+  end
+  return Bridge.Logout(function(code, payload)
+    PlayerModel.clear()
+    if done then done(code, payload) end
+  end)
+end
+
+function M.connect(done)
+  return Bridge.Connect(done)
+end
+
+function M.cancelAll()
+  Bridge.CancelAll()
+end
+
+function M.hasToken()
+  return Bridge.HasToken()
+end
+
+function M.clearLocal()
+  PlayerModel.clear()
+  Bridge.ClearToken()
+end
+
+return M

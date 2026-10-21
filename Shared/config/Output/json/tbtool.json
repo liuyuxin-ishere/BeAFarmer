@@ -1,0 +1,83 @@
+[
+  {
+    "toolId": 5101,
+    "level": 1,
+    "needPlayerLevel": 1,
+    "goldCost": 0,
+    "materials": "",
+    "yieldBonusMax": 0,
+    "rareChance": 0.03
+  },
+  {
+    "toolId": 5101,
+    "level": 2,
+    "needPlayerLevel": 5,
+    "goldCost": 300,
+    "materials": "3009:5",
+    "yieldBonusMax": 1,
+    "rareChance": 0.06
+  },
+  {
+    "toolId": 5101,
+    "level": 3,
+    "needPlayerLevel": 10,
+    "goldCost": 1200,
+    "materials": "3009:10;3010:10",
+    "yieldBonusMax": 2,
+    "rareChance": 0.1
+  },
+  {
+    "toolId": 5102,
+    "level": 1,
+    "needPlayerLevel": 1,
+    "goldCost": 0,
+    "materials": "",
+    "yieldBonusMax": 0,
+    "rareChance": 0.03
+  },
+  {
+    "toolId": 5102,
+    "level": 2,
+    "needPlayerLevel": 5,
+    "goldCost": 300,
+    "materials": "3009:5",
+    "yieldBonusMax": 1,
+    "rareChance": 0.06
+  },
+  {
+    "toolId": 5102,
+    "level": 3,
+    "needPlayerLevel": 10,
+    "goldCost": 1200,
+    "materials": "3009:10;3010:10",
+    "yieldBonusMax": 2,
+    "rareChance": 0.1
+  },
+  {
+    "toolId": 5103,
+    "level": 1,
+    "needPlayerLevel": 1,
+    "goldCost": 0,
+    "materials": "",
+    "yieldBonusMax": 0,
+    "rareChance": 0.03
+  },
+  {
+    "toolId": 5103,
+    "level": 2,
+    "needPlayerLevel": 5,
+    "goldCost": 300,
+    "materials": "3009:5",
+    "yieldBonusMax": 1,
+    "rareChance": 0.06
+  },
+  {
+    "toolId": 5103,
+    "level": 3,
+    "needPlayerLevel": 10,
+    "goldCost": 1200,
+    "materials": "3009:10;3010:10",
+    "yieldBonusMax": 2,
+    "rareChance": 0.1
+  }
+]

@@ -1,0 +1,37 @@
+-- T63：101 热更验证面板。通用 ViewHost；文案优先 Global 键 m1_patch_message。
+-- 100 不得包含本模块/Prefab/该 Global 键。
+
+local UIWindow = require("UI/UIWindow")
+
+local M = {}
+
+function M.new()
+  local self = UIWindow.new()
+
+  function self:OnCreate(view)
+    UIWindow.OnCreate(self, view)
+    -- The real Luban Global value is required. A hardcoded success fallback
+    -- would hide missing configuration and invalidate the migration proof.
+    local value = CS.Game.Framework.Lua.BridgeApi.GetGlobal("m1_patch_message")
+    local msg = value ~= nil and tostring(value) or ""
+    if msg == "" then error("missing Global m1_patch_message") end
+    view:SetText("Title", msg)
+    view:SetText("Message", msg)
+  end
+
+  function self:OnOpen(argsJson)
+    UIWindow.OnOpen(self, argsJson)
+  end
+
+  function self:OnClose()
+    UIWindow.OnClose(self)
+  end
+
+  function self:OnDestroy()
+    UIWindow.OnDestroy(self)
+  end
+
+  return self
+end
+
+return M

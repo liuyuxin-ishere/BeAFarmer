@@ -1,0 +1,14 @@
+{
+    "name": "Game.Demo.AvatarMerge",
+    "rootNamespace": "Game.Demo.AvatarMerge",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

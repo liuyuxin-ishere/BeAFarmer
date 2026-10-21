@@ -1,0 +1,77 @@
+protoc=D:\Users\Lenovo\anaconda3\Library\bin\protoc.exe
+==> Luban --conf E:\Workbench\UnityWorkBench\Farming\Shared\config\luban.conf -t all -c cs-simple-json -d json -x outputCodeDir=E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code -x outputDataDir=E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\data --validationFailAsError
+2026/10/21 14:09:39.524|INFO| ==========================================================================================
+2026/10/21 14:09:39.524|INFO|
+2026/10/21 14:09:39.524|INFO|  Luban is developed by Code Philosophy Technology Co., LTD. https://code-philosophy.com
+2026/10/21 14:09:39.524|INFO|
+2026/10/21 14:09:39.524|INFO| ==========================================================================================
+2026/10/21 14:09:39.573|INFO|load schema. collector: "default"
+2026/10/21 14:09:39.712|INFO|load datas begin
+2026/10/21 14:09:39.712|INFO|process code target:"cs-simple-json" begin
+2026/10/21 14:09:39.724|INFO|load datas end
+2026/10/21 14:09:39.724|INFO|validation begin
+2026/10/21 14:09:39.724|INFO|validation end
+2026/10/21 14:09:39.785|INFO|process data target:"json" begin
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/TbRecipe.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\data/tbgachapool.json 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/TbTool.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\data/tbcrop.json 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/Tables.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\data/tbfurniture.json 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/TbLevel.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/TbFacilityLevel.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\data/tblevel.json 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\data/tbavataritem.json 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/TbGlobal.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\data/tbplot.json 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/TbGatherNode.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/Tool.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/TbFacility.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/TbCrop.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/TbItem.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/TbOrderRule.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/TbPlot.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\data/tbglobal.json 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\data/tbrecipe.json 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/TbGachaRule.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/TbFurniture.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\data/tbglobalkv.json 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/TbAvatarItem.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/TbGachaPoolItem.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/TbGachaPool.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/TbActivity.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/TbGlobalKv.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\data/tbactivity.json 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\data/tbfacility.json 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/AvatarItem.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/Recipe.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/Activity.cs 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\data/tbitem.json 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\data/tbfacilitylevel.json 
+2026/10/21 14:09:39.798|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\data/tborderrule.json 
+2026/10/21 14:09:39.802|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\data/tbgachapoolitem.json 
+2026/10/21 14:09:39.802|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/Crop.cs 
+2026/10/21 14:09:39.802|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/Facility.cs 
+2026/10/21 14:09:39.802|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/Furniture.cs 
+2026/10/21 14:09:39.802|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\data/tbgacharule.json 
+2026/10/21 14:09:39.802|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/FacilityLevel.cs 
+2026/10/21 14:09:39.802|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/GlobalKv.cs 
+2026/10/21 14:09:39.802|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/GatherNode.cs 
+2026/10/21 14:09:39.802|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/LevelRow.cs 
+2026/10/21 14:09:39.802|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/OrderRule.cs 
+2026/10/21 14:09:39.802|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/GachaPoolItem.cs 
+2026/10/21 14:09:39.802|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/Plot.cs 
+2026/10/21 14:09:39.802|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\data/tbtool.json 
+2026/10/21 14:09:39.802|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\data/tbgathernode.json 
+2026/10/21 14:09:39.802|INFO|process data target:"json" end
+2026/10/21 14:09:39.802|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/GachaPool.cs 
+2026/10/21 14:09:39.802|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/GachaRule.cs 
+2026/10/21 14:09:39.802|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/Global.cs 
+2026/10/21 14:09:39.802|INFO|[new] E:\Workbench\UnityWorkBench\Farming\Temp\gen_config\36a66fca51ec4d809a4b25c5c8fe1778\code/Item.cs 
+2026/10/21 14:09:39.802|INFO|process code target:"cs-simple-json" end
+2026/10/21 14:09:39.802|INFO|bye~
+OK ConfigVersion=100 code=E:\Workbench\UnityWorkBench\Farming\Assets\Config\Generated
+OK OutputDir=E:\Workbench\UnityWorkBench\Farming\Docs\Acceptance\M1\20261020-xLua\Root Final 100 R2
+Player=E:\Workbench\UnityWorkBench\Farming\Docs\Acceptance\M1\20261020-xLua\Root Final 100 R2\Player\Farming.exe
+Baseline=E:\Workbench\UnityWorkBench\Farming\Docs\Acceptance\M1\20261020-xLua\Root Final 100 R2\baseline-manifest.json
+Fingerprint=E:\Workbench\UnityWorkBench\Farming\Docs\Acceptance\M1\20261020-xLua\Root Final 100 R2\baseline-fingerprint.json

@@ -1,0 +1,6 @@
+Exception: E:\Workbench\UnityWorkBench\Farming\Tools\build_client_win.ps1:16
+Line |
+  16 |      throw "Unity不存在: $UnityEditorPath"
+     |      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Unity不存在:
+     | E:\Workbench\UnityWorkBench\Farming\Docs\Acceptance\M1\20261020-xLua\Root-Finalization\CliNegative\MissingUnity.exe

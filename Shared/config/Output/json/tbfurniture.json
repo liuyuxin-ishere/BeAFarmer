@@ -1,0 +1,92 @@
+[
+  {
+    "id": 6001,
+    "name": "木栅栏",
+    "sizeW": 1,
+    "sizeH": 1,
+    "price": 30,
+    "unlockLevel": 6,
+    "comfort": 1
+  },
+  {
+    "id": 6002,
+    "name": "花盆",
+    "sizeW": 1,
+    "sizeH": 1,
+    "price": 50,
+    "unlockLevel": 6,
+    "comfort": 2
+  },
+  {
+    "id": 6003,
+    "name": "长椅",
+    "sizeW": 2,
+    "sizeH": 1,
+    "price": 120,
+    "unlockLevel": 6,
+    "comfort": 3
+  },
+  {
+    "id": 6004,
+    "name": "路灯",
+    "sizeW": 1,
+    "sizeH": 1,
+    "price": 150,
+    "unlockLevel": 6,
+    "comfort": 3
+  },
+  {
+    "id": 6005,
+    "name": "小树",
+    "sizeW": 2,
+    "sizeH": 2,
+    "price": 200,
+    "unlockLevel": 8,
+    "comfort": 4
+  },
+  {
+    "id": 6006,
+    "name": "石桌椅",
+    "sizeW": 2,
+    "sizeH": 2,
+    "price": 300,
+    "unlockLevel": 8,
+    "comfort": 5
+  },
+  {
+    "id": 6007,
+    "name": "地毯",
+    "sizeW": 3,
+    "sizeH": 2,
+    "price": 250,
+    "unlockLevel": 8,
+    "comfort": 4
+  },
+  {
+    "id": 6008,
+    "name": "秋千",
+    "sizeW": 2,
+    "sizeH": 2,
+    "price": 600,
+    "unlockLevel": 12,
+    "comfort": 8
+  },
+  {
+    "id": 6009,
+    "name": "凉亭",
+    "sizeW": 3,
+    "sizeH": 3,
+    "price": 1500,
+    "unlockLevel": 12,
+    "comfort": 15
+  },
+  {
+    "id": 6010,
+    "name": "喷泉",
+    "sizeW": 3,
+    "sizeH": 3,
+    "price": 3000,
+    "unlockLevel": 16,
+    "comfort": 25
+  }
+]

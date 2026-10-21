@@ -1,0 +1,9 @@
+{
+  "reconnectRunning": false,
+  "updateMessage": "版本不兼容，请更新",
+  "passed": true,
+  "responseCode": 106,
+  "clientProto": 1,
+  "serverProto": 2,
+  "scope": "C13"
+}

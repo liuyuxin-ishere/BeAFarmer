@@ -1,0 +1,412 @@
+[
+  {
+    "id": 1001,
+    "name": "小麦",
+    "type": "Crop",
+    "stackMax": 99,
+    "sellPrice": 8,
+    "buyPrice": 0,
+    "unlockLevel": 1,
+    "desc": "C01 产出"
+  },
+  {
+    "id": 1002,
+    "name": "胡萝卜",
+    "type": "Crop",
+    "stackMax": 99,
+    "sellPrice": 12,
+    "buyPrice": 0,
+    "unlockLevel": 2,
+    "desc": "C02 产出"
+  },
+  {
+    "id": 1003,
+    "name": "土豆",
+    "type": "Crop",
+    "stackMax": 99,
+    "sellPrice": 12,
+    "buyPrice": 0,
+    "unlockLevel": 3,
+    "desc": "C03 产出"
+  },
+  {
+    "id": 1004,
+    "name": "番茄",
+    "type": "Crop",
+    "stackMax": 99,
+    "sellPrice": 18,
+    "buyPrice": 0,
+    "unlockLevel": 5,
+    "desc": "C04 产出"
+  },
+  {
+    "id": 1005,
+    "name": "玉米",
+    "type": "Crop",
+    "stackMax": 99,
+    "sellPrice": 20,
+    "buyPrice": 0,
+    "unlockLevel": 7,
+    "desc": "C05 产出"
+  },
+  {
+    "id": 1006,
+    "name": "草莓",
+    "type": "Crop",
+    "stackMax": 99,
+    "sellPrice": 30,
+    "buyPrice": 0,
+    "unlockLevel": 9,
+    "desc": "C06 产出"
+  },
+  {
+    "id": 1007,
+    "name": "南瓜",
+    "type": "Crop",
+    "stackMax": 99,
+    "sellPrice": 40,
+    "buyPrice": 0,
+    "unlockLevel": 12,
+    "desc": "C07 产出"
+  },
+  {
+    "id": 2001,
+    "name": "小麦种子",
+    "type": "Seed",
+    "stackMax": 99,
+    "sellPrice": 0,
+    "buyPrice": 10,
+    "unlockLevel": 1,
+    "desc": "对应作物 C01"
+  },
+  {
+    "id": 2002,
+    "name": "胡萝卜种子",
+    "type": "Seed",
+    "stackMax": 99,
+    "sellPrice": 0,
+    "buyPrice": 15,
+    "unlockLevel": 2,
+    "desc": "对应作物 C02"
+  },
+  {
+    "id": 2003,
+    "name": "土豆种子",
+    "type": "Seed",
+    "stackMax": 99,
+    "sellPrice": 0,
+    "buyPrice": 20,
+    "unlockLevel": 3,
+    "desc": "对应作物 C03"
+  },
+  {
+    "id": 2004,
+    "name": "番茄种子",
+    "type": "Seed",
+    "stackMax": 99,
+    "sellPrice": 0,
+    "buyPrice": 30,
+    "unlockLevel": 5,
+    "desc": "对应作物 C04"
+  },
+  {
+    "id": 2005,
+    "name": "玉米种子",
+    "type": "Seed",
+    "stackMax": 99,
+    "sellPrice": 0,
+    "buyPrice": 40,
+    "unlockLevel": 7,
+    "desc": "对应作物 C05"
+  },
+  {
+    "id": 2006,
+    "name": "草莓种子",
+    "type": "Seed",
+    "stackMax": 99,
+    "sellPrice": 0,
+    "buyPrice": 60,
+    "unlockLevel": 9,
+    "desc": "对应作物 C06"
+  },
+  {
+    "id": 2007,
+    "name": "南瓜种子",
+    "type": "Seed",
+    "stackMax": 99,
+    "sellPrice": 0,
+    "buyPrice": 80,
+    "unlockLevel": 12,
+    "desc": "对应作物 C07"
+  },
+  {
+    "id": 3001,
+    "name": "面粉",
+    "type": "Craft",
+    "stackMax": 99,
+    "sellPrice": 32,
+    "buyPrice": 0,
+    "unlockLevel": 2,
+    "desc": "RC001"
+  },
+  {
+    "id": 3002,
+    "name": "面包",
+    "type": "Craft",
+    "stackMax": 99,
+    "sellPrice": 90,
+    "buyPrice": 0,
+    "unlockLevel": 4,
+    "desc": "RC002"
+  },
+  {
+    "id": 3003,
+    "name": "蔬菜汤",
+    "type": "Craft",
+    "stackMax": 99,
+    "sellPrice": 80,
+    "buyPrice": 0,
+    "unlockLevel": 4,
+    "desc": "RC003"
+  },
+  {
+    "id": 3004,
+    "name": "番茄酱",
+    "type": "Craft",
+    "stackMax": 99,
+    "sellPrice": 85,
+    "buyPrice": 0,
+    "unlockLevel": 5,
+    "desc": "RC005"
+  },
+  {
+    "id": 3005,
+    "name": "果酱",
+    "type": "Craft",
+    "stackMax": 99,
+    "sellPrice": 45,
+    "buyPrice": 0,
+    "unlockLevel": 4,
+    "desc": "RC004"
+  },
+  {
+    "id": 3006,
+    "name": "玉米饼",
+    "type": "Craft",
+    "stackMax": 99,
+    "sellPrice": 130,
+    "buyPrice": 0,
+    "unlockLevel": 7,
+    "desc": "RC006"
+  },
+  {
+    "id": 3007,
+    "name": "草莓蛋糕",
+    "type": "Craft",
+    "stackMax": 99,
+    "sellPrice": 260,
+    "buyPrice": 0,
+    "unlockLevel": 9,
+    "desc": "RC007"
+  },
+  {
+    "id": 3008,
+    "name": "南瓜派",
+    "type": "Craft",
+    "stackMax": 99,
+    "sellPrice": 190,
+    "buyPrice": 0,
+    "unlockLevel": 12,
+    "desc": "RC008"
+  },
+  {
+    "id": 3009,
+    "name": "木板",
+    "type": "Craft",
+    "stackMax": 99,
+    "sellPrice": 35,
+    "buyPrice": 0,
+    "unlockLevel": 3,
+    "desc": "RC009"
+  },
+  {
+    "id": 3010,
+    "name": "石砖",
+    "type": "Craft",
+    "stackMax": 99,
+    "sellPrice": 35,
+    "buyPrice": 0,
+    "unlockLevel": 3,
+    "desc": "RC010"
+  },
+  {
+    "id": 3011,
+    "name": "花束",
+    "type": "Craft",
+    "stackMax": 99,
+    "sellPrice": 45,
+    "buyPrice": 0,
+    "unlockLevel": 6,
+    "desc": "RC011"
+  },
+  {
+    "id": 4001,
+    "name": "木头",
+    "type": "Gather",
+    "stackMax": 99,
+    "sellPrice": 6,
+    "buyPrice": 0,
+    "unlockLevel": 1,
+    "desc": "树木产出"
+  },
+  {
+    "id": 4002,
+    "name": "石头",
+    "type": "Gather",
+    "stackMax": 99,
+    "sellPrice": 6,
+    "buyPrice": 0,
+    "unlockLevel": 3,
+    "desc": "矿石产出"
+  },
+  {
+    "id": 4003,
+    "name": "花瓣",
+    "type": "Gather",
+    "stackMax": 99,
+    "sellPrice": 5,
+    "buyPrice": 0,
+    "unlockLevel": 6,
+    "desc": "花丛产出"
+  },
+  {
+    "id": 4004,
+    "name": "浆果",
+    "type": "Gather",
+    "stackMax": 99,
+    "sellPrice": 7,
+    "buyPrice": 0,
+    "unlockLevel": 1,
+    "desc": "浆果丛产出"
+  },
+  {
+    "id": 4101,
+    "name": "树脂",
+    "type": "Gather",
+    "stackMax": 99,
+    "sellPrice": 30,
+    "buyPrice": 0,
+    "unlockLevel": 1,
+    "desc": "树木稀有掉落"
+  },
+  {
+    "id": 4102,
+    "name": "水晶",
+    "type": "Gather",
+    "stackMax": 99,
+    "sellPrice": 50,
+    "buyPrice": 0,
+    "unlockLevel": 3,
+    "desc": "矿石稀有掉落"
+  },
+  {
+    "id": 4103,
+    "name": "蜂蜜",
+    "type": "Gather",
+    "stackMax": 99,
+    "sellPrice": 40,
+    "buyPrice": 0,
+    "unlockLevel": 6,
+    "desc": "花丛稀有掉落"
+  },
+  {
+    "id": 4104,
+    "name": "金浆果",
+    "type": "Gather",
+    "stackMax": 99,
+    "sellPrice": 35,
+    "buyPrice": 0,
+    "unlockLevel": 1,
+    "desc": "浆果丛稀有掉落"
+  },
+  {
+    "id": 5001,
+    "name": "肥料",
+    "type": "Consumable",
+    "stackMax": 99,
+    "sellPrice": 0,
+    "buyPrice": 60,
+    "unlockLevel": 1,
+    "desc": "施肥：缩短 30% 剩余时间"
+  },
+  {
+    "id": 5101,
+    "name": "斧头",
+    "type": "Tool",
+    "stackMax": 1,
+    "sellPrice": 0,
+    "buyPrice": 0,
+    "unlockLevel": 1,
+    "desc": "采集树木；初始赠送"
+  },
+  {
+    "id": 5102,
+    "name": "镐",
+    "type": "Tool",
+    "stackMax": 1,
+    "sellPrice": 0,
+    "buyPrice": 0,
+    "unlockLevel": 3,
+    "desc": "采集矿石；Lv3 赠送"
+  },
+  {
+    "id": 5103,
+    "name": "采集篮",
+    "type": "Tool",
+    "stackMax": 1,
+    "sellPrice": 0,
+    "buyPrice": 0,
+    "unlockLevel": 1,
+    "desc": "采集花丛、浆果丛；初始赠送"
+  },
+  {
+    "id": 9001,
+    "name": "金币",
+    "type": "Currency",
+    "stackMax": 0,
+    "sellPrice": 0,
+    "buyPrice": 0,
+    "unlockLevel": 1,
+    "desc": "软货币"
+  },
+  {
+    "id": 9002,
+    "name": "钻石",
+    "type": "Currency",
+    "stackMax": 0,
+    "sellPrice": 0,
+    "buyPrice": 0,
+    "unlockLevel": 1,
+    "desc": "虚拟硬货币，仅游戏内发放"
+  },
+  {
+    "id": 9003,
+    "name": "抽卡券",
+    "type": "Currency",
+    "stackMax": 0,
+    "sellPrice": 0,
+    "buyPrice": 0,
+    "unlockLevel": 1,
+    "desc": "订单 / 任务获得"
+  },
+  {
+    "id": 9101,
+    "name": "碎片",
+    "type": "Currency",
+    "stackMax": 0,
+    "sellPrice": 0,
+    "buyPrice": 0,
+    "unlockLevel": 1,
+    "desc": "抽卡重复转化，用于碎片商店"
+  }
+]

@@ -1,0 +1,37 @@
+[
+  {
+    "bag_init_slots": 60,
+    "bag_expand_step": 10,
+    "bag_expand_costs": [
+      500,
+      1000,
+      2000,
+      4000,
+      8000
+    ],
+    "stack_default": 99,
+    "water_ratio": 0.1,
+    "fertilize_ratio": 0.3,
+    "speedup_sec_per_gem": 300,
+    "daily_reset_hour": 0,
+    "order_daily_count": 6,
+    "order_reroll_free": 1,
+    "order_reroll_costs": [
+      50,
+      100,
+      150,
+      300
+    ],
+    "order_ticket_at_3": 1,
+    "order_ticket_at_6": 1,
+    "order_all_done_gem": 20,
+    "rare_bonus_chance": 0.1,
+    "plaza_unlock_level": 7,
+    "gacha_unlock_level": 9,
+    "plaza_line_capacity": 100,
+    "chat_interval_sec": 3,
+    "new_player_gold": 200,
+    "new_player_gem": 300,
+    "new_player_ticket": 5
+  }
+]

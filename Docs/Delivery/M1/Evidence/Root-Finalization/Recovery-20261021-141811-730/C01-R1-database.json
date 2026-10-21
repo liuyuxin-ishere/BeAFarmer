@@ -1,0 +1,26 @@
+{
+  "players": [
+    {
+      "id": 1,
+      "account_id": 1,
+      "nickname": "FinalNick",
+      "level": 1,
+      "exp": 0,
+      "gold": 201,
+      "gem": 300,
+      "ticket": 5,
+      "shard": 0,
+      "bag_slots": 60,
+      "guide_step": 0,
+      "last_daily_reset": 0
+    }
+  ],
+  "savedSnapshots": [
+    {
+      "playerId": 1,
+      "savedRevision": 1,
+      "bodyBytes": 33,
+      "bodySha256": "52c4db9010a818f7f6cc5147e526569d5f391d35f2ffd890c6c2dad7574f16fd"
+    }
+  ]
+}

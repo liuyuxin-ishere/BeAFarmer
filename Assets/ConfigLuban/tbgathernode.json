@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "code": "G01",
+    "name": "树木",
+    "toolId": 5101,
+    "unlockLevel": 1,
+    "count": 4,
+    "itemId": 4001,
+    "yieldMin": 2,
+    "yieldMax": 3,
+    "cooldownSec": 600,
+    "rareItemId": 4101,
+    "rareChance": 0.03,
+    "exp": 1
+  },
+  {
+    "id": 2,
+    "code": "G02",
+    "name": "浆果丛",
+    "toolId": 5103,
+    "unlockLevel": 1,
+    "count": 3,
+    "itemId": 4004,
+    "yieldMin": 2,
+    "yieldMax": 4,
+    "cooldownSec": 720,
+    "rareItemId": 4104,
+    "rareChance": 0.03,
+    "exp": 1
+  },
+  {
+    "id": 3,
+    "code": "G03",
+    "name": "矿石",
+    "toolId": 5102,
+    "unlockLevel": 3,
+    "count": 3,
+    "itemId": 4002,
+    "yieldMin": 2,
+    "yieldMax": 3,
+    "cooldownSec": 900,
+    "rareItemId": 4102,
+    "rareChance": 0.03,
+    "exp": 1
+  },
+  {
+    "id": 4,
+    "code": "G04",
+    "name": "花丛",
+    "toolId": 5103,
+    "unlockLevel": 6,
+    "count": 3,
+    "itemId": 4003,
+    "yieldMin": 3,
+    "yieldMax": 4,
+    "cooldownSec": 480,
+    "rareItemId": 4103,
+    "rareChance": 0.03,
+    "exp": 1
+  }
+]

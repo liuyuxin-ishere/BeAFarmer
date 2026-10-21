@@ -1,0 +1,72 @@
+[
+  {
+    "key": "k_easy",
+    "value": "1.3",
+    "desc": "金币系数：简单（1 项）"
+  },
+  {
+    "key": "k_normal",
+    "value": "1.4",
+    "desc": "金币系数：普通（2 项）"
+  },
+  {
+    "key": "k_hard",
+    "value": "1.6",
+    "desc": "金币系数：困难（3 项）"
+  },
+  {
+    "key": "exp_coef",
+    "value": "0.25",
+    "desc": "经验 = max(exp_min, round(V × exp_coef))"
+  },
+  {
+    "key": "exp_min",
+    "value": "5",
+    "desc": "订单经验下限"
+  },
+  {
+    "key": "rare_chance",
+    "value": "0.1",
+    "desc": "“稀有加成”概率"
+  },
+  {
+    "key": "rare_gold_mult",
+    "value": "1.5",
+    "desc": "稀有加成：金币倍率"
+  },
+  {
+    "key": "daily_count",
+    "value": "6",
+    "desc": "每日订单数"
+  },
+  {
+    "key": "diff_ratio",
+    "value": "3:2:1",
+    "desc": "简单 : 普通 : 困难 比例"
+  },
+  {
+    "key": "weight_lv1_3",
+    "value": "原料60%;加工品40%",
+    "desc": "Lv1~3 物品权重"
+  },
+  {
+    "key": "weight_lv4_plus",
+    "value": "原料40%;加工品60%",
+    "desc": "Lv4 起 物品权重"
+  },
+  {
+    "key": "raw_count",
+    "value": "2~6",
+    "desc": "原料数量范围（sell ≥ 30 时 2~3）"
+  },
+  {
+    "key": "product_count",
+    "value": "1~3",
+    "desc": "加工品数量范围（sell ≥ 130 时 1~2）"
+  },
+  {
+    "key": "min_instant_orders",
+    "value": "2",
+    "desc": "至少 N 条订单为玩家当前可立即完成"
+  }
+]

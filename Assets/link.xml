@@ -1,0 +1,6 @@
+<linker>
+  <assembly fullname="Google.Protobuf" preserve="all"/>
+  <assembly fullname="Game.Shared" preserve="all"/>
+  <assembly fullname="Game.Framework" preserve="all"/>
+  <assembly fullname="YooAsset" preserve="all"/>
+</linker>

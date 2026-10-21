@@ -1,0 +1,11 @@
+local M = {}
+
+function M.show(message, durationSeconds)
+  local d = tonumber(durationSeconds) or 0
+  if d <= 0 then
+    error("Toast durationSeconds must be > 0")
+  end
+  CS.Game.Framework.UI.UiBridge.ShowToast(tostring(message or ""), d)
+end
+
+return M

@@ -1,0 +1,49 @@
+syntax = "proto3";
+package cloudisle.poc;
+// 与正式协议 CloudIsle.Proto 分开，避免 LoginReq、LoginResp、ItemStack 同名。
+option csharp_namespace = "CloudIsle.Proto.Poc";
+
+// PoC #4：覆盖常见字段类型 + repeated（泛型压力点）
+message ItemStack {
+  int32 item_id = 1;
+  int32 count = 2;
+}
+
+message LoginReq {
+  string username = 1;
+  string password = 2;
+  string app_version = 3;
+  int32 res_version = 4;
+  int32 proto_version = 5;
+  int32 config_version = 6;
+  string device_id = 7;
+}
+
+message LoginResp {
+  int32 code = 1;
+  string token = 2;
+  int64 server_time = 3;
+  int32 need_res_version = 4;
+  int32 need_config_version = 5;
+  PlayerSnapshot data = 6;
+}
+
+message PlayerSnapshot {
+  int64 player_id = 1;
+  string nickname = 2;
+  int32 level = 3;
+  int64 gold = 4;
+  repeated ItemStack bag = 5;
+  map<string, int32> flags = 6;
+}
+
+// PoC #6：登录后写一条玩家数据（金币），验证 SQLite 落库
+message PocAddGoldReq {
+  int64 op_id = 1;
+  int64 delta = 2;
+}
+
+message PocAddGoldResp {
+  int32 code = 1;
+  int64 gold = 2;
+}

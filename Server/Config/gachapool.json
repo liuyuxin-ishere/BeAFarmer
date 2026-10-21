@@ -1,0 +1,18 @@
+[
+  {
+    "poolId": "P01",
+    "name": "常驻池",
+    "type": "常驻",
+    "activityId": "",
+    "upItemIds": "",
+    "hasUp": 0
+  },
+  {
+    "poolId": "P02",
+    "name": "春日野餐",
+    "type": "限时",
+    "activityId": "A001",
+    "upItemIds": "7101;7102",
+    "hasUp": 1
+  }
+]

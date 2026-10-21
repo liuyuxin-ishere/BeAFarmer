@@ -1,0 +1,19 @@
+syntax = "proto3";
+package cloudisle;
+option csharp_namespace = "CloudIsle.Proto";
+
+// 消息 ID。0 保留给“无消息”，不在线路上当业务包使用。
+enum MsgId {
+  MSG_NONE = 0;
+  HEARTBEAT_REQ = 1001;
+  HEARTBEAT_RESP = 1002;
+  REGISTER_REQ = 1003;
+  REGISTER_RESP = 1004;
+  LOGIN_REQ = 1005;
+  LOGIN_RESP = 1006;
+  RECONNECT_REQ = 1007;
+  RECONNECT_RESP = 1008;
+  LOGOUT_REQ = 1009;
+  KICK_NTF = 1010;
+  // 其余 ID 按 05 第 2 节在对应业务 proto 落地时再填。
+}

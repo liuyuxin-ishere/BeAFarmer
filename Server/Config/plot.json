@@ -1,0 +1,38 @@
+[
+  {
+    "stage": 0,
+    "needPlayerLevel": 1,
+    "totalPlots": 6,
+    "unlockGold": 0
+  },
+  {
+    "stage": 1,
+    "needPlayerLevel": 3,
+    "totalPlots": 9,
+    "unlockGold": 300
+  },
+  {
+    "stage": 2,
+    "needPlayerLevel": 5,
+    "totalPlots": 12,
+    "unlockGold": 800
+  },
+  {
+    "stage": 3,
+    "needPlayerLevel": 8,
+    "totalPlots": 16,
+    "unlockGold": 2000
+  },
+  {
+    "stage": 4,
+    "needPlayerLevel": 12,
+    "totalPlots": 20,
+    "unlockGold": 5000
+  },
+  {
+    "stage": 5,
+    "needPlayerLevel": 16,
+    "totalPlots": 24,
+    "unlockGold": 12000
+  }
+]

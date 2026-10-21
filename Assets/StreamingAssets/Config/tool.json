@@ -1,0 +1,110 @@
+[
+  {
+    "toolId": 5101,
+    "level": 1,
+    "needPlayerLevel": 1,
+    "goldCost": 0,
+    "mat1_id": 0,
+    "mat1_n": 0,
+    "mat2_id": 0,
+    "mat2_n": 0,
+    "yieldBonusMax": 0,
+    "rareChance": 0.03
+  },
+  {
+    "toolId": 5101,
+    "level": 2,
+    "needPlayerLevel": 5,
+    "goldCost": 300,
+    "mat1_id": 3009,
+    "mat1_n": 5,
+    "mat2_id": 0,
+    "mat2_n": 0,
+    "yieldBonusMax": 1,
+    "rareChance": 0.06
+  },
+  {
+    "toolId": 5101,
+    "level": 3,
+    "needPlayerLevel": 10,
+    "goldCost": 1200,
+    "mat1_id": 3009,
+    "mat1_n": 10,
+    "mat2_id": 3010,
+    "mat2_n": 10,
+    "yieldBonusMax": 2,
+    "rareChance": 0.1
+  },
+  {
+    "toolId": 5102,
+    "level": 1,
+    "needPlayerLevel": 1,
+    "goldCost": 0,
+    "mat1_id": 0,
+    "mat1_n": 0,
+    "mat2_id": 0,
+    "mat2_n": 0,
+    "yieldBonusMax": 0,
+    "rareChance": 0.03
+  },
+  {
+    "toolId": 5102,
+    "level": 2,
+    "needPlayerLevel": 5,
+    "goldCost": 300,
+    "mat1_id": 3009,
+    "mat1_n": 5,
+    "mat2_id": 0,
+    "mat2_n": 0,
+    "yieldBonusMax": 1,
+    "rareChance": 0.06
+  },
+  {
+    "toolId": 5102,
+    "level": 3,
+    "needPlayerLevel": 10,
+    "goldCost": 1200,
+    "mat1_id": 3009,
+    "mat1_n": 10,
+    "mat2_id": 3010,
+    "mat2_n": 10,
+    "yieldBonusMax": 2,
+    "rareChance": 0.1
+  },
+  {
+    "toolId": 5103,
+    "level": 1,
+    "needPlayerLevel": 1,
+    "goldCost": 0,
+    "mat1_id": 0,
+    "mat1_n": 0,
+    "mat2_id": 0,
+    "mat2_n": 0,
+    "yieldBonusMax": 0,
+    "rareChance": 0.03
+  },
+  {
+    "toolId": 5103,
+    "level": 2,
+    "needPlayerLevel": 5,
+    "goldCost": 300,
+    "mat1_id": 3009,
+    "mat1_n": 5,
+    "mat2_id": 0,
+    "mat2_n": 0,
+    "yieldBonusMax": 1,
+    "rareChance": 0.06
+  },
+  {
+    "toolId": 5103,
+    "level": 3,
+    "needPlayerLevel": 10,
+    "goldCost": 1200,
+    "mat1_id": 3009,
+    "mat1_n": 10,
+    "mat2_id": 3010,
+    "mat2_n": 10,
+    "yieldBonusMax": 2,
+    "rareChance": 0.1
+  }
+]

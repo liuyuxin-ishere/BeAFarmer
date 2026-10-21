@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="7" result="Failed(Child)" total="7" passed="3" failed="4" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-21 06:24:56Z" end-time="2026-10-21 06:24:56Z" duration="0.2879551">
+  <test-suite type="TestSuite" id="1124" name="Farming" fullname="Farming" runstate="Runnable" testcasecount="95" result="Failed" site="Child" start-time="2026-10-21 06:24:56Z" end-time="2026-10-21 06:24:56Z" duration="0.287955" total="7" passed="3" failed="4" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1117" name="Game.Framework.PlayModeTests.dll" fullname="E:/Workbench/UnityWorkBench/Farming/Library/ScriptAssemblies/Game.Framework.PlayModeTests.dll" runstate="Runnable" testcasecount="95" result="Failed" site="Child" start-time="2026-10-21 06:24:56Z" end-time="2026-10-21 06:24:56Z" duration="0.278494" total="7" passed="3" failed="4" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="536" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1118" name="Game" fullname="Game" runstate="Runnable" testcasecount="95" result="Failed" site="Child" start-time="2026-10-21 06:24:56Z" end-time="2026-10-21 06:24:56Z" duration="0.277497" total="7" passed="3" failed="4" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1119" name="Framework" fullname="Game.Framework" runstate="Runnable" testcasecount="95" result="Failed" site="Child" start-time="2026-10-21 06:24:56Z" end-time="2026-10-21 06:24:56Z" duration="0.276903" total="7" passed="3" failed="4" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestSuite" id="1120" name="PlayModeTests" fullname="Game.Framework.PlayModeTests" runstate="Runnable" testcasecount="95" result="Failed" site="Child" start-time="2026-10-21 06:24:56Z" end-time="2026-10-21 06:24:56Z" duration="0.276139" total="7" passed="3" failed="4" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestFixture" id="1035" name="MouseKeyboardInputTests" fullname="Game.Framework.PlayModeTests.MouseKeyboardInputTests" classname="Game.Framework.PlayModeTests.MouseKeyboardInputTests" runstate="Runnable" testcasecount="5" result="Failed" site="Child" start-time="2026-10-21 06:24:56Z" end-time="2026-10-21 06:24:56Z" duration="0.126859" total="5" passed="1" failed="4" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1040" name="Disable_SuppressesOutput" fullname="Game.Framework.PlayModeTests.MouseKeyboardInputTests.Disable_SuppressesOutput" methodname="Disable_SuppressesOutput" classname="Game.Framework.PlayModeTests.MouseKeyboardInputTests" runstate="Runnable" seed="121525939" result="Passed" start-time="2026-10-21 06:24:56Z" end-time="2026-10-21 06:24:56Z" duration="0.089596" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1038" name="Drag_LogsThreePhases" fullname="Game.Framework.PlayModeTests.MouseKeyboardInputTests.Drag_LogsThreePhases" methodname="Drag_LogsThreePhases" classname="Game.Framework.PlayModeTests.MouseKeyboardInputTests" runstate="Runnable" seed="144869849" result="Failed" start-time="2026-10-21 06:24:56Z" end-time="2026-10-21 06:24:56Z" duration="0.007949" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected is <System.String[3]>, actual is <System.Collections.Generic.List`1[System.String]> with 0 elements
+  Values differ at index [0]
+  Missing:  < "start", "drag", "end" >]]></message>
+                  <stack-trace><![CDATA[at Game.Framework.PlayModeTests.MouseKeyboardInputTests.Drag_LogsThreePhases () [0x00123] in E:\Workbench\UnityWorkBench\Farming\Assets\Tests\PlayMode\MouseKeyboardInputTests.cs:112
+]]></stack-trace>
+                </failure>
+              </test-case>
+              <test-case id="1036" name="Move_LogsNormalizedVector" fullname="Game.Framework.PlayModeTests.MouseKeyboardInputTests.Move_LogsNormalizedVector" methodname="Move_LogsNormalizedVector" classname="Game.Framework.PlayModeTests.MouseKeyboardInputTests" runstate="Runnable" seed="575463584" result="Failed" start-time="2026-10-21 06:24:56Z" end-time="2026-10-21 06:24:56Z" duration="0.003562" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: greater than 0.0f
+  But was:  0.0f
+]]></message>
+                  <stack-trace><![CDATA[at Game.Framework.PlayModeTests.MouseKeyboardInputTests.Move_LogsNormalizedVector () [0x0002a] in E:\Workbench\UnityWorkBench\Farming\Assets\Tests\PlayMode\MouseKeyboardInputTests.cs:65
+]]></stack-trace>
+                </failure>
+              </test-case>
+              <test-case id="1037" name="Tap_LogsWithoutDrag" fullname="Game.Framework.PlayModeTests.MouseKeyboardInputTests.Tap_LogsWithoutDrag" methodname="Tap_LogsWithoutDrag" classname="Game.Framework.PlayModeTests.MouseKeyboardInputTests" runstate="Runnable" seed="1226929624" result="Failed" start-time="2026-10-21 06:24:56Z" end-time="2026-10-21 06:24:56Z" duration="0.002177" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+                  <stack-trace><![CDATA[at Game.Framework.PlayModeTests.MouseKeyboardInputTests.Tap_LogsWithoutDrag () [0x000be] in E:\Workbench\UnityWorkBench\Farming\Assets\Tests\PlayMode\MouseKeyboardInputTests.cs:85
+]]></stack-trace>
+                </failure>
+              </test-case>
+              <test-case id="1039" name="Zoom_LogsScroll" fullname="Game.Framework.PlayModeTests.MouseKeyboardInputTests.Zoom_LogsScroll" methodname="Zoom_LogsScroll" classname="Game.Framework.PlayModeTests.MouseKeyboardInputTests" runstate="Runnable" seed="767077452" result="Failed" start-time="2026-10-21 06:24:56Z" end-time="2026-10-21 06:24:56Z" duration="0.002282" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: 2.5f
+  But was:  0.0f
+]]></message>
+                  <stack-trace><![CDATA[at Game.Framework.PlayModeTests.MouseKeyboardInputTests.Zoom_LogsScroll () [0x00031] in E:\Workbench\UnityWorkBench\Farming\Assets\Tests\PlayMode\MouseKeyboardInputTests.cs:122
+]]></stack-trace>
+                </failure>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1081" name="UiLifecycleTests" fullname="Game.Framework.PlayModeTests.UiLifecycleTests" classname="Game.Framework.PlayModeTests.UiLifecycleTests" runstate="Runnable" testcasecount="18" result="Passed" start-time="2026-10-21 06:24:56Z" end-time="2026-10-21 06:24:56Z" duration="0.144020" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1087" name="Dialog_Confirm_EventSystemHitsOk_NotCoveredByBlocker" fullname="Game.Framework.PlayModeTests.UiLifecycleTests.Dialog_Confirm_EventSystemHitsOk_NotCoveredByBlocker" methodname="Dialog_Confirm_EventSystemHitsOk_NotCoveredByBlocker" classname="Game.Framework.PlayModeTests.UiLifecycleTests" runstate="Runnable" seed="778209515" result="Passed" start-time="2026-10-21 06:24:56Z" end-time="2026-10-21 06:24:56Z" duration="0.124629" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1086" name="Modal_BlocksRaycast_WhenOpen" fullname="Game.Framework.PlayModeTests.UiLifecycleTests.Modal_BlocksRaycast_WhenOpen" methodname="Modal_BlocksRaycast_WhenOpen" classname="Game.Framework.PlayModeTests.UiLifecycleTests" runstate="Runnable" seed="658062574" result="Passed" start-time="2026-10-21 06:24:56Z" end-time="2026-10-21 06:24:56Z" duration="0.013291" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Saving results to: C:/Users/Lenovo/AppData/LocalLow/DefaultCompany/Farming\TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

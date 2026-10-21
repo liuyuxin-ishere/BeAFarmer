@@ -1,0 +1,36 @@
+2026-10-21T06:16:46.0407405Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 file-logger E:\Workbench\UnityWorkBench\Farming\Docs\Acceptance\M1\20261020-xLua\Root-Finalization\Native-20261021-141638-780\client\client-logs
+2026-10-21T06:16:46.0504773Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 version-check http://localhost:25900/
+2026-10-21T06:16:46.1176675Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 patch-prepare
+2026-10-21T06:16:46.1613611Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 patch-prepare-attempt 1
+2026-10-21T06:16:46.4611923Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 resources-init
+2026-10-21T06:16:46.4672743Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 config
+2026-10-21T06:16:46.5313801Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 lua-prepare
+2026-10-21T06:16:46.6899297Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 commit-index
+2026-10-21T06:16:46.6904343Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 login-ready
+2026-10-21T06:16:54.1149330Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 file-logger E:\Workbench\UnityWorkBench\Farming\Docs\Acceptance\M1\20261020-xLua\Root-Finalization\Native-20261021-141638-780\client\client-logs
+2026-10-21T06:16:54.1334574Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 version-check http://localhost:25900/
+2026-10-21T06:16:54.2445478Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 patch-prepare
+2026-10-21T06:16:54.2997107Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 patch-prepare-attempt 1
+2026-10-21T06:16:54.3387988Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 resources-init
+2026-10-21T06:16:54.3444677Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 config
+2026-10-21T06:16:54.4070811Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 lua-prepare
+2026-10-21T06:16:54.4952807Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 commit-index
+2026-10-21T06:16:54.4968095Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 login-ready
+2026-10-21T06:17:01.2700861Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 file-logger E:\Workbench\UnityWorkBench\Farming\Docs\Acceptance\M1\20261020-xLua\Root-Finalization\Native-20261021-141638-780\client\client-logs
+2026-10-21T06:17:01.2851793Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 version-check http://localhost:25900/
+2026-10-21T06:17:01.3692118Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 patch-prepare
+2026-10-21T06:17:01.4136368Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 patch-prepare-attempt 1
+2026-10-21T06:17:01.5712832Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 resources-init
+2026-10-21T06:17:01.5784976Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 config
+2026-10-21T06:17:01.6338141Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 lua-prepare
+2026-10-21T06:17:01.7111029Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 commit-index
+2026-10-21T06:17:01.7294780Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 login-ready
+2026-10-21T06:17:07.8517387Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 file-logger E:\Workbench\UnityWorkBench\Farming\Docs\Acceptance\M1\20261020-xLua\Root-Finalization\Native-20261021-141638-780\client\client-logs
+2026-10-21T06:17:07.8650417Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 version-check http://localhost:25900/
+2026-10-21T06:17:07.9630333Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 patch-prepare
+2026-10-21T06:17:08.0150764Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 patch-prepare-attempt 1
+2026-10-21T06:17:08.0539368Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 resources-init
+2026-10-21T06:17:08.0611967Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 config
+2026-10-21T06:17:08.1058910Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 lua-prepare
+2026-10-21T06:17:08.1886187Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 commit-index
+2026-10-21T06:17:08.1918435Z INFO playerId=0 msgId=0 seq=0 opId=0 elapsedMs=0 login-ready

@@ -1,0 +1,11 @@
+-- 100 基线面板。只通过 BridgeApi 创建通用文本面板。
+
+local M = {}
+
+-- 无参数、无返回值。读取 banner 并创建 panel_base。
+function M.show_base()
+  local banner = CS.Game.Framework.Lua.BridgeApi.ConfigValue("banner")
+  CS.Game.Framework.Lua.BridgeApi.CreatePanel("panel_base", "panel_base", banner)
+end
+
+return M

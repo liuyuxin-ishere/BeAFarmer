@@ -1,0 +1,225 @@
+{
+  "source": "Assets/ReferenceDoc/云屿小筑_配置表与开发进度.xlsx",
+  "tables": [
+    {
+      "name": "Global",
+      "rows": 20,
+      "cols": [
+        "key",
+        "value",
+        "desc"
+      ]
+    },
+    {
+      "name": "Item",
+      "rows": 41,
+      "cols": [
+        "id",
+        "name",
+        "type",
+        "stackMax",
+        "sellPrice",
+        "buyPrice",
+        "unlockLevel",
+        "desc"
+      ]
+    },
+    {
+      "name": "Crop",
+      "rows": 7,
+      "cols": [
+        "id",
+        "name",
+        "seedId",
+        "yieldItemId",
+        "unlockLevel",
+        "growSec",
+        "yieldMin",
+        "yieldMax",
+        "exp",
+        "stageRatio"
+      ]
+    },
+    {
+      "name": "GatherNode",
+      "rows": 4,
+      "cols": [
+        "id",
+        "name",
+        "toolId",
+        "unlockLevel",
+        "count",
+        "itemId",
+        "yieldMin",
+        "yieldMax",
+        "cooldownSec",
+        "rareItemId",
+        "rareChance",
+        "exp"
+      ]
+    },
+    {
+      "name": "Tool",
+      "rows": 9,
+      "cols": [
+        "toolId",
+        "level",
+        "needPlayerLevel",
+        "goldCost",
+        "mat1_id",
+        "mat1_n",
+        "mat2_id",
+        "mat2_n",
+        "yieldBonusMax",
+        "rareChance"
+      ]
+    },
+    {
+      "name": "Facility",
+      "rows": 4,
+      "cols": [
+        "id",
+        "name",
+        "unlockLevel",
+        "buildGold",
+        "category"
+      ]
+    },
+    {
+      "name": "FacilityLevel",
+      "rows": 3,
+      "cols": [
+        "level",
+        "needPlayerLevel",
+        "slots",
+        "speedFactor",
+        "goldCost",
+        "mat1_id",
+        "mat1_n",
+        "mat2_id",
+        "mat2_n",
+        "mat3_id",
+        "mat3_n"
+      ]
+    },
+    {
+      "name": "Recipe",
+      "rows": 11,
+      "cols": [
+        "id",
+        "name",
+        "facilityId",
+        "unlockLevel",
+        "in1_id",
+        "in1_n",
+        "in2_id",
+        "in2_n",
+        "out_id",
+        "out_n",
+        "durationSec",
+        "exp"
+      ]
+    },
+    {
+      "name": "Level",
+      "rows": 19,
+      "cols": [
+        "level",
+        "needExp"
+      ]
+    },
+    {
+      "name": "Plot",
+      "rows": 6,
+      "cols": [
+        "stage",
+        "needPlayerLevel",
+        "totalPlots",
+        "unlockGold"
+      ]
+    },
+    {
+      "name": "OrderRule",
+      "rows": 14,
+      "cols": [
+        "key",
+        "value",
+        "desc"
+      ]
+    },
+    {
+      "name": "Furniture",
+      "rows": 10,
+      "cols": [
+        "id",
+        "name",
+        "sizeW",
+        "sizeH",
+        "price",
+        "unlockLevel",
+        "comfort"
+      ]
+    },
+    {
+      "name": "AvatarItem",
+      "rows": 36,
+      "cols": [
+        "id",
+        "name",
+        "part",
+        "rarity",
+        "source",
+        "price",
+        "poolGroup",
+        "isUp"
+      ]
+    },
+    {
+      "name": "GachaRule",
+      "rows": 18,
+      "cols": [
+        "key",
+        "value",
+        "desc"
+      ]
+    },
+    {
+      "name": "GachaPool",
+      "rows": 2,
+      "cols": [
+        "poolId",
+        "name",
+        "type",
+        "activityId",
+        "upItemIds",
+        "hasUp"
+      ]
+    },
+    {
+      "name": "GachaPoolItem",
+      "rows": 54,
+      "cols": [
+        "poolId",
+        "rarity",
+        "itemId",
+        "weight",
+        "isUp"
+      ]
+    },
+    {
+      "name": "Activity",
+      "rows": 1,
+      "cols": [
+        "activityId",
+        "name",
+        "type",
+        "poolId",
+        "startTime",
+        "endTime",
+        "preloadSec",
+        "resourceBundle",
+        "entryIcon"
+      ]
+    }
+  ]
+}

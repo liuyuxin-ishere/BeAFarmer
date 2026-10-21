@@ -1,0 +1,19 @@
+{
+  "players": [
+    {
+      "id": 1,
+      "account_id": 1,
+      "nickname": "FinalNick",
+      "level": 1,
+      "exp": 0,
+      "gold": 200,
+      "gem": 300,
+      "ticket": 5,
+      "shard": 0,
+      "bag_slots": 60,
+      "guide_step": 0,
+      "last_daily_reset": 0
+    }
+  ],
+  "savedSnapshots": []
+}

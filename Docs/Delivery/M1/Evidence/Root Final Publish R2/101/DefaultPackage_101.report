@@ -1,0 +1,1017 @@
+{
+    "Summary": {
+        "YooVersion": "3.0.6",
+        "UnityVersion": "6000.3.22f1",
+        "BuildDate": "2026/10/21 14:14:00",
+        "BuildSeconds": 9,
+        "BuildTarget": 19,
+        "BuildPipeline": "ScriptableBuildPipeline",
+        "BuildBundleType": 2,
+        "BuildPackageName": "DefaultPackage",
+        "BuildPackageVersion": "101",
+        "BuildPackageNote": "2026/10/21 14:13:50",
+        "UniqueBundleName": false,
+        "EnableAddressable": true,
+        "SupportExtensionless": true,
+        "LocationToLower": false,
+        "IncludeAssetGuid": false,
+        "AutoCollectShaders": true,
+        "IgnoreRuleName": "YooAsset.Editor.NormalIgnoreRule",
+        "ClearBuildCacheFiles": true,
+        "UseAssetDependencyDB": true,
+        "EnableSharePackRule": true,
+        "SingleReferencedPackAlone": true,
+        "EncryptionServicesClassName": "null",
+        "ManifestProcessServicesClassName": "null",
+        "ManifestRestoreServicesClassName": "null",
+        "FileNameStyle": 0,
+        "CompressOption": 2,
+        "DisableWriteTypeTree": false,
+        "IgnoreTypeTreeChanges": false,
+        "ReplaceAssetPathWithAddress": false,
+        "WriteLinkXML": true,
+        "CacheServerHost": "",
+        "CacheServerPort": 0,
+        "BuiltinShadersBundleName": "unityshaders.bundle",
+        "MonoScriptsBundleName": "",
+        "AssetFileTotalCount": 30,
+        "MainAssetTotalCount": 29,
+        "AllBundleTotalCount": 30,
+        "AllBundleTotalSize": 284223,
+        "EncryptedBundleTotalCount": 0,
+        "EncryptedBundleTotalSize": 0
+    },
+    "AssetInfos": [
+        {
+            "Address": "config_manifest",
+            "AssetPath": "Assets/ConfigLuban/config_manifest.json",
+            "AssetGuid": "e636c18a101246fda56a4e6d2bbb4659",
+            "AssetTags": [
+                "config"
+            ],
+            "MainBundleName": "assets_configluban_config_manifest.bundle",
+            "MainBundleSize": 3119,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "tbactivity",
+            "AssetPath": "Assets/ConfigLuban/tbactivity.json",
+            "AssetGuid": "5380b22cb292462d9489ea0ab6c1ea1a",
+            "AssetTags": [
+                "config"
+            ],
+            "MainBundleName": "assets_configluban_tbactivity.bundle",
+            "MainBundleSize": 1403,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "tbavataritem",
+            "AssetPath": "Assets/ConfigLuban/tbavataritem.json",
+            "AssetGuid": "c15e6a55b0594dbb87d146e460785778",
+            "AssetTags": [
+                "config"
+            ],
+            "MainBundleName": "assets_configluban_tbavataritem.bundle",
+            "MainBundleSize": 2060,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "tbcrop",
+            "AssetPath": "Assets/ConfigLuban/tbcrop.json",
+            "AssetGuid": "521c16b916ad49de978e0d5d790e0ff7",
+            "AssetTags": [
+                "config"
+            ],
+            "MainBundleName": "assets_configluban_tbcrop.bundle",
+            "MainBundleSize": 1654,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "tbfacility",
+            "AssetPath": "Assets/ConfigLuban/tbfacility.json",
+            "AssetGuid": "ab4185889031449f8bff31c4850ae293",
+            "AssetTags": [
+                "config"
+            ],
+            "MainBundleName": "assets_configluban_tbfacility.bundle",
+            "MainBundleSize": 1496,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "tbfacilitylevel",
+            "AssetPath": "Assets/ConfigLuban/tbfacilitylevel.json",
+            "AssetGuid": "8aed6ff162c44d6e862d83c6bb9f021d",
+            "AssetTags": [
+                "config"
+            ],
+            "MainBundleName": "assets_configluban_tbfacilitylevel.bundle",
+            "MainBundleSize": 1401,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "tbfurniture",
+            "AssetPath": "Assets/ConfigLuban/tbfurniture.json",
+            "AssetGuid": "c81c714059394d57bed83d00fc5f8b31",
+            "AssetTags": [
+                "config"
+            ],
+            "MainBundleName": "assets_configluban_tbfurniture.bundle",
+            "MainBundleSize": 1556,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "tbgachapool",
+            "AssetPath": "Assets/ConfigLuban/tbgachapool.json",
+            "AssetGuid": "a1c4c3d2fc4342eb9a934c9228557a01",
+            "AssetTags": [
+                "config"
+            ],
+            "MainBundleName": "assets_configluban_tbgachapool.bundle",
+            "MainBundleSize": 1373,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "tbgachapoolitem",
+            "AssetPath": "Assets/ConfigLuban/tbgachapoolitem.json",
+            "AssetGuid": "eeb4f1f3d23549b69528f1f8042821e4",
+            "AssetTags": [
+                "config"
+            ],
+            "MainBundleName": "assets_configluban_tbgachapoolitem.bundle",
+            "MainBundleSize": 1613,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "tbgacharule",
+            "AssetPath": "Assets/ConfigLuban/tbgacharule.json",
+            "AssetGuid": "1726a25358664ccbbcac8d617de8a32a",
+            "AssetTags": [
+                "config"
+            ],
+            "MainBundleName": "assets_configluban_tbgacharule.bundle",
+            "MainBundleSize": 1826,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "tbgathernode",
+            "AssetPath": "Assets/ConfigLuban/tbgathernode.json",
+            "AssetGuid": "c3e5e8f53afe45e9b724b7f14cff7c2d",
+            "AssetTags": [
+                "config"
+            ],
+            "MainBundleName": "assets_configluban_tbgathernode.bundle",
+            "MainBundleSize": 1533,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "tbglobal",
+            "AssetPath": "Assets/ConfigLuban/tbglobal.json",
+            "AssetGuid": "3ca0c93a07df4ec68bbfbf462793add4",
+            "AssetTags": [
+                "config"
+            ],
+            "MainBundleName": "assets_configluban_tbglobal.bundle",
+            "MainBundleSize": 1645,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "tbglobalkv",
+            "AssetPath": "Assets/ConfigLuban/tbglobalkv.json",
+            "AssetGuid": "7895c12843da4bccbd697b135234a8d8",
+            "AssetTags": [
+                "config"
+            ],
+            "MainBundleName": "assets_configluban_tbglobalkv.bundle",
+            "MainBundleSize": 1720,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "tbitem",
+            "AssetPath": "Assets/ConfigLuban/tbitem.json",
+            "AssetGuid": "06b3ae9cf36e46689e49896ccc1a0d18",
+            "AssetTags": [
+                "config"
+            ],
+            "MainBundleName": "assets_configluban_tbitem.bundle",
+            "MainBundleSize": 2535,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "tblevel",
+            "AssetPath": "Assets/ConfigLuban/tblevel.json",
+            "AssetGuid": "de7c7a96ca51418e83c1673d104ea22f",
+            "AssetTags": [
+                "config"
+            ],
+            "MainBundleName": "assets_configluban_tblevel.bundle",
+            "MainBundleSize": 1436,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "tborderrule",
+            "AssetPath": "Assets/ConfigLuban/tborderrule.json",
+            "AssetGuid": "d0806d6b9e954d90800f5e4be35c01b2",
+            "AssetTags": [
+                "config"
+            ],
+            "MainBundleName": "assets_configluban_tborderrule.bundle",
+            "MainBundleSize": 1851,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "tbplot",
+            "AssetPath": "Assets/ConfigLuban/tbplot.json",
+            "AssetGuid": "c21d3f008f5a4ae785a71b0e1740ba49",
+            "AssetTags": [
+                "config"
+            ],
+            "MainBundleName": "assets_configluban_tbplot.bundle",
+            "MainBundleSize": 1383,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "tbrecipe",
+            "AssetPath": "Assets/ConfigLuban/tbrecipe.json",
+            "AssetGuid": "ff97735f811e42f5baf877073a6f4bb9",
+            "AssetTags": [
+                "config"
+            ],
+            "MainBundleName": "assets_configluban_tbrecipe.bundle",
+            "MainBundleSize": 1795,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "tbtool",
+            "AssetPath": "Assets/ConfigLuban/tbtool.json",
+            "AssetGuid": "4d8fa87b33324fddae5b49be943d66cd",
+            "AssetTags": [
+                "config"
+            ],
+            "MainBundleName": "assets_configluban_tbtool.bundle",
+            "MainBundleSize": 1435,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "Home",
+            "AssetPath": "Assets/Res/PoC/Home.unity",
+            "AssetGuid": "be2c5adf66bab1043b853bf5c6c2f5a8",
+            "AssetTags": [
+                "poc"
+            ],
+            "MainBundleName": "assets_res_poc_home.bundle",
+            "MainBundleSize": 5267,
+            "DependAssets": [],
+            "DependBundles": [
+                "unityshaders.bundle"
+            ]
+        },
+        {
+            "Address": "PatchCube",
+            "AssetPath": "Assets/Res/PoC/PatchCube.prefab",
+            "AssetGuid": "a75b8cc3a9b82f54688d1efb65844e87",
+            "AssetTags": [
+                "poc"
+            ],
+            "MainBundleName": "assets_res_poc_patchcube.bundle",
+            "MainBundleSize": 3715,
+            "DependAssets": [
+                {
+                    "AssetPath": "Assets/Res/PoC/PatchCubeMat.mat",
+                    "AssetGUID": "920338f209d19384c911f2db3309b1bb"
+                },
+                {
+                    "AssetPath": "Packages/com.unity.render-pipelines.universal/Shaders/Lit.shader",
+                    "AssetGUID": "933532a4fcc9baf4fa0491de14d08ed7"
+                }
+            ],
+            "DependBundles": [
+                "assets_res_poc_patchcubemat.bundle",
+                "unityshaders.bundle"
+            ]
+        },
+        {
+            "Address": "PatchCubeMat",
+            "AssetPath": "Assets/Res/PoC/PatchCubeMat.mat",
+            "AssetGuid": "920338f209d19384c911f2db3309b1bb",
+            "AssetTags": [
+                "poc"
+            ],
+            "MainBundleName": "assets_res_poc_patchcubemat.bundle",
+            "MainBundleSize": 2983,
+            "DependAssets": [
+                {
+                    "AssetPath": "Packages/com.unity.render-pipelines.universal/Shaders/Lit.shader",
+                    "AssetGUID": "933532a4fcc9baf4fa0491de14d08ed7"
+                }
+            ],
+            "DependBundles": [
+                "unityshaders.bundle"
+            ]
+        },
+        {
+            "Address": "HomeHudWindow",
+            "AssetPath": "Assets/Res/UI/HomeHudWindow.prefab",
+            "AssetGuid": "58c5d4960c8fdc245b1fdbd2d1224da3",
+            "AssetTags": [
+                "ui"
+            ],
+            "MainBundleName": "assets_res_ui_homehudwindow.bundle",
+            "MainBundleSize": 6154,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "LoginWindow",
+            "AssetPath": "Assets/Res/UI/LoginWindow.prefab",
+            "AssetGuid": "a2feb02d8efdc69439348f3748219617",
+            "AssetTags": [
+                "ui"
+            ],
+            "MainBundleName": "assets_res_ui_loginwindow.bundle",
+            "MainBundleSize": 8579,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "PatchDemoWindow",
+            "AssetPath": "Assets/Res/UI/PatchDemoWindow.prefab",
+            "AssetGuid": "ca5ac8a377537d648ae5c213d2c36740",
+            "AssetTags": [
+                "ui"
+            ],
+            "MainBundleName": "assets_res_ui_patchdemowindow.bundle",
+            "MainBundleSize": 4327,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "UiTestWindow",
+            "AssetPath": "Assets/Res/UI/UiTestWindow.prefab",
+            "AssetGuid": "6cdf9822386667e43802623c06adfde2",
+            "AssetTags": [
+                "ui"
+            ],
+            "MainBundleName": "assets_res_ui_uitestwindow.bundle",
+            "MainBundleSize": 5873,
+            "DependAssets": [],
+            "DependBundles": []
+        },
+        {
+            "Address": "M1_Boot",
+            "AssetPath": "Assets/Scenes/M1/M1_Boot.unity",
+            "AssetGuid": "ad796098ae9a01f498b3f6ee0665da4f",
+            "AssetTags": [
+                "m1"
+            ],
+            "MainBundleName": "assets_scenes_m1_m1_boot.bundle",
+            "MainBundleSize": 8146,
+            "DependAssets": [],
+            "DependBundles": [
+                "unityshaders.bundle"
+            ]
+        },
+        {
+            "Address": "M1_Home",
+            "AssetPath": "Assets/Scenes/M1/M1_Home.unity",
+            "AssetGuid": "aa75d8fc1af4eab43a61dde2a90c5597",
+            "AssetTags": [
+                "m1"
+            ],
+            "MainBundleName": "assets_scenes_m1_m1_home.bundle",
+            "MainBundleSize": 8767,
+            "DependAssets": [],
+            "DependBundles": [
+                "unityshaders.bundle"
+            ]
+        },
+        {
+            "Address": "M1_Login",
+            "AssetPath": "Assets/Scenes/M1/M1_Login.unity",
+            "AssetGuid": "7a91b188a9bd03d408dad7d76e40e018",
+            "AssetTags": [
+                "m1"
+            ],
+            "MainBundleName": "assets_scenes_m1_m1_login.bundle",
+            "MainBundleSize": 8768,
+            "DependAssets": [],
+            "DependBundles": [
+                "unityshaders.bundle"
+            ]
+        }
+    ],
+    "BundleInfos": [
+        {
+            "BundleName": "assets_configluban_config_manifest.bundle",
+            "FileName": "3f9b208da532b29e2a902cc6bc934a06.bundle",
+            "FileHash": "3f9b208da532b29e2a902cc6bc934a06",
+            "FileCrc": 159619040,
+            "FileSize": 3119,
+            "Encrypted": false,
+            "Tags": [
+                "config"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/ConfigLuban/config_manifest.json",
+                    "AssetGUID": "e636c18a101246fda56a4e6d2bbb4659"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_configluban_tbactivity.bundle",
+            "FileName": "0e577784dcf5eb0033a3cedb0f0700f9.bundle",
+            "FileHash": "0e577784dcf5eb0033a3cedb0f0700f9",
+            "FileCrc": 1451504992,
+            "FileSize": 1403,
+            "Encrypted": false,
+            "Tags": [
+                "config"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/ConfigLuban/tbactivity.json",
+                    "AssetGUID": "5380b22cb292462d9489ea0ab6c1ea1a"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_configluban_tbavataritem.bundle",
+            "FileName": "f41a9ab0f51718dff8a5dac4e5a13059.bundle",
+            "FileHash": "f41a9ab0f51718dff8a5dac4e5a13059",
+            "FileCrc": 3418349683,
+            "FileSize": 2060,
+            "Encrypted": false,
+            "Tags": [
+                "config"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/ConfigLuban/tbavataritem.json",
+                    "AssetGUID": "c15e6a55b0594dbb87d146e460785778"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_configluban_tbcrop.bundle",
+            "FileName": "8e8f06d4a091342fe82a10c8fc883ee2.bundle",
+            "FileHash": "8e8f06d4a091342fe82a10c8fc883ee2",
+            "FileCrc": 1466729280,
+            "FileSize": 1654,
+            "Encrypted": false,
+            "Tags": [
+                "config"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/ConfigLuban/tbcrop.json",
+                    "AssetGUID": "521c16b916ad49de978e0d5d790e0ff7"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_configluban_tbfacility.bundle",
+            "FileName": "e01f5ca776209fc09a7b726d3e623dd1.bundle",
+            "FileHash": "e01f5ca776209fc09a7b726d3e623dd1",
+            "FileCrc": 1512377106,
+            "FileSize": 1496,
+            "Encrypted": false,
+            "Tags": [
+                "config"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/ConfigLuban/tbfacility.json",
+                    "AssetGUID": "ab4185889031449f8bff31c4850ae293"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_configluban_tbfacilitylevel.bundle",
+            "FileName": "708506cdc9528c40d2adb0cdc950df0d.bundle",
+            "FileHash": "708506cdc9528c40d2adb0cdc950df0d",
+            "FileCrc": 3514051429,
+            "FileSize": 1401,
+            "Encrypted": false,
+            "Tags": [
+                "config"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/ConfigLuban/tbfacilitylevel.json",
+                    "AssetGUID": "8aed6ff162c44d6e862d83c6bb9f021d"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_configluban_tbfurniture.bundle",
+            "FileName": "67f5909d64f4fa991c8817d3824b681e.bundle",
+            "FileHash": "67f5909d64f4fa991c8817d3824b681e",
+            "FileCrc": 112947322,
+            "FileSize": 1556,
+            "Encrypted": false,
+            "Tags": [
+                "config"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/ConfigLuban/tbfurniture.json",
+                    "AssetGUID": "c81c714059394d57bed83d00fc5f8b31"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_configluban_tbgachapool.bundle",
+            "FileName": "16b6ce0acd8223aa0b64c1bc951b63e9.bundle",
+            "FileHash": "16b6ce0acd8223aa0b64c1bc951b63e9",
+            "FileCrc": 2784798559,
+            "FileSize": 1373,
+            "Encrypted": false,
+            "Tags": [
+                "config"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/ConfigLuban/tbgachapool.json",
+                    "AssetGUID": "a1c4c3d2fc4342eb9a934c9228557a01"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_configluban_tbgachapoolitem.bundle",
+            "FileName": "61cfa6c4c2f691b5d700bcc64158a5ef.bundle",
+            "FileHash": "61cfa6c4c2f691b5d700bcc64158a5ef",
+            "FileCrc": 2305179822,
+            "FileSize": 1613,
+            "Encrypted": false,
+            "Tags": [
+                "config"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/ConfigLuban/tbgachapoolitem.json",
+                    "AssetGUID": "eeb4f1f3d23549b69528f1f8042821e4"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_configluban_tbgacharule.bundle",
+            "FileName": "bd89fd792e03525c89206ecbf6233bf3.bundle",
+            "FileHash": "bd89fd792e03525c89206ecbf6233bf3",
+            "FileCrc": 2074135044,
+            "FileSize": 1826,
+            "Encrypted": false,
+            "Tags": [
+                "config"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/ConfigLuban/tbgacharule.json",
+                    "AssetGUID": "1726a25358664ccbbcac8d617de8a32a"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_configluban_tbgathernode.bundle",
+            "FileName": "ec02b61943021d57ed4d9e4ffa3df94c.bundle",
+            "FileHash": "ec02b61943021d57ed4d9e4ffa3df94c",
+            "FileCrc": 3674024377,
+            "FileSize": 1533,
+            "Encrypted": false,
+            "Tags": [
+                "config"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/ConfigLuban/tbgathernode.json",
+                    "AssetGUID": "c3e5e8f53afe45e9b724b7f14cff7c2d"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_configluban_tbglobal.bundle",
+            "FileName": "478c0719d341653e77bb2bd9c28b151b.bundle",
+            "FileHash": "478c0719d341653e77bb2bd9c28b151b",
+            "FileCrc": 3211110041,
+            "FileSize": 1645,
+            "Encrypted": false,
+            "Tags": [
+                "config"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/ConfigLuban/tbglobal.json",
+                    "AssetGUID": "3ca0c93a07df4ec68bbfbf462793add4"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_configluban_tbglobalkv.bundle",
+            "FileName": "dcd8cd257cd0926a7616938290eb746d.bundle",
+            "FileHash": "dcd8cd257cd0926a7616938290eb746d",
+            "FileCrc": 3834652352,
+            "FileSize": 1720,
+            "Encrypted": false,
+            "Tags": [
+                "config"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/ConfigLuban/tbglobalkv.json",
+                    "AssetGUID": "7895c12843da4bccbd697b135234a8d8"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_configluban_tbitem.bundle",
+            "FileName": "ad988a1b0696276f1454e412f019fe79.bundle",
+            "FileHash": "ad988a1b0696276f1454e412f019fe79",
+            "FileCrc": 2461467167,
+            "FileSize": 2535,
+            "Encrypted": false,
+            "Tags": [
+                "config"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/ConfigLuban/tbitem.json",
+                    "AssetGUID": "06b3ae9cf36e46689e49896ccc1a0d18"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_configluban_tblevel.bundle",
+            "FileName": "701c07241b769c665c704307dd494555.bundle",
+            "FileHash": "701c07241b769c665c704307dd494555",
+            "FileCrc": 477554252,
+            "FileSize": 1436,
+            "Encrypted": false,
+            "Tags": [
+                "config"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/ConfigLuban/tblevel.json",
+                    "AssetGUID": "de7c7a96ca51418e83c1673d104ea22f"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_configluban_tborderrule.bundle",
+            "FileName": "3b916d705a349e99ec3dee2042a77116.bundle",
+            "FileHash": "3b916d705a349e99ec3dee2042a77116",
+            "FileCrc": 1605031514,
+            "FileSize": 1851,
+            "Encrypted": false,
+            "Tags": [
+                "config"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/ConfigLuban/tborderrule.json",
+                    "AssetGUID": "d0806d6b9e954d90800f5e4be35c01b2"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_configluban_tbplot.bundle",
+            "FileName": "6665f3c63241c6d00e79abe570ce8e35.bundle",
+            "FileHash": "6665f3c63241c6d00e79abe570ce8e35",
+            "FileCrc": 3105142256,
+            "FileSize": 1383,
+            "Encrypted": false,
+            "Tags": [
+                "config"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/ConfigLuban/tbplot.json",
+                    "AssetGUID": "c21d3f008f5a4ae785a71b0e1740ba49"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_configluban_tbrecipe.bundle",
+            "FileName": "bc4e5a8b2dcf844aef881cb4b55354f2.bundle",
+            "FileHash": "bc4e5a8b2dcf844aef881cb4b55354f2",
+            "FileCrc": 1015593521,
+            "FileSize": 1795,
+            "Encrypted": false,
+            "Tags": [
+                "config"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/ConfigLuban/tbrecipe.json",
+                    "AssetGUID": "ff97735f811e42f5baf877073a6f4bb9"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_configluban_tbtool.bundle",
+            "FileName": "b5175ed09be244981e03bdf2f7f35242.bundle",
+            "FileHash": "b5175ed09be244981e03bdf2f7f35242",
+            "FileCrc": 4212252616,
+            "FileSize": 1435,
+            "Encrypted": false,
+            "Tags": [
+                "config"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/ConfigLuban/tbtool.json",
+                    "AssetGUID": "4d8fa87b33324fddae5b49be943d66cd"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_res_poc_home.bundle",
+            "FileName": "c0ff562927e24fb7d3cf48d2aa6d9680.bundle",
+            "FileHash": "c0ff562927e24fb7d3cf48d2aa6d9680",
+            "FileCrc": 1749923421,
+            "FileSize": 5267,
+            "Encrypted": false,
+            "Tags": [
+                "poc"
+            ],
+            "DependBundles": [
+                "unityshaders.bundle"
+            ],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/Res/PoC/Home.unity",
+                    "AssetGUID": "be2c5adf66bab1043b853bf5c6c2f5a8"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_res_poc_patchcube.bundle",
+            "FileName": "9ed433d93b40aecb7c1439c137c5a5aa.bundle",
+            "FileHash": "9ed433d93b40aecb7c1439c137c5a5aa",
+            "FileCrc": 1285023928,
+            "FileSize": 3715,
+            "Encrypted": false,
+            "Tags": [
+                "poc"
+            ],
+            "DependBundles": [
+                "assets_res_poc_patchcubemat.bundle",
+                "unityshaders.bundle"
+            ],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/Res/PoC/PatchCube.prefab",
+                    "AssetGUID": "a75b8cc3a9b82f54688d1efb65844e87"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_res_poc_patchcubemat.bundle",
+            "FileName": "18fce21787cc9a4034cd149a0eeb951e.bundle",
+            "FileHash": "18fce21787cc9a4034cd149a0eeb951e",
+            "FileCrc": 1349901357,
+            "FileSize": 2983,
+            "Encrypted": false,
+            "Tags": [
+                "poc"
+            ],
+            "DependBundles": [
+                "unityshaders.bundle"
+            ],
+            "ReferenceBundles": [
+                "assets_res_poc_patchcube.bundle"
+            ],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/Res/PoC/PatchCubeMat.mat",
+                    "AssetGUID": "920338f209d19384c911f2db3309b1bb"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_res_ui_homehudwindow.bundle",
+            "FileName": "9138297a80c0da016308b2535369547c.bundle",
+            "FileHash": "9138297a80c0da016308b2535369547c",
+            "FileCrc": 3702729889,
+            "FileSize": 6154,
+            "Encrypted": false,
+            "Tags": [
+                "ui"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/Res/UI/HomeHudWindow.prefab",
+                    "AssetGUID": "58c5d4960c8fdc245b1fdbd2d1224da3"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_res_ui_loginwindow.bundle",
+            "FileName": "464043f2d67f79c5f46c93de773d6a7a.bundle",
+            "FileHash": "464043f2d67f79c5f46c93de773d6a7a",
+            "FileCrc": 4014174246,
+            "FileSize": 8579,
+            "Encrypted": false,
+            "Tags": [
+                "ui"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/Res/UI/LoginWindow.prefab",
+                    "AssetGUID": "a2feb02d8efdc69439348f3748219617"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_res_ui_patchdemowindow.bundle",
+            "FileName": "b4a886ad73bacc729d94d2b5adf8c03a.bundle",
+            "FileHash": "b4a886ad73bacc729d94d2b5adf8c03a",
+            "FileCrc": 3344539821,
+            "FileSize": 4327,
+            "Encrypted": false,
+            "Tags": [
+                "ui"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/Res/UI/PatchDemoWindow.prefab",
+                    "AssetGUID": "ca5ac8a377537d648ae5c213d2c36740"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_res_ui_uitestwindow.bundle",
+            "FileName": "09be87fb630df9a81738be5b2cb7d1b6.bundle",
+            "FileHash": "09be87fb630df9a81738be5b2cb7d1b6",
+            "FileCrc": 1358737291,
+            "FileSize": 5873,
+            "Encrypted": false,
+            "Tags": [
+                "ui"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/Res/UI/UiTestWindow.prefab",
+                    "AssetGUID": "6cdf9822386667e43802623c06adfde2"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_scenes_m1_m1_boot.bundle",
+            "FileName": "fe43a9f2434f18d4237422244ea6eb07.bundle",
+            "FileHash": "fe43a9f2434f18d4237422244ea6eb07",
+            "FileCrc": 923611335,
+            "FileSize": 8146,
+            "Encrypted": false,
+            "Tags": [
+                "m1"
+            ],
+            "DependBundles": [
+                "unityshaders.bundle"
+            ],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/Scenes/M1/M1_Boot.unity",
+                    "AssetGUID": "ad796098ae9a01f498b3f6ee0665da4f"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_scenes_m1_m1_home.bundle",
+            "FileName": "674319b6a3bcce6085ca2926e35857a6.bundle",
+            "FileHash": "674319b6a3bcce6085ca2926e35857a6",
+            "FileCrc": 1382448393,
+            "FileSize": 8767,
+            "Encrypted": false,
+            "Tags": [
+                "m1"
+            ],
+            "DependBundles": [
+                "unityshaders.bundle"
+            ],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/Scenes/M1/M1_Home.unity",
+                    "AssetGUID": "aa75d8fc1af4eab43a61dde2a90c5597"
+                }
+            ]
+        },
+        {
+            "BundleName": "assets_scenes_m1_m1_login.bundle",
+            "FileName": "3b372456d28937701887c03f8a6b066a.bundle",
+            "FileHash": "3b372456d28937701887c03f8a6b066a",
+            "FileCrc": 2205854112,
+            "FileSize": 8768,
+            "Encrypted": false,
+            "Tags": [
+                "m1"
+            ],
+            "DependBundles": [
+                "unityshaders.bundle"
+            ],
+            "ReferenceBundles": [],
+            "BundleContents": [
+                {
+                    "AssetPath": "Assets/Scenes/M1/M1_Login.unity",
+                    "AssetGUID": "7a91b188a9bd03d408dad7d76e40e018"
+                }
+            ]
+        },
+        {
+            "BundleName": "unityshaders.bundle",
+            "FileName": "d0f75e5663b149395f868d16bb234749.bundle",
+            "FileHash": "d0f75e5663b149395f868d16bb234749",
+            "FileCrc": 3395917376,
+            "FileSize": 188810,
+            "Encrypted": false,
+            "Tags": [
+                "poc",
+                "m1"
+            ],
+            "DependBundles": [],
+            "ReferenceBundles": [
+                "assets_res_poc_home.bundle",
+                "assets_res_poc_patchcube.bundle",
+                "assets_res_poc_patchcubemat.bundle",
+                "assets_scenes_m1_m1_boot.bundle",
+                "assets_scenes_m1_m1_home.bundle",
+                "assets_scenes_m1_m1_login.bundle"
+            ],
+            "BundleContents": [
+                {
+                    "AssetPath": "Packages/com.unity.render-pipelines.universal/Shaders/Lit.shader",
+                    "AssetGUID": "933532a4fcc9baf4fa0491de14d08ed7"
+                }
+            ]
+        }
+    ],
+    "IndependentAssets": []
+}

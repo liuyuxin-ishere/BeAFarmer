@@ -1,0 +1,41 @@
+-- PlayMode / 验收用占位控制器。不是 Login/Home 业务窗。
+-- 模块导出 new()，每次 open 独立实例；C# 经 LuaTable.Cast<ILuaUiController>。
+
+local UIWindow = require("UI/UIWindow")
+local M = {}
+
+function M.new()
+  local self = UIWindow.new()
+
+  function self:OnCreate(view)
+    UIWindow.OnCreate(self, view)
+    view:SetText("Title", "TestWindow")
+    view:SetText("Body", "ready")
+    self._click = view:SubscribeClick("OkButton", function()
+      view:SetText("Body", "clicked")
+    end)
+  end
+
+  function self:OnOpen(argsJson)
+    UIWindow.OnOpen(self, argsJson)
+    if self.view then
+      self.view:SetText("Body", tostring(argsJson or ""))
+    end
+  end
+
+  function self:OnClose()
+    UIWindow.OnClose(self)
+  end
+
+  function self:OnDestroy()
+    if self._click then
+      self._click:Dispose()
+      self._click = nil
+    end
+    UIWindow.OnDestroy(self)
+  end
+
+  return self
+end
+
+return M

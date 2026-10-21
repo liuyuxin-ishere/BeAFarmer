@@ -1,0 +1,123 @@
+[
+  {
+    "id": 1,
+    "code": "RC001",
+    "name": "面粉",
+    "facilityId": 1,
+    "unlockLevel": 2,
+    "inputs": "1001:3",
+    "output": "3001:1",
+    "durationSec": 60,
+    "exp": 1
+  },
+  {
+    "id": 9,
+    "code": "RC009",
+    "name": "木板",
+    "facilityId": 2,
+    "unlockLevel": 3,
+    "inputs": "4001:3",
+    "output": "3009:1",
+    "durationSec": 90,
+    "exp": 2
+  },
+  {
+    "id": 10,
+    "code": "RC010",
+    "name": "石砖",
+    "facilityId": 2,
+    "unlockLevel": 3,
+    "inputs": "4002:3",
+    "output": "3010:1",
+    "durationSec": 90,
+    "exp": 2
+  },
+  {
+    "id": 2,
+    "code": "RC002",
+    "name": "面包",
+    "facilityId": 3,
+    "unlockLevel": 4,
+    "inputs": "3001:2",
+    "output": "3002:1",
+    "durationSec": 120,
+    "exp": 3
+  },
+  {
+    "id": 3,
+    "code": "RC003",
+    "name": "蔬菜汤",
+    "facilityId": 4,
+    "unlockLevel": 4,
+    "inputs": "1002:2;1003:2",
+    "output": "3003:1",
+    "durationSec": 180,
+    "exp": 4
+  },
+  {
+    "id": 4,
+    "code": "RC004",
+    "name": "果酱",
+    "facilityId": 4,
+    "unlockLevel": 4,
+    "inputs": "4004:3",
+    "output": "3005:1",
+    "durationSec": 150,
+    "exp": 3
+  },
+  {
+    "id": 5,
+    "code": "RC005",
+    "name": "番茄酱",
+    "facilityId": 4,
+    "unlockLevel": 5,
+    "inputs": "1004:3",
+    "output": "3004:1",
+    "durationSec": 180,
+    "exp": 5
+  },
+  {
+    "id": 11,
+    "code": "RC011",
+    "name": "花束",
+    "facilityId": 2,
+    "unlockLevel": 6,
+    "inputs": "4003:4",
+    "output": "3011:1",
+    "durationSec": 120,
+    "exp": 3
+  },
+  {
+    "id": 6,
+    "code": "RC006",
+    "name": "玉米饼",
+    "facilityId": 3,
+    "unlockLevel": 7,
+    "inputs": "1005:2;3001:1",
+    "output": "3006:1",
+    "durationSec": 300,
+    "exp": 8
+  },
+  {
+    "id": 7,
+    "code": "RC007",
+    "name": "草莓蛋糕",
+    "facilityId": 3,
+    "unlockLevel": 9,
+    "inputs": "3001:2;1006:3",
+    "output": "3007:1",
+    "durationSec": 600,
+    "exp": 15
+  },
+  {
+    "id": 8,
+    "code": "RC008",
+    "name": "南瓜派",
+    "facilityId": 3,
+    "unlockLevel": 12,
+    "inputs": "1007:1;3001:2",
+    "output": "3008:1",
+    "durationSec": 900,
+    "exp": 22
+  }
+]

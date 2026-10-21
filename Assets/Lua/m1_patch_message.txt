@@ -1,0 +1,12 @@
+-- 101 新增模块。100 的目录里没有它（补丁包才收集）。
+
+local M = {}
+
+-- 无参数。返回 shown。面板正文来自配置键 m1_patch_message。
+function M.show()
+  local text = CS.Game.Framework.Lua.BridgeApi.ConfigValue("m1_patch_message")
+  CS.Game.Framework.Lua.BridgeApi.CreatePanel("m1_patch_message", "m1_patch_message", text)
+  return "shown"
+end
+
+return M

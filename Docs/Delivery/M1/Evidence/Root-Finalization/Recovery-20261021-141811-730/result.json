@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "scope": "C01-C12",
+  "committedRevision": 1,
+  "nativeBackoff": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    30,
+    30
+  ],
+  "fullSnapshotAndTokenPreserved": true
+}

@@ -1,0 +1,97 @@
+-- Lua UI 管理器：注册/开闭委托固定 C# UiBridge；业务控制器在 UI/Windows/*。
+
+local M = {}
+
+local function encode_json(value, stack)
+  local t = type(value)
+  if t == "nil" then
+    return "null"
+  elseif t == "boolean" then
+    return value and "true" or "false"
+  elseif t == "number" then
+    if value ~= value or value == math.huge or value == -math.huge then
+      return "null"
+    end
+    return tostring(value)
+  elseif t == "string" then
+    local s = value:gsub("\\", "\\\\"):gsub('"', '\\"'):gsub("\n", "\\n"):gsub("\r", "\\r"):gsub("\t", "\\t")
+    return '"' .. s .. '"'
+  elseif t == "table" then
+    stack = stack or {}
+    if stack[value] then
+      error("UIManager.open: cyclic table args")
+    end
+    stack[value] = true
+    local isArray = true
+    local maxn = 0
+    local count = 0
+    for k, _ in pairs(value) do
+      count = count + 1
+      if type(k) ~= "number" or k < 1 or math.floor(k) ~= k then
+        isArray = false
+        break
+      end
+      if k > maxn then maxn = k end
+    end
+    if isArray and count == maxn then
+      local parts = {}
+      for i = 1, maxn do
+        parts[#parts + 1] = encode_json(value[i], stack)
+      end
+      stack[value] = nil
+      return "[" .. table.concat(parts, ",") .. "]"
+    end
+    local parts = {}
+    for k, v in pairs(value) do
+      local key = tostring(k)
+      parts[#parts + 1] = encode_json(key, stack) .. ":" .. encode_json(v, stack)
+    end
+    table.sort(parts)
+    stack[value] = nil
+    return "{" .. table.concat(parts, ",") .. "}"
+  else
+    return encode_json(tostring(value), stack)
+  end
+end
+
+function M.register(registration)
+  local r = registration or {}
+  CS.Game.Framework.UI.UiBridge.Register(
+    tostring(r.windowId or ""),
+    tostring(r.prefabAddress or ""),
+    tonumber(r.layer) or 2,
+    tostring(r.controllerModule or ""),
+    r.modal == true,
+    r.canGoBack ~= false
+  )
+end
+
+function M.open(windowId, args, done)
+  local argsJson
+  if type(args) == "table" then
+    argsJson = encode_json(args)
+  else
+    argsJson = tostring(args or "")
+  end
+  return CS.Game.Framework.UI.UiBridge.Open(tostring(windowId), argsJson, done)
+end
+
+function M.close(windowId, done)
+  return CS.Game.Framework.UI.UiBridge.Close(tostring(windowId), done)
+end
+
+function M.closeTop(done)
+  return CS.Game.Framework.UI.UiBridge.CloseTop(done)
+end
+
+function M.closeAll()
+  CS.Game.Framework.UI.UiBridge.CloseAll()
+end
+
+function M.shutdown()
+  pcall(function()
+    CS.Game.Framework.UI.UiBridge.CloseAll()
+  end)
+end
+
+return M

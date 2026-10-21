@@ -1,0 +1,140 @@
+-- 玩家模型：快照整体替换（含 info 层与全部集合），不追加。int64 保持字符串。
+
+local Json = require("Json")
+
+local M = {
+  playerId = "0",
+  nickname = "",
+  level = 0,
+  exp = 0,
+  gold = "0",
+  gem = "0",
+  ticket = "0",
+  shard = "0",
+  bagSlots = 0,
+  guideStep = 0,
+  bag = {},
+  plots = {},
+  nodes = {},
+  tools = {},
+  facilities = {},
+  orders = {},
+  orderProgress = nil,
+  home = nil,
+  avatar = nil,
+  gachaStates = {},
+  activities = {},
+}
+
+local function as_string(v)
+  if v == nil then return "0" end
+  return tostring(v)
+end
+
+local function deep_copy(v)
+  if type(v) ~= "table" then
+    return v
+  end
+  local out = {}
+  for k, val in pairs(v) do
+    out[k] = deep_copy(val)
+  end
+  return out
+end
+
+local function copy_array(src)
+  local out = {}
+  if type(src) ~= "table" then
+    return out
+  end
+  -- 优先数组序；否则 pairs 拷贝
+  local n = #src
+  if n > 0 then
+    for i = 1, n do
+      out[i] = deep_copy(src[i])
+    end
+    return out
+  end
+  for k, val in pairs(src) do
+    out[k] = deep_copy(val)
+  end
+  return out
+end
+
+-- snapshot：ProtoJSON 对象或 JSON 字符串。两次 apply 整体覆盖，不 append。
+function M.applySnapshot(snapshot)
+  local s = snapshot
+  if type(s) == "string" then
+    s = Json.decode(s)
+  end
+  if type(s) ~= "table" then
+    error("PlayerModel.applySnapshot expects table or json string")
+  end
+
+  local info = s.info
+  if type(info) ~= "table" then
+    info = s
+  end
+
+  M.playerId = as_string(info.playerId or "0")
+  M.nickname = tostring(info.nickname or "")
+  M.level = tonumber(info.level) or 0
+  M.exp = tonumber(info.exp) or 0
+  M.gold = as_string(info.gold or "0")
+  M.gem = as_string(info.gem or "0")
+  M.ticket = as_string(info.ticket or "0")
+  M.shard = as_string(info.shard or "0")
+  M.bagSlots = tonumber(info.bagSlots) or 0
+  M.guideStep = tonumber(info.guideStep) or 0
+
+  M.bag = copy_array(s.bag)
+  M.plots = copy_array(s.plots)
+  M.nodes = copy_array(s.nodes)
+  M.tools = copy_array(s.tools)
+  M.facilities = copy_array(s.facilities)
+  M.orders = copy_array(s.orders)
+  M.gachaStates = copy_array(s.gachaStates)
+  M.activities = copy_array(s.activities)
+  M.orderProgress = s.orderProgress ~= nil and deep_copy(s.orderProgress) or nil
+  M.home = s.home ~= nil and deep_copy(s.home) or nil
+  M.avatar = s.avatar ~= nil and deep_copy(s.avatar) or nil
+  return M
+end
+
+function M.clear()
+  M.playerId = "0"
+  M.nickname = ""
+  M.level = 0
+  M.exp = 0
+  M.gold = "0"
+  M.gem = "0"
+  M.ticket = "0"
+  M.shard = "0"
+  M.bagSlots = 0
+  M.guideStep = 0
+  M.bag = {}
+  M.plots = {}
+  M.nodes = {}
+  M.tools = {}
+  M.facilities = {}
+  M.orders = {}
+  M.orderProgress = nil
+  M.home = nil
+  M.avatar = nil
+  M.gachaStates = {}
+  M.activities = {}
+end
+
+function M.snapshot()
+  return {
+    playerId = M.playerId,
+    nickname = M.nickname,
+    level = M.level,
+    gold = M.gold,
+    bagCount = #M.bag,
+    plotCount = #M.plots,
+    hasOrderProgress = M.orderProgress ~= nil,
+  }
+end
+
+return M

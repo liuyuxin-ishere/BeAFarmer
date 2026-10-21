@@ -1,0 +1,169 @@
+syntax = "proto3";
+package cloudisle;
+option csharp_namespace = "CloudIsle.Proto";
+
+// 背包里的一格。item_id 是配置表物品编号，count 是数量。
+message ItemStack {
+  int32 item_id = 1;
+  int32 count = 2;
+}
+
+// 一次发放的奖励。items 为物品列表，其余为货币和经验增量。
+message Reward {
+  repeated ItemStack items = 1;
+  int32 gold = 2;
+  int32 gem = 3;
+  int32 ticket = 4;
+  int32 exp = 5;
+}
+
+// 玩家基础属性。时间无关；货币用 int64，避免大数溢出。
+message PlayerInfo {
+  int64 player_id = 1;
+  string nickname = 2;
+  int32 level = 3;
+  int32 exp = 4;
+  int64 gold = 5;
+  int64 gem = 6;
+  int64 ticket = 7;
+  int64 shard = 8;
+  int32 bag_slots = 9;
+  int32 guide_step = 10;
+}
+
+// 地块状态。0 未解锁，1 空地，2 生长中，3 可收获。
+enum PlotState {
+  PLOT_LOCKED = 0;
+  PLOT_EMPTY = 1;
+  PLOT_GROWING = 2;
+  PLOT_RIPE = 3;
+}
+
+// 一块田。plant_time、ready_time 为 Unix 毫秒。
+message PlotData {
+  int32 plot_id = 1;
+  PlotState state = 2;
+  int32 crop_id = 3;
+  int64 plant_time = 4;
+  int64 ready_time = 5;
+  bool watered = 6;
+  bool fertilized = 7;
+}
+
+// 批量种植或收获时，单块地的结果。code 为 0 表示该块成功。
+message PlotResult {
+  int32 plot_id = 1;
+  int32 code = 2;
+  PlotData plot = 3;
+}
+
+// 采集点。next_ready_time 为下次可采集的 Unix 毫秒。
+message NodeData {
+  int32 node_id = 1;
+  int64 next_ready_time = 2;
+}
+
+// 工具等级。
+message ToolData {
+  int32 tool_id = 1;
+  int32 level = 2;
+}
+
+// 加工槽状态。0 空闲，1 生产中，2 待领取。
+enum SlotState {
+  SLOT_IDLE = 0;
+  SLOT_WORKING = 1;
+  SLOT_DONE = 2;
+}
+
+// 设施上的一个生产槽。finish_time 为 Unix 毫秒。
+message SlotData {
+  int32 slot_id = 1;
+  int32 recipe_id = 2;
+  int64 finish_time = 3;
+  SlotState state = 4;
+}
+
+// 一座设施及其槽位。
+message FacilityData {
+  int32 facility_id = 1;
+  int32 level = 2;
+  repeated SlotData slots = 3;
+}
+
+// 一条订单。slot 为 0~5；status 为 0 进行中、1 已完成。
+message OrderData {
+  int32 order_id = 1;
+  int32 slot = 2;
+  repeated ItemStack needs = 3;
+  Reward reward = 4;
+  int32 difficulty = 5;
+  bool rare = 6;
+  int32 status = 7;
+}
+
+// 当日订单进度。next_refresh_time 为 Unix 毫秒。
+message OrderProgress {
+  int32 day_index = 1;
+  int32 done_count = 2;
+  int32 reroll_count = 3;
+  bool claimed_3 = 4;
+  bool claimed_6 = 5;
+  int64 next_refresh_time = 6;
+}
+
+// 一件家具的摆放。坐标单位是厘米。
+message FurniturePlacement {
+  int32 furniture_id = 1;
+  int32 x = 2;
+  int32 y = 3;
+  int32 rotation = 4;
+}
+
+// 家园布局。version 用于保存时识别客户端提交的是哪一版布局。
+message HomeLayout {
+  repeated FurniturePlacement items = 1;
+  int32 version = 2;
+}
+
+// 外观。equipped 的键是部位，值是外观 ID。
+message AvatarData {
+  repeated int32 owned = 1;
+  map<int32, int32> equipped = 2;
+}
+
+// 一个卡池的保底计数。
+message GachaPoolState {
+  int32 pool_id = 1;
+  int32 pity_ssr = 2;
+  int32 pity_sr = 3;
+  bool up_guarantee = 4;
+}
+
+// 一条活动。type 目前为 "gacha"；时间为 Unix 毫秒。
+message ActivityInfo {
+  int32 activity_id = 1;
+  string name = 2;
+  string type = 3;
+  int32 pool_id = 4;
+  int64 start_time = 5;
+  int64 end_time = 6;
+  int64 preload_time = 7;
+  string resource_bundle = 8;
+}
+
+// 登录和重连下发的全量玩家数据。正式快照用它，不用 PoC 的 PlayerSnapshot。
+message PlayerFullData {
+  PlayerInfo info = 1;
+  repeated ItemStack bag = 2;
+  repeated PlotData plots = 3;
+  repeated NodeData nodes = 4;
+  repeated ToolData tools = 5;
+  repeated FacilityData facilities = 6;
+  repeated OrderData orders = 7;
+  OrderProgress order_progress = 8;
+  HomeLayout home = 9;
+  AvatarData avatar = 10;
+  repeated GachaPoolState gacha_states = 11;
+  repeated ActivityInfo activities = 12;
+}

@@ -1,0 +1,86 @@
+[
+  {
+    "id": "C01",
+    "name": "小麦",
+    "seedId": 2001,
+    "yieldItemId": 1001,
+    "unlockLevel": 1,
+    "growSec": 120,
+    "yieldMin": 2,
+    "yieldMax": 3,
+    "exp": 2,
+    "stageRatio": "25;25;25;25"
+  },
+  {
+    "id": "C02",
+    "name": "胡萝卜",
+    "seedId": 2002,
+    "yieldItemId": 1002,
+    "unlockLevel": 2,
+    "growSec": 300,
+    "yieldMin": 2,
+    "yieldMax": 3,
+    "exp": 3,
+    "stageRatio": "25;25;25;25"
+  },
+  {
+    "id": "C03",
+    "name": "土豆",
+    "seedId": 2003,
+    "yieldItemId": 1003,
+    "unlockLevel": 3,
+    "growSec": 600,
+    "yieldMin": 3,
+    "yieldMax": 4,
+    "exp": 4,
+    "stageRatio": "25;25;25;25"
+  },
+  {
+    "id": "C04",
+    "name": "番茄",
+    "seedId": 2004,
+    "yieldItemId": 1004,
+    "unlockLevel": 5,
+    "growSec": 1200,
+    "yieldMin": 3,
+    "yieldMax": 4,
+    "exp": 6,
+    "stageRatio": "25;25;25;25"
+  },
+  {
+    "id": "C05",
+    "name": "玉米",
+    "seedId": 2005,
+    "yieldItemId": 1005,
+    "unlockLevel": 7,
+    "growSec": 1800,
+    "yieldMin": 3,
+    "yieldMax": 5,
+    "exp": 8,
+    "stageRatio": "25;25;25;25"
+  },
+  {
+    "id": "C06",
+    "name": "草莓",
+    "seedId": 2006,
+    "yieldItemId": 1006,
+    "unlockLevel": 9,
+    "growSec": 3600,
+    "yieldMin": 4,
+    "yieldMax": 5,
+    "exp": 12,
+    "stageRatio": "25;25;25;25"
+  },
+  {
+    "id": "C07",
+    "name": "南瓜",
+    "seedId": 2007,
+    "yieldItemId": 1007,
+    "unlockLevel": 12,
+    "growSec": 7200,
+    "yieldMin": 4,
+    "yieldMax": 6,
+    "exp": 18,
+    "stageRatio": "25;25;25;25"
+  }
+]

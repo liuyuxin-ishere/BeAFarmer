@@ -1,0 +1,111 @@
+-- 登录/注册窗口。处理中禁重复提交；密码遮蔽；错误可见且恢复可点。
+-- 成功后只请求 AccountFlow.EnterHome；窗口由场景 CurrentAddress 统一打开，禁止提前开 HUD。
+
+local UIWindow = require("UI/UIWindow")
+local AccountService = require("AccountService")
+
+local M = {}
+
+function M.new()
+  local self = UIWindow.new()
+  self._busy = false
+  self._clicks = {}
+
+  local function set_busy(busy)
+    self._busy = busy and true or false
+    if not self.view then return end
+    self.view:SetInteractable("RegisterButton", not self._busy)
+    self.view:SetInteractable("LoginButton", not self._busy)
+  end
+
+  local function show_error(msg)
+    if self.view then
+      self.view:SetText("ErrorLabel", tostring(msg or ""))
+    end
+  end
+
+  local function go_home()
+    -- 业务仍在 Lua：只驱动场景；Login/HomeHud 由 AccountFlow 按真实 CurrentAddress 打开。
+    if CS.Game.Framework.Account.AccountFlow ~= nil then
+      CS.Game.Framework.Account.AccountFlow.EnterHome()
+    end
+  end
+
+  function self:OnCreate(view)
+    UIWindow.OnCreate(self, view)
+    view:SetText("Title", "登录")
+    view:SetText("ErrorLabel", "")
+    view:SetInputContentType("Password", 7) -- Password
+    self._clicks[#self._clicks + 1] = view:SubscribeClick("RegisterButton", function()
+      if self._busy then return end
+      local user = view:GetInputText("Username")
+      local pass = view:GetInputText("Password")
+      local nick = view:GetInputText("Nickname")
+      set_busy(true)
+      show_error("注册中…")
+      self._op = AccountService.register(user, pass, nick, function(code, payload)
+        set_busy(false)
+        if code == 0 then
+          show_error("注册成功，请登录")
+        elseif code == 201 then
+          show_error("用户名已存在")
+        elseif code == 203 then
+          show_error("昵称非法")
+        elseif code == -2 then
+          show_error("网络错误")
+        else
+          show_error("注册失败(" .. tostring(code) .. ")")
+        end
+      end)
+    end)
+    self._clicks[#self._clicks + 1] = view:SubscribeClick("LoginButton", function()
+      if self._busy then return end
+      local user = view:GetInputText("Username")
+      local pass = view:GetInputText("Password")
+      set_busy(true)
+      show_error("登录中…")
+      self._op = AccountService.login(user, pass, function(code, payload)
+        set_busy(false)
+        if code == 0 then
+          show_error("")
+          go_home()
+        elseif code == 202 then
+          show_error("用户名或密码错误")
+        elseif code == 106 then
+          show_error("版本不兼容，请更新")
+        elseif code == -2 then
+          show_error("网络错误")
+        else
+          show_error("登录失败(" .. tostring(code) .. ")")
+        end
+      end)
+    end)
+  end
+
+  function self:OnOpen(argsJson)
+    UIWindow.OnOpen(self, argsJson)
+    show_error("")
+    set_busy(false)
+  end
+
+  function self:OnClose()
+    if self._op then
+      pcall(function() self._op:Dispose() end)
+      self._op = nil
+    end
+    AccountService.cancelAll()
+    UIWindow.OnClose(self)
+  end
+
+  function self:OnDestroy()
+    for _, c in ipairs(self._clicks) do
+      pcall(function() c:Dispose() end)
+    end
+    self._clicks = {}
+    UIWindow.OnDestroy(self)
+  end
+
+  return self
+end
+
+return M

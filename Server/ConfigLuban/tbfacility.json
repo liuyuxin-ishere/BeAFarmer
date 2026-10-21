@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "code": "F01",
+    "name": "磨坊",
+    "unlockLevel": 2,
+    "buildGold": 200,
+    "category": "面粉"
+  },
+  {
+    "id": 2,
+    "code": "F02",
+    "name": "工坊",
+    "unlockLevel": 3,
+    "buildGold": 400,
+    "category": "木板;石砖;花束;工具升级"
+  },
+  {
+    "id": 3,
+    "code": "F03",
+    "name": "烤炉",
+    "unlockLevel": 4,
+    "buildGold": 800,
+    "category": "面包;玉米饼;草莓蛋糕;南瓜派"
+  },
+  {
+    "id": 4,
+    "code": "F04",
+    "name": "厨灶",
+    "unlockLevel": 4,
+    "buildGold": 800,
+    "category": "蔬菜汤;番茄酱;果酱"
+  }
+]

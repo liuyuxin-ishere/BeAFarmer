@@ -1,0 +1,21 @@
+[
+  {
+    "id": 1,
+    "code": "P01",
+    "name": "常驻池",
+    "type": "Permanent",
+    "hasUp": false,
+    "upItemIds": []
+  },
+  {
+    "id": 2,
+    "code": "P02",
+    "name": "春日野餐",
+    "type": "Limited",
+    "hasUp": true,
+    "upItemIds": [
+      7101,
+      7102
+    ]
+  }
+]

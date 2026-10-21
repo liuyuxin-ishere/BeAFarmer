@@ -1,0 +1,8 @@
+local M = {}
+
+-- done(code,payload)：确认 code=1 / 取消 code=0；关闭后结束等待。
+function M.confirm(title, message, done)
+  return CS.Game.Framework.UI.UiBridge.Confirm(tostring(title or ""), tostring(message or ""), done)
+end
+
+return M

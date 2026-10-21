@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "code": "A001",
+    "name": "春日野餐",
+    "type": "gacha",
+    "poolId": 2,
+    "startTime": 0,
+    "endTime": 0,
+    "preloadSec": 259200,
+    "resourceBundle": "activity_spring_picnic",
+    "entryIcon": "广场公告板;主界面"
+  }
+]

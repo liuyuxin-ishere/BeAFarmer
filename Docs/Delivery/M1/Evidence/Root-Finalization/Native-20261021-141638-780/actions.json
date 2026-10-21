@@ -1,0 +1,839 @@
+[
+  {
+    "utc": "2026-10-21T06:16:39.5438671Z",
+    "phase": "100-account",
+    "name": "atomic-version-pointer",
+    "actual": 100
+  },
+  {
+    "utc": "2026-10-21T06:16:42.1057265Z",
+    "phase": "100-account",
+    "name": "server-started",
+    "actual": {
+      "wrapperPid": 6268,
+      "tcp": 25899,
+      "http": 25900,
+      "database": "E:\\Workbench\\UnityWorkBench\\Farming\\Docs\\Acceptance\\M1\\20261020-xLua\\Root-Finalization\\Native-20261021-141638-780\\players.db"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:16:42.4084616Z",
+    "phase": "100-account",
+    "name": "player-started",
+    "actual": {
+      "exe": "E:\\Workbench\\UnityWorkBench\\Farming\\Docs\\Acceptance\\M1\\20261020-xLua\\Root Final 100 R2\\Player\\Farming.exe",
+      "pid": 27600,
+      "clientRoot": "E:\\Workbench\\UnityWorkBench\\Farming\\Docs\\Acceptance\\M1\\20261020-xLua\\Root-Finalization\\Native-20261021-141638-780\\client"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:16:47.1432853Z",
+    "phase": "100-account",
+    "name": "login-ready-100",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:16:47.1567999Z",
+    "phase": "100-account",
+    "name": "A02-B02-login100",
+    "actual": {
+      "registerMessage": "",
+      "lastBiz": "0",
+      "reconnectRunning": "False",
+      "mask": "False",
+      "luaNick": "",
+      "loadedScenes": "M1_Boot,M1_Login",
+      "winLogin": "True",
+      "reconnectAttempt": "0",
+      "lastKind": "",
+      "patchRetryVisible": "False",
+      "hudNick": "",
+      "committed": "True",
+      "scene": "M1_Boot",
+      "winPatch": "False",
+      "entry": "True",
+      "disposeError": "",
+      "patchModule": "False",
+      "luaModel": "{\"activities\":{},\"bag\":{},\"facilities\":{},\"gachaStates\":{},\"info\":{\"bagSlots\":0,\"exp\":0,\"gem\":\"0\",\"gold\":\"0\",\"guideStep\":0,\"level\":0,\"nickname\":\"\",\"playerId\":\"0\",\"shard\":\"0\",\"ticket\":\"0\"},\"nodes\":{},\"orders\":{},\"plots\":{},\"tools\":{}}",
+      "expectedNick": "",
+      "hasToken": "False",
+      "resVersion": "100",
+      "utc": "2026-10-21T06:16:47.0604117Z",
+      "loginOpened": "True",
+      "auth": "False",
+      "globalPatch": "",
+      "winHome": "False",
+      "downloadFiles": "42",
+      "bizSnap": "{}"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:16:47.3943245Z",
+    "phase": "100-account",
+    "name": "ack-screenshot:100_login",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:16:47.4007829Z",
+    "phase": "100-account",
+    "name": "command-screenshot:100_login",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:16:47.6223451Z",
+    "phase": "100-account",
+    "name": "ack-fill-creds",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:16:47.6238983Z",
+    "phase": "100-account",
+    "name": "command-fill-creds",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:16:47.8322126Z",
+    "phase": "100-account",
+    "name": "ack-register",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:16:47.8333007Z",
+    "phase": "100-account",
+    "name": "command-register",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:16:48.2863288Z",
+    "phase": "100-account",
+    "name": "registration-business-result",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:16:48.2886759Z",
+    "phase": "100-account",
+    "name": "A03-register-not-authorized",
+    "actual": {
+      "registerMessage": "注册成功，请登录",
+      "lastBiz": "0",
+      "reconnectRunning": "False",
+      "mask": "False",
+      "luaNick": "",
+      "loadedScenes": "M1_Boot,M1_Login",
+      "winLogin": "True",
+      "reconnectAttempt": "0",
+      "lastKind": "ok",
+      "patchRetryVisible": "False",
+      "hudNick": "",
+      "committed": "True",
+      "scene": "M1_Boot",
+      "winPatch": "False",
+      "entry": "True",
+      "disposeError": "",
+      "patchModule": "False",
+      "luaModel": "{\"activities\":{},\"bag\":{},\"facilities\":{},\"gachaStates\":{},\"info\":{\"bagSlots\":0,\"exp\":0,\"gem\":\"0\",\"gold\":\"0\",\"guideStep\":0,\"level\":0,\"nickname\":\"\",\"playerId\":\"0\",\"shard\":\"0\",\"ticket\":\"0\"},\"nodes\":{},\"orders\":{},\"plots\":{},\"tools\":{}}",
+      "expectedNick": "",
+      "hasToken": "False",
+      "resVersion": "100",
+      "utc": "2026-10-21T06:16:48.0629172Z",
+      "loginOpened": "True",
+      "auth": "False",
+      "globalPatch": "",
+      "winHome": "False",
+      "downloadFiles": "42",
+      "bizSnap": "{}"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:16:48.5046367Z",
+    "phase": "100-account",
+    "name": "ack-fill-creds",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:16:48.5057147Z",
+    "phase": "100-account",
+    "name": "command-fill-creds",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:16:48.7228983Z",
+    "phase": "100-account",
+    "name": "ack-login",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:16:48.7240554Z",
+    "phase": "100-account",
+    "name": "command-login",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:16:49.1697875Z",
+    "phase": "100-account",
+    "name": "authenticated-home",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:16:49.1737830Z",
+    "phase": "100-account",
+    "name": "A04-S1-home100",
+    "actual": {
+      "registerMessage": "",
+      "lastBiz": "0",
+      "reconnectRunning": "False",
+      "mask": "False",
+      "luaNick": "FinalNick",
+      "loadedScenes": "M1_Boot,M1_Home",
+      "winLogin": "False",
+      "reconnectAttempt": "0",
+      "lastKind": "ok",
+      "patchRetryVisible": "False",
+      "hudNick": "FinalNick",
+      "committed": "True",
+      "scene": "M1_Boot",
+      "winPatch": "False",
+      "entry": "True",
+      "disposeError": "",
+      "patchModule": "False",
+      "luaModel": "{\"activities\":{},\"bag\":{},\"facilities\":{},\"gachaStates\":{},\"info\":{\"bagSlots\":60,\"exp\":0,\"gem\":\"300\",\"gold\":\"200\",\"guideStep\":0,\"level\":1,\"nickname\":\"FinalNick\",\"playerId\":\"1\",\"shard\":\"0\",\"ticket\":\"5\"},\"nodes\":{},\"orders\":{},\"plots\":{},\"tools\":{}}",
+      "expectedNick": "",
+      "hasToken": "True",
+      "resVersion": "100",
+      "utc": "2026-10-21T06:16:49.0632287Z",
+      "loginOpened": "True",
+      "auth": "True",
+      "globalPatch": "",
+      "winHome": "True",
+      "downloadFiles": "42",
+      "bizSnap": "{ \"info\": { \"playerId\": \"1\", \"nickname\": \"FinalNick\", \"level\": 1, \"gold\": \"200\", \"gem\": \"300\", \"ticket\": \"5\", \"bagSlots\": 60 } }"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:16:49.4650406Z",
+    "phase": "100-account",
+    "name": "ack-screenshot:100_home",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:16:49.4663411Z",
+    "phase": "100-account",
+    "name": "command-screenshot:100_home",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:16:49.6839781Z",
+    "phase": "100-account",
+    "name": "ack-logout",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:16:49.6850731Z",
+    "phase": "100-account",
+    "name": "command-logout",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:16:49.7031730Z",
+    "phase": "100-account",
+    "name": "logout-to-login",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:16:49.7066049Z",
+    "phase": "100-account",
+    "name": "A06-logout",
+    "actual": {
+      "registerMessage": "",
+      "lastBiz": "0",
+      "reconnectRunning": "False",
+      "mask": "False",
+      "luaNick": "",
+      "loadedScenes": "M1_Boot,M1_Login",
+      "winLogin": "True",
+      "reconnectAttempt": "0",
+      "lastKind": "ok",
+      "patchRetryVisible": "False",
+      "hudNick": "",
+      "committed": "True",
+      "scene": "M1_Boot",
+      "winPatch": "False",
+      "entry": "True",
+      "disposeError": "",
+      "patchModule": "False",
+      "luaModel": "{\"activities\":{},\"bag\":{},\"facilities\":{},\"gachaStates\":{},\"info\":{\"bagSlots\":0,\"exp\":0,\"gem\":\"0\",\"gold\":\"0\",\"guideStep\":0,\"level\":0,\"nickname\":\"\",\"playerId\":\"0\",\"shard\":\"0\",\"ticket\":\"0\"},\"nodes\":{},\"orders\":{},\"plots\":{},\"tools\":{}}",
+      "expectedNick": "",
+      "hasToken": "False",
+      "resVersion": "100",
+      "utc": "2026-10-21T06:16:49.5638062Z",
+      "loginOpened": "True",
+      "auth": "False",
+      "globalPatch": "",
+      "winHome": "False",
+      "downloadFiles": "42",
+      "bizSnap": "{}"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:16:49.9192760Z",
+    "phase": "100-account",
+    "name": "ack-fill-creds",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:16:49.9206304Z",
+    "phase": "100-account",
+    "name": "command-fill-creds",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:16:49.9242051Z",
+    "phase": "100-account",
+    "name": "ack-login",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:16:49.9294386Z",
+    "phase": "100-account",
+    "name": "command-login",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:16:50.1388793Z",
+    "phase": "100-account",
+    "name": "authenticated-home",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:16:50.1427345Z",
+    "phase": "100-account",
+    "name": "A07-login-again",
+    "actual": {
+      "registerMessage": "",
+      "lastBiz": "0",
+      "reconnectRunning": "False",
+      "mask": "False",
+      "luaNick": "FinalNick",
+      "loadedScenes": "M1_Boot,M1_Home",
+      "winLogin": "False",
+      "reconnectAttempt": "0",
+      "lastKind": "ok",
+      "patchRetryVisible": "False",
+      "hudNick": "FinalNick",
+      "committed": "True",
+      "scene": "M1_Boot",
+      "winPatch": "False",
+      "entry": "True",
+      "disposeError": "",
+      "patchModule": "False",
+      "luaModel": "{\"activities\":{},\"bag\":{},\"facilities\":{},\"gachaStates\":{},\"info\":{\"bagSlots\":60,\"exp\":0,\"gem\":\"300\",\"gold\":\"200\",\"guideStep\":0,\"level\":1,\"nickname\":\"FinalNick\",\"playerId\":\"1\",\"shard\":\"0\",\"ticket\":\"5\"},\"nodes\":{},\"orders\":{},\"plots\":{},\"tools\":{}}",
+      "expectedNick": "",
+      "hasToken": "True",
+      "resVersion": "100",
+      "utc": "2026-10-21T06:16:50.0635212Z",
+      "loginOpened": "True",
+      "auth": "True",
+      "globalPatch": "",
+      "winHome": "True",
+      "downloadFiles": "42",
+      "bizSnap": "{ \"info\": { \"playerId\": \"1\", \"nickname\": \"FinalNick\", \"level\": 1, \"gold\": \"200\", \"gem\": \"300\", \"ticket\": \"5\", \"bagSlots\": 60 } }"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:16:50.3587542Z",
+    "phase": "100-account",
+    "name": "ack-quit",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:16:50.3593024Z",
+    "phase": "100-account",
+    "name": "command-quit",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:16:51.1258279Z",
+    "phase": "100-account",
+    "name": "player-stopped",
+    "actual": 0
+  },
+  {
+    "utc": "2026-10-21T06:16:51.1445561Z",
+    "phase": "100-account",
+    "name": "player-started",
+    "actual": {
+      "exe": "E:\\Workbench\\UnityWorkBench\\Farming\\Docs\\Acceptance\\M1\\20261020-xLua\\Root Final 100 R2\\Player\\Farming.exe",
+      "pid": 3152,
+      "clientRoot": "E:\\Workbench\\UnityWorkBench\\Farming\\Docs\\Acceptance\\M1\\20261020-xLua\\Root-Finalization\\Native-20261021-141638-780\\client"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:16:54.8363597Z",
+    "phase": "100-account",
+    "name": "login-ready-100",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:16:55.0399915Z",
+    "phase": "100-account",
+    "name": "ack-fill-creds",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:16:55.0410374Z",
+    "phase": "100-account",
+    "name": "command-fill-creds",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:16:55.2455296Z",
+    "phase": "100-account",
+    "name": "ack-login",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:16:55.2460530Z",
+    "phase": "100-account",
+    "name": "command-login",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:16:55.8610772Z",
+    "phase": "100-account",
+    "name": "authenticated-home",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:16:55.8636857Z",
+    "phase": "100-account",
+    "name": "A10-reopen-same-install",
+    "actual": {
+      "registerMessage": "",
+      "lastBiz": "0",
+      "reconnectRunning": "False",
+      "mask": "False",
+      "luaNick": "FinalNick",
+      "loadedScenes": "M1_Boot,M1_Home",
+      "winLogin": "False",
+      "reconnectAttempt": "0",
+      "lastKind": "ok",
+      "patchRetryVisible": "False",
+      "hudNick": "FinalNick",
+      "committed": "True",
+      "scene": "M1_Boot",
+      "winPatch": "False",
+      "entry": "True",
+      "disposeError": "",
+      "patchModule": "False",
+      "luaModel": "{\"activities\":{},\"bag\":{},\"facilities\":{},\"gachaStates\":{},\"info\":{\"bagSlots\":60,\"exp\":0,\"gem\":\"300\",\"gold\":\"200\",\"guideStep\":0,\"level\":1,\"nickname\":\"FinalNick\",\"playerId\":\"1\",\"shard\":\"0\",\"ticket\":\"5\"},\"nodes\":{},\"orders\":{},\"plots\":{},\"tools\":{}}",
+      "expectedNick": "",
+      "hasToken": "True",
+      "resVersion": "100",
+      "utc": "2026-10-21T06:16:55.6797486Z",
+      "loginOpened": "True",
+      "auth": "True",
+      "globalPatch": "",
+      "winHome": "True",
+      "downloadFiles": "0",
+      "bizSnap": "{ \"info\": { \"playerId\": \"1\", \"nickname\": \"FinalNick\", \"level\": 1, \"gold\": \"200\", \"gem\": \"300\", \"ticket\": \"5\", \"bagSlots\": 60 } }"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:16:56.0781482Z",
+    "phase": "100-account",
+    "name": "ack-quit",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:16:56.0794827Z",
+    "phase": "100-account",
+    "name": "command-quit",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:16:56.6592943Z",
+    "phase": "100-account",
+    "name": "player-stopped",
+    "actual": 0
+  },
+  {
+    "utc": "2026-10-21T06:16:56.6947019Z",
+    "phase": "101-update",
+    "name": "atomic-version-pointer",
+    "actual": 101
+  },
+  {
+    "utc": "2026-10-21T06:16:56.9267802Z",
+    "phase": "101-update",
+    "name": "server-stopped",
+    "actual": 0
+  },
+  {
+    "utc": "2026-10-21T06:16:58.1998430Z",
+    "phase": "101-update",
+    "name": "server-started",
+    "actual": {
+      "wrapperPid": 32648,
+      "tcp": 25899,
+      "http": 25900,
+      "database": "E:\\Workbench\\UnityWorkBench\\Farming\\Docs\\Acceptance\\M1\\20261020-xLua\\Root-Finalization\\Native-20261021-141638-780\\players.db"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:16:58.2163428Z",
+    "phase": "101-update",
+    "name": "player-started",
+    "actual": {
+      "exe": "E:\\Workbench\\UnityWorkBench\\Farming\\Docs\\Acceptance\\M1\\20261020-xLua\\Root Final 100 R2\\Player\\Farming.exe",
+      "pid": 26936,
+      "clientRoot": "E:\\Workbench\\UnityWorkBench\\Farming\\Docs\\Acceptance\\M1\\20261020-xLua\\Root-Finalization\\Native-20261021-141638-780\\client"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:17:01.9546007Z",
+    "phase": "101-update",
+    "name": "login-ready-101",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:17:01.9566878Z",
+    "phase": "101-update",
+    "name": "B06-updated101",
+    "actual": {
+      "registerMessage": "",
+      "lastBiz": "0",
+      "reconnectRunning": "False",
+      "mask": "False",
+      "luaNick": "",
+      "loadedScenes": "M1_Boot,M1_Login",
+      "winLogin": "True",
+      "reconnectAttempt": "0",
+      "lastKind": "",
+      "patchRetryVisible": "False",
+      "hudNick": "",
+      "committed": "True",
+      "scene": "M1_Boot",
+      "winPatch": "False",
+      "entry": "True",
+      "disposeError": "",
+      "patchModule": "True",
+      "luaModel": "{\"activities\":{},\"bag\":{},\"facilities\":{},\"gachaStates\":{},\"info\":{\"bagSlots\":0,\"exp\":0,\"gem\":\"0\",\"gold\":\"0\",\"guideStep\":0,\"level\":0,\"nickname\":\"\",\"playerId\":\"0\",\"shard\":\"0\",\"ticket\":\"0\"},\"nodes\":{},\"orders\":{},\"plots\":{},\"tools\":{}}",
+      "expectedNick": "",
+      "hasToken": "True",
+      "resVersion": "101",
+      "utc": "2026-10-21T06:17:01.8052546Z",
+      "loginOpened": "True",
+      "auth": "False",
+      "globalPatch": "热更新验证成功",
+      "winHome": "False",
+      "downloadFiles": "5",
+      "bizSnap": "{}"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:17:02.1752773Z",
+    "phase": "101-update",
+    "name": "ack-fill-creds",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:17:02.1761216Z",
+    "phase": "101-update",
+    "name": "command-fill-creds",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:17:02.3818858Z",
+    "phase": "101-update",
+    "name": "ack-login",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:17:02.3824808Z",
+    "phase": "101-update",
+    "name": "command-login",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:17:02.9919284Z",
+    "phase": "101-update",
+    "name": "authenticated-home",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:17:02.9937490Z",
+    "phase": "101-update",
+    "name": "B07-home101",
+    "actual": {
+      "registerMessage": "",
+      "lastBiz": "0",
+      "reconnectRunning": "False",
+      "mask": "False",
+      "luaNick": "FinalNick",
+      "loadedScenes": "M1_Boot,M1_Home",
+      "winLogin": "False",
+      "reconnectAttempt": "0",
+      "lastKind": "ok",
+      "patchRetryVisible": "False",
+      "hudNick": "FinalNick",
+      "committed": "True",
+      "scene": "M1_Boot",
+      "winPatch": "False",
+      "entry": "True",
+      "disposeError": "",
+      "patchModule": "True",
+      "luaModel": "{\"activities\":{},\"bag\":{},\"facilities\":{},\"gachaStates\":{},\"info\":{\"bagSlots\":60,\"exp\":0,\"gem\":\"300\",\"gold\":\"200\",\"guideStep\":0,\"level\":1,\"nickname\":\"FinalNick\",\"playerId\":\"1\",\"shard\":\"0\",\"ticket\":\"5\"},\"nodes\":{},\"orders\":{},\"plots\":{},\"tools\":{}}",
+      "expectedNick": "",
+      "hasToken": "True",
+      "resVersion": "101",
+      "utc": "2026-10-21T06:17:02.8067970Z",
+      "loginOpened": "True",
+      "auth": "True",
+      "globalPatch": "热更新验证成功",
+      "winHome": "True",
+      "downloadFiles": "5",
+      "bizSnap": "{ \"info\": { \"playerId\": \"1\", \"nickname\": \"FinalNick\", \"level\": 1, \"gold\": \"200\", \"gem\": \"300\", \"ticket\": \"5\", \"bagSlots\": 60 } }"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:17:03.2114818Z",
+    "phase": "101-update",
+    "name": "ack-open-patchdemo",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:17:03.2121794Z",
+    "phase": "101-update",
+    "name": "command-open-patchdemo",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:17:03.4502525Z",
+    "phase": "101-update",
+    "name": "real-patch-prefab-opened",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:17:03.6554302Z",
+    "phase": "101-update",
+    "name": "ack-screenshot:101_patch_window",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:17:03.6560238Z",
+    "phase": "101-update",
+    "name": "command-screenshot:101_patch_window",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:17:03.6578133Z",
+    "phase": "101-update",
+    "name": "B08-real-prefab-and-global",
+    "actual": {
+      "registerMessage": "",
+      "lastBiz": "0",
+      "reconnectRunning": "False",
+      "mask": "False",
+      "luaNick": "FinalNick",
+      "loadedScenes": "M1_Boot,M1_Home",
+      "winLogin": "False",
+      "reconnectAttempt": "0",
+      "lastKind": "ok",
+      "patchRetryVisible": "False",
+      "hudNick": "FinalNick",
+      "committed": "True",
+      "scene": "M1_Boot",
+      "winPatch": "True",
+      "entry": "True",
+      "disposeError": "",
+      "patchModule": "True",
+      "luaModel": "{\"activities\":{},\"bag\":{},\"facilities\":{},\"gachaStates\":{},\"info\":{\"bagSlots\":60,\"exp\":0,\"gem\":\"300\",\"gold\":\"200\",\"guideStep\":0,\"level\":1,\"nickname\":\"FinalNick\",\"playerId\":\"1\",\"shard\":\"0\",\"ticket\":\"5\"},\"nodes\":{},\"orders\":{},\"plots\":{},\"tools\":{}}",
+      "expectedNick": "",
+      "hasToken": "True",
+      "resVersion": "101",
+      "utc": "2026-10-21T06:17:03.3065089Z",
+      "loginOpened": "True",
+      "auth": "True",
+      "globalPatch": "热更新验证成功",
+      "winHome": "True",
+      "downloadFiles": "5",
+      "bizSnap": "{ \"info\": { \"playerId\": \"1\", \"nickname\": \"FinalNick\", \"level\": 1, \"gold\": \"200\", \"gem\": \"300\", \"ticket\": \"5\", \"bagSlots\": 60 } }"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:17:03.8751761Z",
+    "phase": "101-update",
+    "name": "ack-quit",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:17:03.8768352Z",
+    "phase": "101-update",
+    "name": "command-quit",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:17:04.8580804Z",
+    "phase": "101-update",
+    "name": "player-stopped",
+    "actual": 0
+  },
+  {
+    "utc": "2026-10-21T06:17:04.8856001Z",
+    "phase": "101-cache-reuse",
+    "name": "player-started",
+    "actual": {
+      "exe": "E:\\Workbench\\UnityWorkBench\\Farming\\Docs\\Acceptance\\M1\\20261020-xLua\\Root Final 100 R2\\Player\\Farming.exe",
+      "pid": 15924,
+      "clientRoot": "E:\\Workbench\\UnityWorkBench\\Farming\\Docs\\Acceptance\\M1\\20261020-xLua\\Root-Finalization\\Native-20261021-141638-780\\client"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:17:08.5891641Z",
+    "phase": "101-cache-reuse",
+    "name": "login-ready-101",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:17:08.5920950Z",
+    "phase": "101-cache-reuse",
+    "name": "B10-cached101",
+    "actual": {
+      "registerMessage": "",
+      "lastBiz": "0",
+      "reconnectRunning": "False",
+      "mask": "False",
+      "luaNick": "",
+      "loadedScenes": "M1_Boot,M1_Login",
+      "winLogin": "True",
+      "reconnectAttempt": "0",
+      "lastKind": "",
+      "patchRetryVisible": "False",
+      "hudNick": "",
+      "committed": "True",
+      "scene": "M1_Boot",
+      "winPatch": "False",
+      "entry": "True",
+      "disposeError": "",
+      "patchModule": "True",
+      "luaModel": "{\"activities\":{},\"bag\":{},\"facilities\":{},\"gachaStates\":{},\"info\":{\"bagSlots\":0,\"exp\":0,\"gem\":\"0\",\"gold\":\"0\",\"guideStep\":0,\"level\":0,\"nickname\":\"\",\"playerId\":\"0\",\"shard\":\"0\",\"ticket\":\"0\"},\"nodes\":{},\"orders\":{},\"plots\":{},\"tools\":{}}",
+      "expectedNick": "",
+      "hasToken": "True",
+      "resVersion": "101",
+      "utc": "2026-10-21T06:17:08.3871918Z",
+      "loginOpened": "True",
+      "auth": "False",
+      "globalPatch": "热更新验证成功",
+      "winHome": "False",
+      "downloadFiles": "0",
+      "bizSnap": "{}"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:17:08.8079455Z",
+    "phase": "101-cache-reuse",
+    "name": "ack-fill-creds",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:17:08.8091412Z",
+    "phase": "101-cache-reuse",
+    "name": "command-fill-creds",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:17:09.0126236Z",
+    "phase": "101-cache-reuse",
+    "name": "ack-login",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:17:09.0131042Z",
+    "phase": "101-cache-reuse",
+    "name": "command-login",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:17:09.4233150Z",
+    "phase": "101-cache-reuse",
+    "name": "authenticated-home",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:17:09.4249122Z",
+    "phase": "101-cache-reuse",
+    "name": "B10-cached-home",
+    "actual": {
+      "registerMessage": "",
+      "lastBiz": "0",
+      "reconnectRunning": "False",
+      "mask": "False",
+      "luaNick": "FinalNick",
+      "loadedScenes": "M1_Boot,M1_Home",
+      "winLogin": "False",
+      "reconnectAttempt": "0",
+      "lastKind": "ok",
+      "patchRetryVisible": "False",
+      "hudNick": "FinalNick",
+      "committed": "True",
+      "scene": "M1_Boot",
+      "winPatch": "False",
+      "entry": "True",
+      "disposeError": "",
+      "patchModule": "True",
+      "luaModel": "{\"activities\":{},\"bag\":{},\"facilities\":{},\"gachaStates\":{},\"info\":{\"bagSlots\":60,\"exp\":0,\"gem\":\"300\",\"gold\":\"200\",\"guideStep\":0,\"level\":1,\"nickname\":\"FinalNick\",\"playerId\":\"1\",\"shard\":\"0\",\"ticket\":\"5\"},\"nodes\":{},\"orders\":{},\"plots\":{},\"tools\":{}}",
+      "expectedNick": "",
+      "hasToken": "True",
+      "resVersion": "101",
+      "utc": "2026-10-21T06:17:09.3884679Z",
+      "loginOpened": "True",
+      "auth": "True",
+      "globalPatch": "热更新验证成功",
+      "winHome": "True",
+      "downloadFiles": "0",
+      "bizSnap": "{ \"info\": { \"playerId\": \"1\", \"nickname\": \"FinalNick\", \"level\": 1, \"gold\": \"200\", \"gem\": \"300\", \"ticket\": \"5\", \"bagSlots\": 60 } }"
+    }
+  },
+  {
+    "utc": "2026-10-21T06:17:09.6287812Z",
+    "phase": "101-cache-reuse",
+    "name": "ack-open-patchdemo",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:17:09.6296332Z",
+    "phase": "101-cache-reuse",
+    "name": "command-open-patchdemo",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:17:10.0422921Z",
+    "phase": "101-cache-reuse",
+    "name": "cached-patch-prefab-opened",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:17:10.2594315Z",
+    "phase": "101-cache-reuse",
+    "name": "ack-quit",
+    "actual": "passed"
+  },
+  {
+    "utc": "2026-10-21T06:17:10.2612218Z",
+    "phase": "101-cache-reuse",
+    "name": "command-quit",
+    "actual": "ok"
+  },
+  {
+    "utc": "2026-10-21T06:17:10.8747184Z",
+    "phase": "101-cache-reuse",
+    "name": "player-stopped",
+    "actual": 0
+  },
+  {
+    "utc": "2026-10-21T06:17:11.2516503Z",
+    "phase": "101-cache-reuse",
+    "name": "server-stopped",
+    "actual": 0
+  }
+]
