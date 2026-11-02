@@ -1,0 +1,89 @@
+syntax = "proto3";
+package cloudisle;
+option csharp_namespace = "CloudIsle.Proto";
+import "common.proto";
+
+message FacilityBuildReq {
+  int64 op_id = 1;
+  int32 facility_id = 2;
+  int64 operation_scope_id = 3;
+  int64 expected_revision = 4;
+  int32 config_version = 5;
+}
+
+message FacilityBuildResp {
+  int32 code = 1;
+  FacilityData facility = 2;
+  int64 committed_revision = 3;
+  CommandAck ack = 4;
+}
+
+message FacilityUpgradeReq {
+  int64 op_id = 1;
+  int32 facility_id = 2;
+  int64 operation_scope_id = 3;
+  int64 expected_revision = 4;
+  int32 config_version = 5;
+}
+
+message FacilityUpgradeResp {
+  int32 code = 1;
+  FacilityData facility = 2;
+  int64 committed_revision = 3;
+  CommandAck ack = 4;
+}
+
+message CraftStartReq {
+  int64 op_id = 1;
+  int32 facility_id = 2;
+  int32 slot_id = 3;
+  int32 recipe_id = 4;
+  int64 operation_scope_id = 5;
+  int64 expected_revision = 6;
+  int32 config_version = 7;
+}
+
+message CraftStartResp {
+  int32 code = 1;
+  SlotData slot = 2;
+  int64 committed_revision = 3;
+  CommandAck ack = 4;
+}
+
+message CraftCollectReq {
+  int64 op_id = 1;
+  int32 facility_id = 2;
+  int32 slot_id = 3;
+  int64 operation_scope_id = 4;
+  int64 expected_revision = 5;
+  int32 config_version = 6;
+}
+
+message CraftCollectResp {
+  int32 code = 1;
+  repeated ItemStack gained = 2;
+  int32 exp_gained = 3;
+  int64 committed_revision = 4;
+  CommandAck ack = 5;
+}
+
+message CraftSpeedupReq {
+  int64 op_id = 1;
+  int32 facility_id = 2;
+  int32 slot_id = 3;
+  int64 operation_scope_id = 4;
+  int64 expected_revision = 5;
+  int32 config_version = 6;
+}
+
+message CraftSpeedupResp {
+  int32 code = 1;
+  int32 gem_cost = 2;
+  SlotData slot = 3;
+  int64 committed_revision = 4;
+  CommandAck ack = 5;
+}
+
+message FacilityChangeNtf {
+  repeated FacilityData facilities = 1;
+}

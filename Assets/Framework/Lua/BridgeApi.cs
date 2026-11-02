@@ -7,14 +7,14 @@ using UnityEngine.UI;
 namespace Game.Framework.Lua
 {
     /// <summary>
-    /// 固定 C# UI 宿主与资源查询。签名属于 bridgeContract m1-bridge-0.3（AppVersion 0.3.0 基包）。
-    /// 旧 0.2.0 / main-bridge-1 安装不能靠资源补丁补出本桥；100/101 补丁不新增 C# 类型。
+    /// 固定 C# UI 宿主与资源查询。签名属于 bridgeContract m2-bridge-0.4（含 GameplayBridge）。
+    /// 旧 m1-bridge-0.3 / 0.2.0 安装不能靠资源补丁补出本桥；补丁不新增 C# 类型。
     /// Player AppVersion 使用 Application.version，不得与 bridgeContract 混称。
     /// </summary>
     public static class BridgeApi
     {
-        /// <summary>C# 桥接契约名。补丁只换 Lua/配置，不改此常量。</summary>
-        public const string BridgeContractValue = "m1-bridge-0.3";
+        /// <summary>C# 桥接契约名。补丁只换 Lua/配置，不改此常量。M2：m2-bridge-0.4。</summary>
+        public const string BridgeContractValue = "m2-bridge-0.4";
 
         /// <summary>历史别名：等同 BridgeContractValue。新代码请用 BridgeContractValue。</summary>
         public const string AppVersionValue = BridgeContractValue;

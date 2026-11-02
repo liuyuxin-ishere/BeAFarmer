@@ -1,0 +1,125 @@
+-- U01 ProgressionPresenter：只读展示等级/解锁；不发赠品、不写 Model。
+
+local Progression = require("Services/ProgressionService")
+
+local M = {}
+
+local function safe_call(fn, ...)
+  if type(fn) ~= "function" then return end
+  local ok, err = pcall(fn, ...)
+  if not ok then _ = err end
+end
+
+function M.new(service, store, clock, catalog)
+  local self = {
+    _service = service or Progression,
+    _store = store,
+    _clock = clock,
+    _catalog = catalog,
+    _view = nil,
+    _sub = nil,
+    _gen = 0,
+    _closed = true,
+    _destroyed = false,
+    _lastView = nil,
+  }
+
+  local function bump_gen()
+    self._gen = self._gen + 1
+    return self._gen
+  end
+
+  local function alive(gen)
+    return (not self._destroyed) and (not self._closed) and self._gen == gen and self._view ~= nil
+  end
+
+  function self:OnCreate(view)
+    self._view = view
+  end
+
+  function self:OnOpen(argsJson)
+    self._closed = false
+    self._destroyed = false
+    local gen = bump_gen()
+    if self._sub then
+      safe_call(function() self._sub.dispose() end)
+      self._sub = nil
+    end
+    if self._store and self._store.subscribe then
+      self._sub = self._store.subscribe(nil, function(snap, _)
+        if not alive(gen) then return end
+        self:render(snap)
+      end)
+    end
+    self:render(self._store and self._store.getSnapshot and self._store.getSnapshot() or nil)
+    _ = argsJson
+  end
+
+  function self:OnClose()
+    bump_gen()
+    self._closed = true
+    if self._sub then
+      safe_call(function() self._sub.dispose() end)
+      self._sub = nil
+    end
+  end
+
+  function self:OnDestroy()
+    self:OnClose()
+    self._destroyed = true
+    self._view = nil
+  end
+
+  function self:render(snapshot)
+    if self._destroyed or self._view == nil then return end
+    local level = 0
+    if type(snapshot) == "table" then
+      level = snapshot.level or 0
+    end
+    self:showUnlocks(level)
+  end
+
+  --- showUnlocks(level)：只读；不发等级赠品。不重复 HomeHud 已有等级/金币行。
+  function self:showUnlocks(level)
+    local snap = self._store and self._store.getSnapshot and self._store.getSnapshot() or nil
+    local view = self._service.buildUnlockView(snap, level)
+    self._lastView = view
+    if self._view and self._view.SetText then
+      local cat = self._catalog
+      local lines = {}
+      if type(view.tools) == "table" and #view.tools > 0 then
+        local t = {}
+        for i = 1, #view.tools do
+          local id = view.tools[i]
+          local info = cat and cat.getItem and cat.getItem(id) or nil
+          t[#t + 1] = info and info.name or "工具"
+        end
+        lines[#lines + 1] = "工具: " .. table.concat(t, "、")
+      else
+        lines[#lines + 1] = "工具: (无)"
+      end
+      if type(view.hints) == "table" and #view.hints > 0 then
+        local hs = {}
+        for i = 1, #view.hints do
+          hs[#hs + 1] = view.hints[i].text
+        end
+        -- 紧凑换行：全部解锁说明可读，避免多行居中撑破 HUD
+        lines[#lines + 1] = "解锁: " .. table.concat(hs, " · ")
+      else
+        lines[#lines + 1] = "解锁: (暂无)"
+      end
+      safe_call(function()
+        self._view:SetText("UnlocksLabel", table.concat(lines, "\n"))
+      end)
+    end
+    return view
+  end
+
+  function self:lastView()
+    return self._lastView
+  end
+
+  return self
+end
+
+return M

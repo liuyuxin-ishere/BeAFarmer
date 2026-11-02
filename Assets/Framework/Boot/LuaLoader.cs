@@ -343,18 +343,20 @@ namespace Game.Framework.Boot
                     }
                 }
 
+                InvokeEntryShutdown();
                 DisposeEntryObjects();
                 if (_luaEnv != null)
                 {
                     _luaEnv.Tick();
                     _asyncBeforeDispose = BridgeApi.AsyncCount;
                     _luaEnv.Dispose();
-                    _disposeError = "";
                 }
             }
             catch (Exception ex)
             {
-                _disposeError = ex.GetType().Name + ": " + ex.Message;
+                _disposeError = string.IsNullOrEmpty(_disposeError)
+                    ? ex.GetType().Name + ": " + ex.Message
+                    : _disposeError + " | " + ex.GetType().Name + ": " + ex.Message;
             }
 
             _luaEnv = null;
@@ -675,11 +677,12 @@ namespace Game.Framework.Boot
                 {
                     _luaEnv.Tick();
                     _luaEnv.Dispose();
-                    _disposeError = "";
                 }
                 catch (Exception ex)
                 {
-                    _disposeError = ex.GetType().Name + ": " + ex.Message;
+                    _disposeError = string.IsNullOrEmpty(_disposeError)
+                        ? ex.GetType().Name + ": " + ex.Message
+                        : _disposeError + " | " + ex.GetType().Name + ": " + ex.Message;
                 }
 
                 _luaEnv = null;

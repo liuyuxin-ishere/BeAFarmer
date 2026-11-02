@@ -32,6 +32,112 @@ namespace CloudIsle.Proto
                 return 1009;
             if (messageType == typeof(KickNtf))
                 return 1010;
+            if (messageType == typeof(BagSellReq))
+                return 2001;
+            if (messageType == typeof(BagSellResp))
+                return 2002;
+            if (messageType == typeof(BagExpandReq))
+                return 2003;
+            if (messageType == typeof(BagExpandResp))
+                return 2004;
+            if (messageType == typeof(GuideStepReq))
+                return 2005;
+            if (messageType == typeof(GuideStepResp))
+                return 2006;
+            if (messageType == typeof(SyncStateReq))
+                return 2007;
+            if (messageType == typeof(SyncStateResp))
+                return 2008;
+            if (messageType == typeof(CommandResultQueryReq))
+                return 2009;
+            if (messageType == typeof(CommandResultQueryResp))
+                return 2010;
+            if (messageType == typeof(PlayerAttrNtf))
+                return 2101;
+            if (messageType == typeof(BagChangeNtf))
+                return 2102;
+            if (messageType == typeof(LevelUpNtf))
+                return 2103;
+            if (messageType == typeof(PlayerDeltaBatchNtf))
+                return 2110;
+            if (messageType == typeof(PlotUnlockReq))
+                return 3001;
+            if (messageType == typeof(PlotUnlockResp))
+                return 3002;
+            if (messageType == typeof(PlantReq))
+                return 3003;
+            if (messageType == typeof(PlantResp))
+                return 3004;
+            if (messageType == typeof(HarvestReq))
+                return 3005;
+            if (messageType == typeof(HarvestResp))
+                return 3006;
+            if (messageType == typeof(WaterReq))
+                return 3007;
+            if (messageType == typeof(WaterResp))
+                return 3008;
+            if (messageType == typeof(FertilizeReq))
+                return 3009;
+            if (messageType == typeof(FertilizeResp))
+                return 3010;
+            if (messageType == typeof(PlotChangeNtf))
+                return 3101;
+            if (messageType == typeof(GatherReq))
+                return 4001;
+            if (messageType == typeof(GatherResp))
+                return 4002;
+            if (messageType == typeof(ToolUpgradeReq))
+                return 4003;
+            if (messageType == typeof(ToolUpgradeResp))
+                return 4004;
+            if (messageType == typeof(NodeChangeNtf))
+                return 4101;
+            if (messageType == typeof(ToolChangeNtf))
+                return 4102;
+            if (messageType == typeof(FacilityBuildReq))
+                return 5001;
+            if (messageType == typeof(FacilityBuildResp))
+                return 5002;
+            if (messageType == typeof(FacilityUpgradeReq))
+                return 5003;
+            if (messageType == typeof(FacilityUpgradeResp))
+                return 5004;
+            if (messageType == typeof(CraftStartReq))
+                return 5005;
+            if (messageType == typeof(CraftStartResp))
+                return 5006;
+            if (messageType == typeof(CraftCollectReq))
+                return 5007;
+            if (messageType == typeof(CraftCollectResp))
+                return 5008;
+            if (messageType == typeof(CraftSpeedupReq))
+                return 5009;
+            if (messageType == typeof(CraftSpeedupResp))
+                return 5010;
+            if (messageType == typeof(FacilityChangeNtf))
+                return 5101;
+            if (messageType == typeof(OrderListReq))
+                return 6001;
+            if (messageType == typeof(OrderListResp))
+                return 6002;
+            if (messageType == typeof(OrderSubmitReq))
+                return 6003;
+            if (messageType == typeof(OrderSubmitResp))
+                return 6004;
+            if (messageType == typeof(OrderRerollReq))
+                return 6005;
+            if (messageType == typeof(OrderRerollResp))
+                return 6006;
+            if (messageType == typeof(OrderMilestoneClaimReq))
+                return 6007;
+            if (messageType == typeof(OrderMilestoneClaimResp))
+                return 6008;
+            if (messageType == typeof(OrderChangeNtf))
+                return 6101;
+            if (messageType == typeof(ShopBuyReq))
+                return 7001;
+            if (messageType == typeof(ShopBuyResp))
+                return 7002;
             throw new InvalidOperationException("未知消息类型: " + messageType.FullName);
         }
 
@@ -64,6 +170,112 @@ namespace CloudIsle.Proto
                     return LogoutReq.Parser.ParseFrom(body);
                 case 1010:
                     return KickNtf.Parser.ParseFrom(body);
+                case 2001:
+                    return BagSellReq.Parser.ParseFrom(body);
+                case 2002:
+                    return BagSellResp.Parser.ParseFrom(body);
+                case 2003:
+                    return BagExpandReq.Parser.ParseFrom(body);
+                case 2004:
+                    return BagExpandResp.Parser.ParseFrom(body);
+                case 2005:
+                    return GuideStepReq.Parser.ParseFrom(body);
+                case 2006:
+                    return GuideStepResp.Parser.ParseFrom(body);
+                case 2007:
+                    return SyncStateReq.Parser.ParseFrom(body);
+                case 2008:
+                    return SyncStateResp.Parser.ParseFrom(body);
+                case 2009:
+                    return CommandResultQueryReq.Parser.ParseFrom(body);
+                case 2010:
+                    return CommandResultQueryResp.Parser.ParseFrom(body);
+                case 2101:
+                    return PlayerAttrNtf.Parser.ParseFrom(body);
+                case 2102:
+                    return BagChangeNtf.Parser.ParseFrom(body);
+                case 2103:
+                    return LevelUpNtf.Parser.ParseFrom(body);
+                case 2110:
+                    return PlayerDeltaBatchNtf.Parser.ParseFrom(body);
+                case 3001:
+                    return PlotUnlockReq.Parser.ParseFrom(body);
+                case 3002:
+                    return PlotUnlockResp.Parser.ParseFrom(body);
+                case 3003:
+                    return PlantReq.Parser.ParseFrom(body);
+                case 3004:
+                    return PlantResp.Parser.ParseFrom(body);
+                case 3005:
+                    return HarvestReq.Parser.ParseFrom(body);
+                case 3006:
+                    return HarvestResp.Parser.ParseFrom(body);
+                case 3007:
+                    return WaterReq.Parser.ParseFrom(body);
+                case 3008:
+                    return WaterResp.Parser.ParseFrom(body);
+                case 3009:
+                    return FertilizeReq.Parser.ParseFrom(body);
+                case 3010:
+                    return FertilizeResp.Parser.ParseFrom(body);
+                case 3101:
+                    return PlotChangeNtf.Parser.ParseFrom(body);
+                case 4001:
+                    return GatherReq.Parser.ParseFrom(body);
+                case 4002:
+                    return GatherResp.Parser.ParseFrom(body);
+                case 4003:
+                    return ToolUpgradeReq.Parser.ParseFrom(body);
+                case 4004:
+                    return ToolUpgradeResp.Parser.ParseFrom(body);
+                case 4101:
+                    return NodeChangeNtf.Parser.ParseFrom(body);
+                case 4102:
+                    return ToolChangeNtf.Parser.ParseFrom(body);
+                case 5001:
+                    return FacilityBuildReq.Parser.ParseFrom(body);
+                case 5002:
+                    return FacilityBuildResp.Parser.ParseFrom(body);
+                case 5003:
+                    return FacilityUpgradeReq.Parser.ParseFrom(body);
+                case 5004:
+                    return FacilityUpgradeResp.Parser.ParseFrom(body);
+                case 5005:
+                    return CraftStartReq.Parser.ParseFrom(body);
+                case 5006:
+                    return CraftStartResp.Parser.ParseFrom(body);
+                case 5007:
+                    return CraftCollectReq.Parser.ParseFrom(body);
+                case 5008:
+                    return CraftCollectResp.Parser.ParseFrom(body);
+                case 5009:
+                    return CraftSpeedupReq.Parser.ParseFrom(body);
+                case 5010:
+                    return CraftSpeedupResp.Parser.ParseFrom(body);
+                case 5101:
+                    return FacilityChangeNtf.Parser.ParseFrom(body);
+                case 6001:
+                    return OrderListReq.Parser.ParseFrom(body);
+                case 6002:
+                    return OrderListResp.Parser.ParseFrom(body);
+                case 6003:
+                    return OrderSubmitReq.Parser.ParseFrom(body);
+                case 6004:
+                    return OrderSubmitResp.Parser.ParseFrom(body);
+                case 6005:
+                    return OrderRerollReq.Parser.ParseFrom(body);
+                case 6006:
+                    return OrderRerollResp.Parser.ParseFrom(body);
+                case 6007:
+                    return OrderMilestoneClaimReq.Parser.ParseFrom(body);
+                case 6008:
+                    return OrderMilestoneClaimResp.Parser.ParseFrom(body);
+                case 6101:
+                    return OrderChangeNtf.Parser.ParseFrom(body);
+                case 7001:
+                    return ShopBuyReq.Parser.ParseFrom(body);
+                case 7002:
+                    return ShopBuyResp.Parser.ParseFrom(body);
                 default:
                     throw new InvalidOperationException("未知消息 ID: " + msgId);
             }
@@ -88,6 +300,72 @@ namespace CloudIsle.Proto
                     return true;
                 case 1007:
                     responseId = 1008;
+                    return true;
+                case 2001:
+                    responseId = 2002;
+                    return true;
+                case 2003:
+                    responseId = 2004;
+                    return true;
+                case 2005:
+                    responseId = 2006;
+                    return true;
+                case 2007:
+                    responseId = 2008;
+                    return true;
+                case 2009:
+                    responseId = 2010;
+                    return true;
+                case 3001:
+                    responseId = 3002;
+                    return true;
+                case 3003:
+                    responseId = 3004;
+                    return true;
+                case 3005:
+                    responseId = 3006;
+                    return true;
+                case 3007:
+                    responseId = 3008;
+                    return true;
+                case 3009:
+                    responseId = 3010;
+                    return true;
+                case 4001:
+                    responseId = 4002;
+                    return true;
+                case 4003:
+                    responseId = 4004;
+                    return true;
+                case 5001:
+                    responseId = 5002;
+                    return true;
+                case 5003:
+                    responseId = 5004;
+                    return true;
+                case 5005:
+                    responseId = 5006;
+                    return true;
+                case 5007:
+                    responseId = 5008;
+                    return true;
+                case 5009:
+                    responseId = 5010;
+                    return true;
+                case 6001:
+                    responseId = 6002;
+                    return true;
+                case 6003:
+                    responseId = 6004;
+                    return true;
+                case 6005:
+                    responseId = 6006;
+                    return true;
+                case 6007:
+                    responseId = 6008;
+                    return true;
+                case 7001:
+                    responseId = 7002;
                     return true;
                 default:
                     responseId = 0;

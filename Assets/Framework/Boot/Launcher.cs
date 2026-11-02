@@ -8,6 +8,7 @@ using Cysharp.Threading.Tasks;
 using Game.Framework.Account;
 using Game.Framework.Config;
 using Game.Framework.Core;
+using Game.Framework.Gameplay;
 using Game.Framework.Lua;
 using Game.Framework.Resource;
 using Game.Framework.Scenes;
@@ -35,6 +36,7 @@ namespace Game.Framework.Boot
         readonly string _tcpHost;
         readonly int _tcpPort;
         readonly string _tokenDir;
+        readonly string _pendingRoot;
         Action<string> _log;
         PatchService _patch;
         LuaLoader _lua;
@@ -80,7 +82,8 @@ namespace Game.Framework.Boot
             string tcpHost = null,
             int tcpPort = 0,
             string tokenDir = null,
-            Action<string> log = null)
+            Action<string> log = null,
+            string pendingRoot = null)
         {
             _httpBase = string.IsNullOrWhiteSpace(httpBase) ? DefaultHttpBase : EnsureSlash(httpBase);
             _cacheRoot = string.IsNullOrWhiteSpace(cacheRoot)
@@ -94,6 +97,10 @@ namespace Game.Framework.Boot
             _tokenDir = string.IsNullOrWhiteSpace(tokenDir)
                 ? Path.Combine(Application.persistentDataPath, "m1-account")
                 : tokenDir;
+            // 验收隔离：pending 必须落在 accept-root，否则退出重开会串到机器默认 persistent 目录。
+            _pendingRoot = string.IsNullOrWhiteSpace(pendingRoot)
+                ? Path.Combine(Application.persistentDataPath, "m2-pending")
+                : pendingRoot;
             _log = log ?? (s => Debug.Log("[Launcher] " + s));
         }
 
@@ -109,6 +116,8 @@ namespace Game.Framework.Boot
             try
             {
                 EnsureFileLogger();
+                // T007：显式主线程 Dispatcher + SessionContext；无 port（T013）时 Lua 发送仍 NotReady。
+                EnsureGameplayHost();
                 _log("version-check " + _httpBase);
                 var versions = new VersionService();
                 VersionManifest manifest = await versions.FetchAsync(new Uri(_httpBase + "version.json"), linked);
@@ -172,9 +181,11 @@ namespace Game.Framework.Boot
                         _tcpPort,
                         Application.version,
                         captured.ResVersion > 0 ? captured.ResVersion : 100,
-                        captured.ConfigVersion > 0 ? captured.ConfigVersion : 100,
+                        captured.ConfigVersion > 0 ? captured.ConfigVersion : 200,
                         "m1-device",
                         _tokenDir);
+                    // LuaEnv 已创建：挂载玩法 Runtime（Store/Transport/Client/Adapter/ModelPort）
+                    AttachGameplayRuntime(env);
                     return UniTask.CompletedTask;
                 };
 
@@ -392,8 +403,45 @@ namespace Game.Framework.Boot
             }
         }
 
+        /// <summary>
+        /// 组合根注入玩法宿主：仅 Unity 主线程 SynchronizationContext，不另造 NetClient。
+        /// </summary>
+        void EnsureGameplayHost()
+        {
+            SynchronizationContext sync = SynchronizationContext.Current;
+            if (sync == null)
+                throw new InvalidOperationException("launcher-requires-synchronization-context");
+            var dispatcher = new MainThreadDispatcher(sync);
+            var context = new GameplaySessionContext();
+            GameplayBridgeBinding.ConfigureHost(dispatcher, context);
+            _log("gameplay-host-configured");
+        }
+
+        /// <summary>
+        /// AccountBridge.Configure 之后：绑定实际 Store/Transport/Client/Adapter 与 Lua PlayerModel 端口。
+        /// </summary>
+        void AttachGameplayRuntime(XLua.LuaEnv env)
+        {
+            if (env == null)
+                throw new ArgumentNullException(nameof(env));
+            if (!GameplayBridgeBinding.TryGetHost(
+                    out IMainThreadDispatcher dispatcher,
+                    out GameplaySessionContext context,
+                    out _))
+            {
+                throw new InvalidOperationException("gameplay-host-missing");
+            }
+
+            Directory.CreateDirectory(_pendingRoot);
+            AccountBridge.AttachGameplayRuntime(dispatcher, context, env, _pendingRoot);
+            _log("gameplay-runtime-attached pending=" + _pendingRoot);
+        }
+
         void ReleaseOwningScope(bool disconnectStatics)
         {
+            // 先卸 Runtime（解绑 port/观察者），再 Shutdown host，再 Dispose Session/Lua
+            try { AccountBridge.DetachGameplayRuntime(); } catch { /* 取消路径尽力 */ }
+            try { GameplayBridgeBinding.Shutdown(); } catch { /* 取消路径尽力 */ }
             try { AccountBridge.CancelAll(); } catch { /* 取消路径尽力 */ }
             try { AccountBridge.StopReconnect(); } catch { }
 
@@ -482,45 +530,14 @@ namespace Game.Framework.Boot
         }
 
 #if UNITY_EDITOR
-        /// <summary>编辑器磁盘 Lua：catalog 使用当前 bridge，模块 SHA 现场计算。</summary>
+        /// <summary>编辑器加载正式Staging目录，校验声明SHA、完整依赖及ABI。</summary>
         static async UniTask PrepareEditorLuaFromDiskAsync(LuaLoader lua, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
-            // 不含 async_case：正式 Login entry 不武装迁移探测租约；含它会触发 AdvanceAsyncProducers 硬失败。
-            string[] names =
-            {
-                "entry", "AccountService", "PlayerModel", "Json", "panel_base"
-            };
-            var list = new System.Collections.Generic.List<CatalogModule>();
-            var modules = new System.Collections.Generic.Dictionary<string, byte[]>(StringComparer.Ordinal);
-            foreach (string name in names)
-            {
-                byte[] bytes = ReadEditorLuaBytes(name);
-                if (bytes == null)
-                    continue;
-                string sha = HashUtil.Sha256(bytes);
-                list.Add(new CatalogModule { name = name, address = name, sha256 = sha });
-                modules[name] = bytes;
-            }
-
-            if (!modules.ContainsKey("entry"))
-                throw new InvalidOperationException("editor-lua-missing-entry");
-
-            byte[] configBytes = ReadEditorLuaBytes("cfg_runtime")
-                                 ?? ReadEditorLuaBytes("Staging/cfg_runtime")
-                                 ?? Encoding.UTF8.GetBytes("{}");
-            var catalog = new RuntimeCatalog
-            {
-                resVersion = "100",
-                entryModule = "entry",
-                configAddress = "cfg_runtime",
-                configSha256 = HashUtil.Sha256(configBytes),
-                bridgeContract = BridgeApi.BridgeContractValue,
-                requiredAppVersion = Application.version,
-                protoVersion = BridgeApi.RequiredProtoVersion,
-                modules = list.ToArray()
-            };
-            LuaIndex index = LuaIndex.FromCatalog(catalog);
+            if (!LuaModulePreloader.TryLoadFormalFromDisk(
+                    out LuaIndex index, out System.Collections.Generic.Dictionary<string, byte[]> modules,
+                    out byte[] configBytes, out _))
+                throw new InvalidOperationException("editor-formal-catalog-invalid");
             await lua.PrepareAsync(index, modules, configBytes, ct);
         }
 

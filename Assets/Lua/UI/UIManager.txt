@@ -66,6 +66,12 @@ function M.register(registration)
   )
 end
 
+-- Lua callers may omit completion; the fixed C# bridge still receives an owned callback lease.
+local function completion(done)
+  if done == nil then return function(_, _) end end
+  return done
+end
+
 function M.open(windowId, args, done)
   local argsJson
   if type(args) == "table" then
@@ -73,15 +79,15 @@ function M.open(windowId, args, done)
   else
     argsJson = tostring(args or "")
   end
-  return CS.Game.Framework.UI.UiBridge.Open(tostring(windowId), argsJson, done)
+  return CS.Game.Framework.UI.UiBridge.Open(tostring(windowId), argsJson, completion(done))
 end
 
 function M.close(windowId, done)
-  return CS.Game.Framework.UI.UiBridge.Close(tostring(windowId), done)
+  return CS.Game.Framework.UI.UiBridge.Close(tostring(windowId), completion(done))
 end
 
 function M.closeTop(done)
-  return CS.Game.Framework.UI.UiBridge.CloseTop(done)
+  return CS.Game.Framework.UI.UiBridge.CloseTop(completion(done))
 end
 
 function M.closeAll()

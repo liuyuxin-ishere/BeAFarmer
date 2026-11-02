@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Net;
 using System.Runtime.ExceptionServices;
 using CloudIsle.Net;
@@ -6,6 +7,9 @@ using CloudIsle.Server.Account;
 using CloudIsle.Server.Config;
 using CloudIsle.Server.Data;
 using CloudIsle.Server.Diagnostics;
+using CloudIsle.Server.Gameplay.Application.Commands;
+using CloudIsle.Server.Gameplay.Infrastructure.Clock;
+using CloudIsle.Server.Gameplay.Infrastructure.Commands;
 using CloudIsle.Server.Network;
 using CloudIsle.Server.Players;
 
@@ -19,7 +23,7 @@ public sealed class M1ServerOptions
     /// <summary>包含正式config_manifest.json的目录。</summary>
     public string ConfigDirectory { get; init; } = "";
     /// <summary>启动必须精确加载的配置版本。</summary>
-    public int ConfigVersion { get; init; } = 100;
+    public int ConfigVersion { get; init; } = 200;
     /// <summary>静态HTTP内容根，包含version.json及版本目录。</summary>
     public string ContentRoot { get; init; } = "";
     /// <summary>HTTP监听前缀；本机Native客户端使用localhost避开127代理问题。</summary>
@@ -30,16 +34,60 @@ public sealed class M1ServerOptions
     public string LogDirectory { get; init; } = "";
     /// <summary>正式登录协议必须与此值相等。</summary>
     public int ProtoVersion { get; init; } = 1;
-    /// <summary>允许登录的最低安装包版本。</summary>
-    public string MinAppVersion { get; init; } = "0.3.0";
-    /// <summary>登录最低资源版本；较新的兼容客户端允许通过。</summary>
-    public int RequiredResVersion { get; init; } = 100;
-    /// <summary>登录最低配置版本；与启动数据的精确ConfigVersion区分。</summary>
-    public int RequiredConfigVersion { get; init; } = 100;
+    /// <summary>允许登录的最低安装包版本（生产 M2：0.4.0）。</summary>
+    public string MinAppVersion { get; init; } = "0.4.0";
+    /// <summary>桥契约名（生产 M2：m2-bridge-0.4）。</summary>
+    public string RequiredBridgeContract { get; init; } = "m2-bridge-0.4";
+    /// <summary>登录最低资源版本（生产 M2：200）。</summary>
+    public int RequiredResVersion { get; init; } = 200;
+    /// <summary>登录最低配置版本（生产 M2：200）。</summary>
+    public int RequiredConfigVersion { get; init; } = 200;
     /// <summary>令牌有效期，默认24小时；原文不入日志或数据库。</summary>
     public TimeSpan TokenLifetime { get; init; } = TimeSpan.FromHours(24);
     /// <summary>正常停机保存预算，耗尽会明确失败而不是假称已保存。</summary>
     public TimeSpan ShutdownSaveBudget { get; init; } = TimeSpan.FromSeconds(15);
+
+    /// <summary>
+    /// 测试专用：额外玩法规则注入（非公开调试消息）。生产留空——禁止 FakeGoldBump 生产注册。
+    /// </summary>
+    internal IEnumerable<IGameplayRule>? TestGameplayRules { get; init; }
+
+    /// <summary>
+    /// 测试专用：日切模块注入。与生产表合并（同 ModuleKey 覆盖）；生产始终含 ShopDailyResetPolicy。
+    /// </summary>
+    internal IEnumerable<DailyModuleRegistration>? TestDailyModules { get; init; }
+
+    /// <summary>
+    /// 测试专用：提交故障探针（默认关闭）。挂真实 COMMIT/缓存/发送点；无生产 GM/调试协议。
+    /// </summary>
+    internal CommitFaultProbe? TestCommitProbe { get; init; }
+
+    /// <summary>测试专用：启动时设置 SqliteCommandCommitStore.FaultPoint（默认 None）。</summary>
+    internal CommitFaultPoint TestCommitFaultPoint { get; init; }
+
+    /// <summary>测试专用：启动时对下一次缓存发布注入故障。</summary>
+    internal bool TestFaultNextCachePublish { get; init; }
+
+    /// <summary>测试专用：覆盖回执清理时钟。</summary>
+    internal Func<long>? TestUtcNowMs { get; init; }
+
+    /// <summary>测试专用：覆盖回执清理 delay（避免真实 1h 等待）。</summary>
+    internal Func<TimeSpan, CancellationToken, Task>? TestRetentionDelayAsync { get; init; }
+
+    /// <summary>测试专用：清理唤醒间隔。</summary>
+    internal TimeSpan? TestRetentionInterval { get; init; }
+
+    /// <summary>测试专用：积压短间隔。</summary>
+    internal TimeSpan? TestRetentionBacklogInterval { get; init; }
+
+    /// <summary>测试专用：单批大小。</summary>
+    internal int? TestRetentionBatchSize { get; init; }
+
+    /// <summary>测试专用：每次唤醒最大批次数。</summary>
+    internal int? TestRetentionMaxBatchesPerWake { get; init; }
+
+    /// <summary>测试专用：保留窗毫秒；-1 默认 7 天。</summary>
+    internal long? TestRetentionMs { get; init; }
 }
 
 /// <summary>
@@ -72,9 +120,22 @@ public sealed class M1ServerHost
             HttpPrefix = options.HttpPrefix, LogDirectory = options.LogDirectory,
             TcpEndpoint = new IPEndPoint(options.TcpEndpoint.Address, options.TcpEndpoint.Port),
             ProtoVersion = options.ProtoVersion, MinAppVersion = options.MinAppVersion,
+            RequiredBridgeContract = options.RequiredBridgeContract,
             RequiredResVersion = options.RequiredResVersion,
             RequiredConfigVersion = options.RequiredConfigVersion,
-            TokenLifetime = options.TokenLifetime, ShutdownSaveBudget = options.ShutdownSaveBudget
+            TokenLifetime = options.TokenLifetime, ShutdownSaveBudget = options.ShutdownSaveBudget,
+            TestGameplayRules = options.TestGameplayRules,
+            TestDailyModules = options.TestDailyModules,
+            TestCommitProbe = options.TestCommitProbe,
+            TestCommitFaultPoint = options.TestCommitFaultPoint,
+            TestFaultNextCachePublish = options.TestFaultNextCachePublish,
+            TestUtcNowMs = options.TestUtcNowMs,
+            TestRetentionDelayAsync = options.TestRetentionDelayAsync,
+            TestRetentionInterval = options.TestRetentionInterval,
+            TestRetentionBacklogInterval = options.TestRetentionBacklogInterval,
+            TestRetentionBatchSize = options.TestRetentionBatchSize,
+            TestRetentionMaxBatchesPerWake = options.TestRetentionMaxBatchesPerWake,
+            TestRetentionMs = options.TestRetentionMs
         };
     }
 
@@ -107,13 +168,25 @@ public sealed class M1ServerHost
             ct.ThrowIfCancellationRequested();
             ValidateOptions();
             var config = new ServerConfigService();
-            config.Load(Path.GetFullPath(_options.ConfigDirectory), _options.ConfigVersion);
+            string configDir = Path.GetFullPath(_options.ConfigDirectory);
+            config.Load(configDir, _options.ConfigVersion);
+            // 启动完整校验：与 T006 同一 GameConfigSnapshot 路径，不造第二套目录
+            CloudIsle.Config.GameConfigSnapshot gameplayConfig =
+                CloudIsle.Config.GameConfigSnapshot.LoadDirectory(configDir, _options.ConfigVersion);
+            // 配置门槛与已加载快照必须同一版本；不允许 Host 选项与磁盘配置分叉后仍启动。
+            if (_options.RequiredConfigVersion != gameplayConfig.Version)
+            {
+                throw new InvalidOperationException(
+                    $"RequiredConfigVersion {_options.RequiredConfigVersion} != loaded GameConfigSnapshot.Version {gameplayConfig.Version}");
+            }
+
             logging.Configure(Path.GetFullPath(_options.LogDirectory), "Information");
             loggingConfigured = true;
             _connectionFaultLog = (id, stage, errorType) => logging.Logger.Warning(
                 "M1 session cleanup failed sessionId={SessionId} stage={Stage} errorType={ErrorType}",
                 id, stage, errorType);
             Action<string> trace = text => logging.Logger.Information("M1 {Trace}", text);
+            trace($"gameplay config snapshot version={gameplayConfig.Version} items={gameplayConfig.KnownItemIds.Count}");
 
             store = new SqliteStore();
             store.Initialize(Path.GetFullPath(_options.DatabasePath));
@@ -121,18 +194,76 @@ public sealed class M1ServerHost
             players = new PlayerQueue();
             var playerStore = new PlayerStore(store);
             var cache = new PlayerCache(playerStore);
+            var committedCache = new CommittedPlayerCache(cache, playerStore)
+            {
+                Probe = _options.TestCommitProbe,
+                FaultNextPublish = _options.TestFaultNextCachePublish
+            };
+            var commitStore = new CloudIsle.Server.Gameplay.Infrastructure.Commands.SqliteCommandCommitStore(store)
+            {
+                Probe = _options.TestCommitProbe,
+                FaultPoint = _options.TestCommitFaultPoint
+            };
+            var commitCore = new CloudIsle.Server.Gameplay.Application.Commands.GameplayCommitCore(
+                commitStore, committedCache);
+            // T016/T024：有效单调时钟；生产日切含 ShopDailyResetPolicy；测试经 TestDailyModules 同 Key 覆盖。
+            var gameClock = new PersistedGameClock(store, rawUtcMs: _options.TestUtcNowMs);
+            IReadOnlyList<DailyModuleRegistration> dailyModules =
+                GameplayDailyComposition.MergeProductionWithTestOverrides(_options.TestDailyModules);
+            var systemWrites = new CloudIsle.Server.Gameplay.Application.Commands.SystemWriteCoordinator(
+                commitCore, playerStore, store, dailyModules: dailyModules, gameplayConfig);
             _sessions = new SessionRegistry(players, SessionRegistry.DefaultKickBudget, trace);
             saves = new SaveService(players, cache, playerStore);
             _router = new MessageRouter(SendAsync, CloseAsync, new SystemRouterClock(), trace);
             _heartbeat = new HeartbeatHandler(SendAsync);
             _heartbeat.Register(_router);
+            // Config 门槛取自同一已注入快照，不另读盘、不另设断开的 flag。
+            // LoginSessionOptions 保留同步 Func 供非玩法路径；权威有效时间走 gameClock。
             var loginOptions = new LoginSessionOptions(
-                _options.ProtoVersion, _options.RequiredResVersion, _options.RequiredConfigVersion,
-                _options.TokenLifetime, _options.MinAppVersion);
+                _options.ProtoVersion, _options.RequiredResVersion, gameplayConfig.Version,
+                _options.TokenLifetime, _options.MinAppVersion, utcNowMs: _options.TestUtcNowMs,
+                requiredBridgeContract: _options.RequiredBridgeContract);
             var accounts = new AccountHandler(
                 new AccountRepository(store, new PasswordHasher()), players, cache,
-                new TokenService(store), _sessions, FindSession, loginOptions, saves, SendAsync);
+                new TokenService(store), _sessions, FindSession, loginOptions, saves, SendAsync,
+                gameplayConfig, systemWrites, gameClock);
             accounts.RegisterRoutes(_router);
+
+            // T014/T022/T024：同一 Host 装配玩法 Query/Write/Publisher；生产 BagSell/BagExpand/ShopBuy。
+            // 测试经内部 TestGameplayRules 覆盖同 Kind（GoldBump 等）；禁止 FakeGoldBump 生产注册；非公开调试消息。
+            GameplayServices gameplay = GameplayModule.Create(new GameplayDependencies
+            {
+                Queue = players,
+                Store = store,
+                Sessions = _sessions,
+                Players = playerStore,
+                CommitCore = commitCore,
+                HostConfigVersion = gameplayConfig.Version,
+                Config = gameplayConfig,
+                UtcNowMs = _options.TestUtcNowMs,
+                Clock = gameClock,
+                SystemWrites = systemWrites,
+                Rules = _options.TestGameplayRules,
+                TestCommitProbe = _options.TestCommitProbe,
+                SendAsync = SendAsync,
+                CloseAsync = CloseAsync
+            });
+            GameplayModule.RegisterHandlers(_router, gameplay);
+            trace("gameplay routes registered sync/query/19-write (BagSell/BagExpand/ShopBuy production)");
+
+            var retention = new ReceiptRetentionWorker(
+                store,
+                utcNowMs: _options.TestUtcNowMs,
+                delayAsync: _options.TestRetentionDelayAsync,
+                interval: _options.TestRetentionInterval,
+                retentionMs: _options.TestRetentionMs ?? -1,
+                batchSize: _options.TestRetentionBatchSize ?? ReceiptRetentionWorker.DefaultBatchSize,
+                log: text => logging.Logger.Information("M1 {Trace}", text),
+                maxBatchesPerWake: _options.TestRetentionMaxBatchesPerWake
+                    ?? ReceiptRetentionWorker.DefaultMaxBatchesPerWake,
+                backlogInterval: _options.TestRetentionBacklogInterval,
+                clock: gameClock);
+            tasks.Add(retention.RunAsync(lifetime.Token));
 
             _tcp = new TcpServer(DispatchAsync);
             Task http = new PatchHttpService().RunAsync(

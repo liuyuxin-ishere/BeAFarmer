@@ -1,0 +1,53 @@
+-- C08/U01：商店意图入口。只传 shopItemId/count；展示价不进意图。
+
+local Gameplay = require("Services/GameplayService")
+
+local M = {}
+
+local function as_pos_int32(v, field)
+  if type(v) == "string" then
+    if not v:match("^%d+$") or v:match("^0%d") then
+      return nil, field .. "-invalid"
+    end
+    v = tonumber(v)
+  end
+  if type(v) ~= "number" or v ~= math.floor(v) or v < 1 or v > 2147483647 then
+    return nil, field .. "-invalid"
+  end
+  return v
+end
+
+--- buy(shopId, count, done) -> observation
+function M.buy(shopId, count, done)
+  assert(type(done) == "function", "buy requires done")
+  local sid, serr = as_pos_int32(shopId, "shopId")
+  if not sid then
+    done(-12, {
+      code = -12,
+      disposition = "NotAccepted",
+      kind = "malformed_intent",
+      message = serr or "参数无效",
+      retryable = false,
+    })
+    return nil
+  end
+  local cnt, cerr = as_pos_int32(count, "count")
+  if not cnt then
+    done(-12, {
+      code = -12,
+      disposition = "NotAccepted",
+      kind = "malformed_intent",
+      message = cerr or "参数无效",
+      retryable = false,
+    })
+    return nil
+  end
+  -- Proto ShopBuyReq.shop_item_id → shopItemId；禁止附带 price/gold
+  return Gameplay.execute("ShopBuy", { shopItemId = sid, count = cnt }, done)
+end
+
+function M.isWritable()
+  return Gameplay.isWritable()
+end
+
+return M

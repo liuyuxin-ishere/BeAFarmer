@@ -37,67 +37,89 @@ namespace CloudIsle.Proto {
             "IAEoAxISCgpyZWFkeV90aW1lGAUgASgDEg8KB3dhdGVyZWQYBiABKAgSEgoK",
             "ZmVydGlsaXplZBgHIAEoCCJOCgpQbG90UmVzdWx0Eg8KB3Bsb3RfaWQYASAB",
             "KAUSDAoEY29kZRgCIAEoBRIhCgRwbG90GAMgASgLMhMuY2xvdWRpc2xlLlBs",
-            "b3REYXRhIjQKCE5vZGVEYXRhEg8KB25vZGVfaWQYASABKAUSFwoPbmV4dF9y",
-            "ZWFkeV90aW1lGAIgASgDIioKCFRvb2xEYXRhEg8KB3Rvb2xfaWQYASABKAUS",
-            "DQoFbGV2ZWwYAiABKAUiaAoIU2xvdERhdGESDwoHc2xvdF9pZBgBIAEoBRIR",
-            "CglyZWNpcGVfaWQYAiABKAUSEwoLZmluaXNoX3RpbWUYAyABKAMSIwoFc3Rh",
-            "dGUYBCABKA4yFC5jbG91ZGlzbGUuU2xvdFN0YXRlIlYKDEZhY2lsaXR5RGF0",
-            "YRITCgtmYWNpbGl0eV9pZBgBIAEoBRINCgVsZXZlbBgCIAEoBRIiCgVzbG90",
-            "cxgDIAMoCzITLmNsb3VkaXNsZS5TbG90RGF0YSKlAQoJT3JkZXJEYXRhEhAK",
-            "CG9yZGVyX2lkGAEgASgFEgwKBHNsb3QYAiABKAUSIwoFbmVlZHMYAyADKAsy",
-            "FC5jbG91ZGlzbGUuSXRlbVN0YWNrEiEKBnJld2FyZBgEIAEoCzIRLmNsb3Vk",
-            "aXNsZS5SZXdhcmQSEgoKZGlmZmljdWx0eRgFIAEoBRIMCgRyYXJlGAYgASgI",
-            "Eg4KBnN0YXR1cxgHIAEoBSKNAQoNT3JkZXJQcm9ncmVzcxIRCglkYXlfaW5k",
-            "ZXgYASABKAUSEgoKZG9uZV9jb3VudBgCIAEoBRIUCgxyZXJvbGxfY291bnQY",
-            "AyABKAUSEQoJY2xhaW1lZF8zGAQgASgIEhEKCWNsYWltZWRfNhgFIAEoCBIZ",
-            "ChFuZXh0X3JlZnJlc2hfdGltZRgGIAEoAyJSChJGdXJuaXR1cmVQbGFjZW1l",
-            "bnQSFAoMZnVybml0dXJlX2lkGAEgASgFEgkKAXgYAiABKAUSCQoBeRgDIAEo",
-            "BRIQCghyb3RhdGlvbhgEIAEoBSJLCgpIb21lTGF5b3V0EiwKBWl0ZW1zGAEg",
-            "AygLMh0uY2xvdWRpc2xlLkZ1cm5pdHVyZVBsYWNlbWVudBIPCgd2ZXJzaW9u",
-            "GAIgASgFIoMBCgpBdmF0YXJEYXRhEg0KBW93bmVkGAEgAygFEjUKCGVxdWlw",
-            "cGVkGAIgAygLMiMuY2xvdWRpc2xlLkF2YXRhckRhdGEuRXF1aXBwZWRFbnRy",
-            "eRovCg1FcXVpcHBlZEVudHJ5EgsKA2tleRgBIAEoBRINCgV2YWx1ZRgCIAEo",
-            "BToCOAEiWgoOR2FjaGFQb29sU3RhdGUSDwoHcG9vbF9pZBgBIAEoBRIQCghw",
-            "aXR5X3NzchgCIAEoBRIPCgdwaXR5X3NyGAMgASgFEhQKDHVwX2d1YXJhbnRl",
-            "ZRgEIAEoCCKlAQoMQWN0aXZpdHlJbmZvEhMKC2FjdGl2aXR5X2lkGAEgASgF",
-            "EgwKBG5hbWUYAiABKAkSDAoEdHlwZRgDIAEoCRIPCgdwb29sX2lkGAQgASgF",
-            "EhIKCnN0YXJ0X3RpbWUYBSABKAMSEAoIZW5kX3RpbWUYBiABKAMSFAoMcHJl",
-            "bG9hZF90aW1lGAcgASgDEhcKD3Jlc291cmNlX2J1bmRsZRgIIAEoCSLzAwoO",
-            "UGxheWVyRnVsbERhdGESIwoEaW5mbxgBIAEoCzIVLmNsb3VkaXNsZS5QbGF5",
-            "ZXJJbmZvEiEKA2JhZxgCIAMoCzIULmNsb3VkaXNsZS5JdGVtU3RhY2sSIgoF",
-            "cGxvdHMYAyADKAsyEy5jbG91ZGlzbGUuUGxvdERhdGESIgoFbm9kZXMYBCAD",
-            "KAsyEy5jbG91ZGlzbGUuTm9kZURhdGESIgoFdG9vbHMYBSADKAsyEy5jbG91",
-            "ZGlzbGUuVG9vbERhdGESKwoKZmFjaWxpdGllcxgGIAMoCzIXLmNsb3VkaXNs",
-            "ZS5GYWNpbGl0eURhdGESJAoGb3JkZXJzGAcgAygLMhQuY2xvdWRpc2xlLk9y",
-            "ZGVyRGF0YRIwCg5vcmRlcl9wcm9ncmVzcxgIIAEoCzIYLmNsb3VkaXNsZS5P",
-            "cmRlclByb2dyZXNzEiMKBGhvbWUYCSABKAsyFS5jbG91ZGlzbGUuSG9tZUxh",
-            "eW91dBIlCgZhdmF0YXIYCiABKAsyFS5jbG91ZGlzbGUuQXZhdGFyRGF0YRIv",
-            "CgxnYWNoYV9zdGF0ZXMYCyADKAsyGS5jbG91ZGlzbGUuR2FjaGFQb29sU3Rh",
-            "dGUSKwoKYWN0aXZpdGllcxgMIAMoCzIXLmNsb3VkaXNsZS5BY3Rpdml0eUlu",
-            "Zm8qTQoJUGxvdFN0YXRlEg8KC1BMT1RfTE9DS0VEEAASDgoKUExPVF9FTVBU",
-            "WRABEhAKDFBMT1RfR1JPV0lORxACEg0KCVBMT1RfUklQRRADKjsKCVNsb3RT",
-            "dGF0ZRINCglTTE9UX0lETEUQABIQCgxTTE9UX1dPUktJTkcQARINCglTTE9U",
-            "X0RPTkUQAkISqgIPQ2xvdWRJc2xlLlByb3RvYgZwcm90bzM="));
+            "b3REYXRhIkwKCE5vZGVEYXRhEg8KB25vZGVfaWQYASABKAUSFwoPbmV4dF9y",
+            "ZWFkeV90aW1lGAIgASgDEhYKDmNvbmZpZ19ub2RlX2lkGAMgASgFIioKCFRv",
+            "b2xEYXRhEg8KB3Rvb2xfaWQYASABKAUSDQoFbGV2ZWwYAiABKAUiaAoIU2xv",
+            "dERhdGESDwoHc2xvdF9pZBgBIAEoBRIRCglyZWNpcGVfaWQYAiABKAUSEwoL",
+            "ZmluaXNoX3RpbWUYAyABKAMSIwoFc3RhdGUYBCABKA4yFC5jbG91ZGlzbGUu",
+            "U2xvdFN0YXRlIlYKDEZhY2lsaXR5RGF0YRITCgtmYWNpbGl0eV9pZBgBIAEo",
+            "BRINCgVsZXZlbBgCIAEoBRIiCgVzbG90cxgDIAMoCzITLmNsb3VkaXNsZS5T",
+            "bG90RGF0YSKGAgoJT3JkZXJEYXRhEhAKCG9yZGVyX2lkGAEgASgFEgwKBHNs",
+            "b3QYAiABKAUSIwoFbmVlZHMYAyADKAsyFC5jbG91ZGlzbGUuSXRlbVN0YWNr",
+            "EiEKBnJld2FyZBgEIAEoCzIRLmNsb3VkaXNsZS5SZXdhcmQSEgoKZGlmZmlj",
+            "dWx0eRgFIAEoBRIMCgRyYXJlGAYgASgIEg4KBnN0YXR1cxgHIAEoBRIUCgxz",
+            "dWJtaXRfcmVhZHkYCCABKAgSEgoKcHJvZHVjaWJsZRgJIAEoCBI1Cg5kZWdy",
+            "YWRlX3JlYXNvbhgKIAEoDjIdLmNsb3VkaXNsZS5PcmRlckRlZ3JhZGVSZWFz",
+            "b24ijQEKDU9yZGVyUHJvZ3Jlc3MSEQoJZGF5X2luZGV4GAEgASgFEhIKCmRv",
+            "bmVfY291bnQYAiABKAUSFAoMcmVyb2xsX2NvdW50GAMgASgFEhEKCWNsYWlt",
+            "ZWRfMxgEIAEoCBIRCgljbGFpbWVkXzYYBSABKAgSGQoRbmV4dF9yZWZyZXNo",
+            "X3RpbWUYBiABKAMiUgoSRnVybml0dXJlUGxhY2VtZW50EhQKDGZ1cm5pdHVy",
+            "ZV9pZBgBIAEoBRIJCgF4GAIgASgFEgkKAXkYAyABKAUSEAoIcm90YXRpb24Y",
+            "BCABKAUiSwoKSG9tZUxheW91dBIsCgVpdGVtcxgBIAMoCzIdLmNsb3VkaXNs",
+            "ZS5GdXJuaXR1cmVQbGFjZW1lbnQSDwoHdmVyc2lvbhgCIAEoBSKDAQoKQXZh",
+            "dGFyRGF0YRINCgVvd25lZBgBIAMoBRI1CghlcXVpcHBlZBgCIAMoCzIjLmNs",
+            "b3VkaXNsZS5BdmF0YXJEYXRhLkVxdWlwcGVkRW50cnkaLwoNRXF1aXBwZWRF",
+            "bnRyeRILCgNrZXkYASABKAUSDQoFdmFsdWUYAiABKAU6AjgBIloKDkdhY2hh",
+            "UG9vbFN0YXRlEg8KB3Bvb2xfaWQYASABKAUSEAoIcGl0eV9zc3IYAiABKAUS",
+            "DwoHcGl0eV9zchgDIAEoBRIUCgx1cF9ndWFyYW50ZWUYBCABKAgipQEKDEFj",
+            "dGl2aXR5SW5mbxITCgthY3Rpdml0eV9pZBgBIAEoBRIMCgRuYW1lGAIgASgJ",
+            "EgwKBHR5cGUYAyABKAkSDwoHcG9vbF9pZBgEIAEoBRISCgpzdGFydF90aW1l",
+            "GAUgASgDEhAKCGVuZF90aW1lGAYgASgDEhQKDHByZWxvYWRfdGltZRgHIAEo",
+            "AxIXCg9yZXNvdXJjZV9idW5kbGUYCCABKAkinAQKDlBsYXllckZ1bGxEYXRh",
+            "EiMKBGluZm8YASABKAsyFS5jbG91ZGlzbGUuUGxheWVySW5mbxIhCgNiYWcY",
+            "AiADKAsyFC5jbG91ZGlzbGUuSXRlbVN0YWNrEiIKBXBsb3RzGAMgAygLMhMu",
+            "Y2xvdWRpc2xlLlBsb3REYXRhEiIKBW5vZGVzGAQgAygLMhMuY2xvdWRpc2xl",
+            "Lk5vZGVEYXRhEiIKBXRvb2xzGAUgAygLMhMuY2xvdWRpc2xlLlRvb2xEYXRh",
+            "EisKCmZhY2lsaXRpZXMYBiADKAsyFy5jbG91ZGlzbGUuRmFjaWxpdHlEYXRh",
+            "EiQKBm9yZGVycxgHIAMoCzIULmNsb3VkaXNsZS5PcmRlckRhdGESMAoOb3Jk",
+            "ZXJfcHJvZ3Jlc3MYCCABKAsyGC5jbG91ZGlzbGUuT3JkZXJQcm9ncmVzcxIj",
+            "CgRob21lGAkgASgLMhUuY2xvdWRpc2xlLkhvbWVMYXlvdXQSJQoGYXZhdGFy",
+            "GAogASgLMhUuY2xvdWRpc2xlLkF2YXRhckRhdGESLwoMZ2FjaGFfc3RhdGVz",
+            "GAsgAygLMhkuY2xvdWRpc2xlLkdhY2hhUG9vbFN0YXRlEisKCmFjdGl2aXRp",
+            "ZXMYDCADKAsyFy5jbG91ZGlzbGUuQWN0aXZpdHlJbmZvEhAKCHJldmlzaW9u",
+            "GA0gASgDEhUKDWdyYW50X3ZlcnNpb24YDiABKAUiyAEKCkNvbW1hbmRBY2sS",
+            "GgoSb3BlcmF0aW9uX3Njb3BlX2lkGAEgASgDEg0KBW9wX2lkGAIgASgDEjIK",
+            "C2Rpc3Bvc2l0aW9uGAMgASgOMh0uY2xvdWRpc2xlLkNvbW1hbmREaXNwb3Np",
+            "dGlvbhIXCgpuZXh0X29wX2lkGAQgASgDSACIAQESMwoLc2NvcGVfc3RhdGUY",
+            "BSABKA4yHi5jbG91ZGlzbGUuT3BlcmF0aW9uU2NvcGVTdGF0ZUINCgtfbmV4",
+            "dF9vcF9pZCpNCglQbG90U3RhdGUSDwoLUExPVF9MT0NLRUQQABIOCgpQTE9U",
+            "X0VNUFRZEAESEAoMUExPVF9HUk9XSU5HEAISDQoJUExPVF9SSVBFEAMqOwoJ",
+            "U2xvdFN0YXRlEg0KCVNMT1RfSURMRRAAEhAKDFNMT1RfV09SS0lORxABEg0K",
+            "CVNMT1RfRE9ORRACKnIKEk9yZGVyRGVncmFkZVJlYXNvbhIWChJPUkRFUl9E",
+            "RUdSQURFX05PTkUQABIhCh1PUkRFUl9ERUdSQURFX0lOVkVOVE9SWV9TSE9S",
+            "VBABEiEKHU9SREVSX0RFR1JBREVfRU1QVFlfQ0FORElEQVRFEAIqogEKEkNv",
+            "bW1hbmREaXNwb3NpdGlvbhIjCh9DT01NQU5EX0RJU1BPU0lUSU9OX1VOU1BF",
+            "Q0lGSUVEEAASJAogQ09NTUFORF9ESVNQT1NJVElPTl9OT1RfQUNDRVBURUQQ",
+            "ARIgChxDT01NQU5EX0RJU1BPU0lUSU9OX1JFQ09SREVEEAISHwobQ09NTUFO",
+            "RF9ESVNQT1NJVElPTl9FWFBJUkVEEAMqegoTT3BlcmF0aW9uU2NvcGVTdGF0",
+            "ZRIhCh1PUEVSQVRJT05fU0NPUEVfU1RBVEVfVU5LTk9XThAAEh4KGk9QRVJB",
+            "VElPTl9TQ09QRV9TVEFURV9PUEVOEAESIAocT1BFUkFUSU9OX1NDT1BFX1NU",
+            "QVRFX0NMT1NFRBACKqYBChJDb21tYW5kUmVzdWx0U3RhdGUSJAogQ09NTUFO",
+            "RF9SRVNVTFRfU1RBVEVfVU5TUEVDSUZJRUQQABIhCh1DT01NQU5EX1JFU1VM",
+            "VF9TVEFURV9SRUNPUkRFRBABEiUKIUNPTU1BTkRfUkVTVUxUX1NUQVRFX05P",
+            "VF9SRUNPUkRFRBACEiAKHENPTU1BTkRfUkVTVUxUX1NUQVRFX0VYUElSRUQQ",
+            "A0ISqgIPQ2xvdWRJc2xlLlByb3RvYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
-          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::CloudIsle.Proto.PlotState), typeof(global::CloudIsle.Proto.SlotState), }, null, new pbr::GeneratedClrTypeInfo[] {
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::CloudIsle.Proto.PlotState), typeof(global::CloudIsle.Proto.SlotState), typeof(global::CloudIsle.Proto.OrderDegradeReason), typeof(global::CloudIsle.Proto.CommandDisposition), typeof(global::CloudIsle.Proto.OperationScopeState), typeof(global::CloudIsle.Proto.CommandResultState), }, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.ItemStack), global::CloudIsle.Proto.ItemStack.Parser, new[]{ "ItemId", "Count" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.Reward), global::CloudIsle.Proto.Reward.Parser, new[]{ "Items", "Gold", "Gem", "Ticket", "Exp" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.PlayerInfo), global::CloudIsle.Proto.PlayerInfo.Parser, new[]{ "PlayerId", "Nickname", "Level", "Exp", "Gold", "Gem", "Ticket", "Shard", "BagSlots", "GuideStep" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.PlotData), global::CloudIsle.Proto.PlotData.Parser, new[]{ "PlotId", "State", "CropId", "PlantTime", "ReadyTime", "Watered", "Fertilized" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.PlotResult), global::CloudIsle.Proto.PlotResult.Parser, new[]{ "PlotId", "Code", "Plot" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.NodeData), global::CloudIsle.Proto.NodeData.Parser, new[]{ "NodeId", "NextReadyTime" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.NodeData), global::CloudIsle.Proto.NodeData.Parser, new[]{ "NodeId", "NextReadyTime", "ConfigNodeId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.ToolData), global::CloudIsle.Proto.ToolData.Parser, new[]{ "ToolId", "Level" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.SlotData), global::CloudIsle.Proto.SlotData.Parser, new[]{ "SlotId", "RecipeId", "FinishTime", "State" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.FacilityData), global::CloudIsle.Proto.FacilityData.Parser, new[]{ "FacilityId", "Level", "Slots" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.OrderData), global::CloudIsle.Proto.OrderData.Parser, new[]{ "OrderId", "Slot", "Needs", "Reward", "Difficulty", "Rare", "Status" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.OrderData), global::CloudIsle.Proto.OrderData.Parser, new[]{ "OrderId", "Slot", "Needs", "Reward", "Difficulty", "Rare", "Status", "SubmitReady", "Producible", "DegradeReason" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.OrderProgress), global::CloudIsle.Proto.OrderProgress.Parser, new[]{ "DayIndex", "DoneCount", "RerollCount", "Claimed3", "Claimed6", "NextRefreshTime" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.FurniturePlacement), global::CloudIsle.Proto.FurniturePlacement.Parser, new[]{ "FurnitureId", "X", "Y", "Rotation" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.HomeLayout), global::CloudIsle.Proto.HomeLayout.Parser, new[]{ "Items", "Version" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.AvatarData), global::CloudIsle.Proto.AvatarData.Parser, new[]{ "Owned", "Equipped" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
             new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.GachaPoolState), global::CloudIsle.Proto.GachaPoolState.Parser, new[]{ "PoolId", "PitySsr", "PitySr", "UpGuarantee" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.ActivityInfo), global::CloudIsle.Proto.ActivityInfo.Parser, new[]{ "ActivityId", "Name", "Type", "PoolId", "StartTime", "EndTime", "PreloadTime", "ResourceBundle" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.PlayerFullData), global::CloudIsle.Proto.PlayerFullData.Parser, new[]{ "Info", "Bag", "Plots", "Nodes", "Tools", "Facilities", "Orders", "OrderProgress", "Home", "Avatar", "GachaStates", "Activities" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.PlayerFullData), global::CloudIsle.Proto.PlayerFullData.Parser, new[]{ "Info", "Bag", "Plots", "Nodes", "Tools", "Facilities", "Orders", "OrderProgress", "Home", "Avatar", "GachaStates", "Activities", "Revision", "GrantVersion" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.CommandAck), global::CloudIsle.Proto.CommandAck.Parser, new[]{ "OperationScopeId", "OpId", "Disposition", "NextOpId", "ScopeState" }, new[]{ "NextOpId" }, null, null, null)
           }));
     }
     #endregion
@@ -121,6 +143,44 @@ namespace CloudIsle.Proto {
     [pbr::OriginalName("SLOT_IDLE")] SlotIdle = 0,
     [pbr::OriginalName("SLOT_WORKING")] SlotWorking = 1,
     [pbr::OriginalName("SLOT_DONE")] SlotDone = 2,
+  }
+
+  /// <summary>
+  /// 订单生成降级原因。成功写出的订单不会使用 EMPTY_CANDIDATE。
+  /// </summary>
+  public enum OrderDegradeReason {
+    [pbr::OriginalName("ORDER_DEGRADE_NONE")] OrderDegradeNone = 0,
+    [pbr::OriginalName("ORDER_DEGRADE_INVENTORY_SHORT")] OrderDegradeInventoryShort = 1,
+    [pbr::OriginalName("ORDER_DEGRADE_EMPTY_CANDIDATE")] OrderDegradeEmptyCandidate = 2,
+  }
+
+  /// <summary>
+  /// 命令处置：0 未指定；1 预受理拒绝（未消费 op）；2 已记账（含业务拒绝）；3 账本详情过期。
+  /// </summary>
+  public enum CommandDisposition {
+    [pbr::OriginalName("COMMAND_DISPOSITION_UNSPECIFIED")] Unspecified = 0,
+    [pbr::OriginalName("COMMAND_DISPOSITION_NOT_ACCEPTED")] NotAccepted = 1,
+    [pbr::OriginalName("COMMAND_DISPOSITION_RECORDED")] Recorded = 2,
+    [pbr::OriginalName("COMMAND_DISPOSITION_EXPIRED")] Expired = 3,
+  }
+
+  /// <summary>
+  /// 写权限 scope 状态。
+  /// </summary>
+  public enum OperationScopeState {
+    [pbr::OriginalName("OPERATION_SCOPE_STATE_UNKNOWN")] Unknown = 0,
+    [pbr::OriginalName("OPERATION_SCOPE_STATE_OPEN")] Open = 1,
+    [pbr::OriginalName("OPERATION_SCOPE_STATE_CLOSED")] Closed = 2,
+  }
+
+  /// <summary>
+  /// Query 结果态：NotRecorded 用 code=0 + 本字段显式表达，不另造错误码。
+  /// </summary>
+  public enum CommandResultState {
+    [pbr::OriginalName("COMMAND_RESULT_STATE_UNSPECIFIED")] Unspecified = 0,
+    [pbr::OriginalName("COMMAND_RESULT_STATE_RECORDED")] Recorded = 1,
+    [pbr::OriginalName("COMMAND_RESULT_STATE_NOT_RECORDED")] NotRecorded = 2,
+    [pbr::OriginalName("COMMAND_RESULT_STATE_EXPIRED")] Expired = 3,
   }
 
   #endregion
@@ -1899,7 +1959,7 @@ namespace CloudIsle.Proto {
   }
 
   /// <summary>
-  /// 采集点。next_ready_time 为下次可采集的 Unix 毫秒。
+  /// 采集点实例。node_id 为持久实例身份；config_node_id 为配置表类型 Id。
   /// </summary>
   public sealed partial class NodeData : pb::IMessage<NodeData>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -1937,6 +1997,7 @@ namespace CloudIsle.Proto {
     public NodeData(NodeData other) : this() {
       nodeId_ = other.nodeId_;
       nextReadyTime_ = other.nextReadyTime_;
+      configNodeId_ = other.configNodeId_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1970,6 +2031,18 @@ namespace CloudIsle.Proto {
       }
     }
 
+    /// <summary>Field number for the "config_node_id" field.</summary>
+    public const int ConfigNodeIdFieldNumber = 3;
+    private int configNodeId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int ConfigNodeId {
+      get { return configNodeId_; }
+      set {
+        configNodeId_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -1987,6 +2060,7 @@ namespace CloudIsle.Proto {
       }
       if (NodeId != other.NodeId) return false;
       if (NextReadyTime != other.NextReadyTime) return false;
+      if (ConfigNodeId != other.ConfigNodeId) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1996,6 +2070,7 @@ namespace CloudIsle.Proto {
       int hash = 1;
       if (NodeId != 0) hash ^= NodeId.GetHashCode();
       if (NextReadyTime != 0L) hash ^= NextReadyTime.GetHashCode();
+      if (ConfigNodeId != 0) hash ^= ConfigNodeId.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -2022,6 +2097,10 @@ namespace CloudIsle.Proto {
         output.WriteRawTag(16);
         output.WriteInt64(NextReadyTime);
       }
+      if (ConfigNodeId != 0) {
+        output.WriteRawTag(24);
+        output.WriteInt32(ConfigNodeId);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -2040,6 +2119,10 @@ namespace CloudIsle.Proto {
         output.WriteRawTag(16);
         output.WriteInt64(NextReadyTime);
       }
+      if (ConfigNodeId != 0) {
+        output.WriteRawTag(24);
+        output.WriteInt32(ConfigNodeId);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -2055,6 +2138,9 @@ namespace CloudIsle.Proto {
       }
       if (NextReadyTime != 0L) {
         size += 1 + pb::CodedOutputStream.ComputeInt64Size(NextReadyTime);
+      }
+      if (ConfigNodeId != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(ConfigNodeId);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -2073,6 +2159,9 @@ namespace CloudIsle.Proto {
       }
       if (other.NextReadyTime != 0L) {
         NextReadyTime = other.NextReadyTime;
+      }
+      if (other.ConfigNodeId != 0) {
+        ConfigNodeId = other.ConfigNodeId;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -2097,6 +2186,10 @@ namespace CloudIsle.Proto {
             NextReadyTime = input.ReadInt64();
             break;
           }
+          case 24: {
+            ConfigNodeId = input.ReadInt32();
+            break;
+          }
         }
       }
     #endif
@@ -2118,6 +2211,10 @@ namespace CloudIsle.Proto {
           }
           case 16: {
             NextReadyTime = input.ReadInt64();
+            break;
+          }
+          case 24: {
+            ConfigNodeId = input.ReadInt32();
             break;
           }
         }
@@ -2958,6 +3055,9 @@ namespace CloudIsle.Proto {
       difficulty_ = other.difficulty_;
       rare_ = other.rare_;
       status_ = other.status_;
+      submitReady_ = other.submitReady_;
+      producible_ = other.producible_;
+      degradeReason_ = other.degradeReason_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -3050,6 +3150,51 @@ namespace CloudIsle.Proto {
       }
     }
 
+    /// <summary>Field number for the "submit_ready" field.</summary>
+    public const int SubmitReadyFieldNumber = 8;
+    private bool submitReady_;
+    /// <summary>
+    /// M2：当前库存是否可提交（真正可提交）。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool SubmitReady {
+      get { return submitReady_; }
+      set {
+        submitReady_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "producible" field.</summary>
+    public const int ProducibleFieldNumber = 9;
+    private bool producible_;
+    /// <summary>
+    /// M2：是否已解锁可生产（不依赖当前库存）。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Producible {
+      get { return producible_; }
+      set {
+        producible_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "degrade_reason" field.</summary>
+    public const int DegradeReasonFieldNumber = 10;
+    private global::CloudIsle.Proto.OrderDegradeReason degradeReason_ = global::CloudIsle.Proto.OrderDegradeReason.OrderDegradeNone;
+    /// <summary>
+    /// M2：生成时降级原因；无降级为 NONE。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::CloudIsle.Proto.OrderDegradeReason DegradeReason {
+      get { return degradeReason_; }
+      set {
+        degradeReason_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -3072,6 +3217,9 @@ namespace CloudIsle.Proto {
       if (Difficulty != other.Difficulty) return false;
       if (Rare != other.Rare) return false;
       if (Status != other.Status) return false;
+      if (SubmitReady != other.SubmitReady) return false;
+      if (Producible != other.Producible) return false;
+      if (DegradeReason != other.DegradeReason) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -3086,6 +3234,9 @@ namespace CloudIsle.Proto {
       if (Difficulty != 0) hash ^= Difficulty.GetHashCode();
       if (Rare != false) hash ^= Rare.GetHashCode();
       if (Status != 0) hash ^= Status.GetHashCode();
+      if (SubmitReady != false) hash ^= SubmitReady.GetHashCode();
+      if (Producible != false) hash ^= Producible.GetHashCode();
+      if (DegradeReason != global::CloudIsle.Proto.OrderDegradeReason.OrderDegradeNone) hash ^= DegradeReason.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -3129,6 +3280,18 @@ namespace CloudIsle.Proto {
         output.WriteRawTag(56);
         output.WriteInt32(Status);
       }
+      if (SubmitReady != false) {
+        output.WriteRawTag(64);
+        output.WriteBool(SubmitReady);
+      }
+      if (Producible != false) {
+        output.WriteRawTag(72);
+        output.WriteBool(Producible);
+      }
+      if (DegradeReason != global::CloudIsle.Proto.OrderDegradeReason.OrderDegradeNone) {
+        output.WriteRawTag(80);
+        output.WriteEnum((int) DegradeReason);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -3164,6 +3327,18 @@ namespace CloudIsle.Proto {
         output.WriteRawTag(56);
         output.WriteInt32(Status);
       }
+      if (SubmitReady != false) {
+        output.WriteRawTag(64);
+        output.WriteBool(SubmitReady);
+      }
+      if (Producible != false) {
+        output.WriteRawTag(72);
+        output.WriteBool(Producible);
+      }
+      if (DegradeReason != global::CloudIsle.Proto.OrderDegradeReason.OrderDegradeNone) {
+        output.WriteRawTag(80);
+        output.WriteEnum((int) DegradeReason);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -3192,6 +3367,15 @@ namespace CloudIsle.Proto {
       }
       if (Status != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(Status);
+      }
+      if (SubmitReady != false) {
+        size += 1 + 1;
+      }
+      if (Producible != false) {
+        size += 1 + 1;
+      }
+      if (DegradeReason != global::CloudIsle.Proto.OrderDegradeReason.OrderDegradeNone) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) DegradeReason);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -3226,6 +3410,15 @@ namespace CloudIsle.Proto {
       }
       if (other.Status != 0) {
         Status = other.Status;
+      }
+      if (other.SubmitReady != false) {
+        SubmitReady = other.SubmitReady;
+      }
+      if (other.Producible != false) {
+        Producible = other.Producible;
+      }
+      if (other.DegradeReason != global::CloudIsle.Proto.OrderDegradeReason.OrderDegradeNone) {
+        DegradeReason = other.DegradeReason;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -3273,6 +3466,18 @@ namespace CloudIsle.Proto {
             Status = input.ReadInt32();
             break;
           }
+          case 64: {
+            SubmitReady = input.ReadBool();
+            break;
+          }
+          case 72: {
+            Producible = input.ReadBool();
+            break;
+          }
+          case 80: {
+            DegradeReason = (global::CloudIsle.Proto.OrderDegradeReason) input.ReadEnum();
+            break;
+          }
         }
       }
     #endif
@@ -3317,6 +3522,18 @@ namespace CloudIsle.Proto {
           }
           case 56: {
             Status = input.ReadInt32();
+            break;
+          }
+          case 64: {
+            SubmitReady = input.ReadBool();
+            break;
+          }
+          case 72: {
+            Producible = input.ReadBool();
+            break;
+          }
+          case 80: {
+            DegradeReason = (global::CloudIsle.Proto.OrderDegradeReason) input.ReadEnum();
             break;
           }
         }
@@ -5236,6 +5453,8 @@ namespace CloudIsle.Proto {
       avatar_ = other.avatar_ != null ? other.avatar_.Clone() : null;
       gachaStates_ = other.gachaStates_.Clone();
       activities_ = other.activities_.Clone();
+      revision_ = other.revision_;
+      grantVersion_ = other.grantVersion_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -5381,6 +5600,36 @@ namespace CloudIsle.Proto {
       get { return activities_; }
     }
 
+    /// <summary>Field number for the "revision" field.</summary>
+    public const int RevisionFieldNumber = 13;
+    private long revision_;
+    /// <summary>
+    /// M2：家园经济状态 revision；全量同步与增量对齐用。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long Revision {
+      get { return revision_; }
+      set {
+        revision_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "grant_version" field.</summary>
+    public const int GrantVersionFieldNumber = 14;
+    private int grantVersion_;
+    /// <summary>
+    /// M2：玩法域初始化版本；可重入，已完成域不再发放。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int GrantVersion {
+      get { return grantVersion_; }
+      set {
+        grantVersion_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -5408,6 +5657,8 @@ namespace CloudIsle.Proto {
       if (!object.Equals(Avatar, other.Avatar)) return false;
       if(!gachaStates_.Equals(other.gachaStates_)) return false;
       if(!activities_.Equals(other.activities_)) return false;
+      if (Revision != other.Revision) return false;
+      if (GrantVersion != other.GrantVersion) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -5427,6 +5678,8 @@ namespace CloudIsle.Proto {
       if (avatar_ != null) hash ^= Avatar.GetHashCode();
       hash ^= gachaStates_.GetHashCode();
       hash ^= activities_.GetHashCode();
+      if (Revision != 0L) hash ^= Revision.GetHashCode();
+      if (GrantVersion != 0) hash ^= GrantVersion.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -5469,6 +5722,14 @@ namespace CloudIsle.Proto {
       }
       gachaStates_.WriteTo(output, _repeated_gachaStates_codec);
       activities_.WriteTo(output, _repeated_activities_codec);
+      if (Revision != 0L) {
+        output.WriteRawTag(104);
+        output.WriteInt64(Revision);
+      }
+      if (GrantVersion != 0) {
+        output.WriteRawTag(112);
+        output.WriteInt32(GrantVersion);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -5503,6 +5764,14 @@ namespace CloudIsle.Proto {
       }
       gachaStates_.WriteTo(ref output, _repeated_gachaStates_codec);
       activities_.WriteTo(ref output, _repeated_activities_codec);
+      if (Revision != 0L) {
+        output.WriteRawTag(104);
+        output.WriteInt64(Revision);
+      }
+      if (GrantVersion != 0) {
+        output.WriteRawTag(112);
+        output.WriteInt32(GrantVersion);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -5533,6 +5802,12 @@ namespace CloudIsle.Proto {
       }
       size += gachaStates_.CalculateSize(_repeated_gachaStates_codec);
       size += activities_.CalculateSize(_repeated_activities_codec);
+      if (Revision != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(Revision);
+      }
+      if (GrantVersion != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(GrantVersion);
+      }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -5577,6 +5852,12 @@ namespace CloudIsle.Proto {
       }
       gachaStates_.Add(other.gachaStates_);
       activities_.Add(other.activities_);
+      if (other.Revision != 0L) {
+        Revision = other.Revision;
+      }
+      if (other.GrantVersion != 0) {
+        GrantVersion = other.GrantVersion;
+      }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -5652,6 +5933,14 @@ namespace CloudIsle.Proto {
             activities_.AddEntriesFrom(input, _repeated_activities_codec);
             break;
           }
+          case 104: {
+            Revision = input.ReadInt64();
+            break;
+          }
+          case 112: {
+            GrantVersion = input.ReadInt32();
+            break;
+          }
         }
       }
     #endif
@@ -5725,6 +6014,373 @@ namespace CloudIsle.Proto {
           }
           case 98: {
             activities_.AddEntriesFrom(ref input, _repeated_activities_codec);
+            break;
+          }
+          case 104: {
+            Revision = input.ReadInt64();
+            break;
+          }
+          case 112: {
+            GrantVersion = input.ReadInt32();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// 写命令配对响应上的权威 Ack。next_op_id 仅在服务端已知/拥有该 scope 时为正；缺省有意义（未认证前不得伪造）。
+  /// disposition=UNSPECIFIED(0) 永不表示已记账。
+  /// </summary>
+  public sealed partial class CommandAck : pb::IMessage<CommandAck>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<CommandAck> _parser = new pb::MessageParser<CommandAck>(() => new CommandAck());
+    private pb::UnknownFieldSet _unknownFields;
+    private int _hasBits0;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<CommandAck> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::CloudIsle.Proto.CommonReflection.Descriptor.MessageTypes[17]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CommandAck() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CommandAck(CommandAck other) : this() {
+      _hasBits0 = other._hasBits0;
+      operationScopeId_ = other.operationScopeId_;
+      opId_ = other.opId_;
+      disposition_ = other.disposition_;
+      nextOpId_ = other.nextOpId_;
+      scopeState_ = other.scopeState_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CommandAck Clone() {
+      return new CommandAck(this);
+    }
+
+    /// <summary>Field number for the "operation_scope_id" field.</summary>
+    public const int OperationScopeIdFieldNumber = 1;
+    private long operationScopeId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long OperationScopeId {
+      get { return operationScopeId_; }
+      set {
+        operationScopeId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "op_id" field.</summary>
+    public const int OpIdFieldNumber = 2;
+    private long opId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long OpId {
+      get { return opId_; }
+      set {
+        opId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "disposition" field.</summary>
+    public const int DispositionFieldNumber = 3;
+    private global::CloudIsle.Proto.CommandDisposition disposition_ = global::CloudIsle.Proto.CommandDisposition.Unspecified;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::CloudIsle.Proto.CommandDisposition Disposition {
+      get { return disposition_; }
+      set {
+        disposition_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "next_op_id" field.</summary>
+    public const int NextOpIdFieldNumber = 4;
+    private long nextOpId_;
+    /// <summary>
+    /// proto3 optional：未设置 ≠ 权威 0；正数才是权威 next。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long NextOpId {
+      get { if ((_hasBits0 & 1) != 0) { return nextOpId_; } else { return 0L; } }
+      set {
+        _hasBits0 |= 1;
+        nextOpId_ = value;
+      }
+    }
+    /// <summary>Gets whether the "next_op_id" field is set</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool HasNextOpId {
+      get { return (_hasBits0 & 1) != 0; }
+    }
+    /// <summary>Clears the value of the "next_op_id" field</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void ClearNextOpId() {
+      _hasBits0 &= ~1;
+    }
+
+    /// <summary>Field number for the "scope_state" field.</summary>
+    public const int ScopeStateFieldNumber = 5;
+    private global::CloudIsle.Proto.OperationScopeState scopeState_ = global::CloudIsle.Proto.OperationScopeState.Unknown;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::CloudIsle.Proto.OperationScopeState ScopeState {
+      get { return scopeState_; }
+      set {
+        scopeState_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as CommandAck);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(CommandAck other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (OperationScopeId != other.OperationScopeId) return false;
+      if (OpId != other.OpId) return false;
+      if (Disposition != other.Disposition) return false;
+      if (NextOpId != other.NextOpId) return false;
+      if (ScopeState != other.ScopeState) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (OperationScopeId != 0L) hash ^= OperationScopeId.GetHashCode();
+      if (OpId != 0L) hash ^= OpId.GetHashCode();
+      if (Disposition != global::CloudIsle.Proto.CommandDisposition.Unspecified) hash ^= Disposition.GetHashCode();
+      if (HasNextOpId) hash ^= NextOpId.GetHashCode();
+      if (ScopeState != global::CloudIsle.Proto.OperationScopeState.Unknown) hash ^= ScopeState.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (OperationScopeId != 0L) {
+        output.WriteRawTag(8);
+        output.WriteInt64(OperationScopeId);
+      }
+      if (OpId != 0L) {
+        output.WriteRawTag(16);
+        output.WriteInt64(OpId);
+      }
+      if (Disposition != global::CloudIsle.Proto.CommandDisposition.Unspecified) {
+        output.WriteRawTag(24);
+        output.WriteEnum((int) Disposition);
+      }
+      if (HasNextOpId) {
+        output.WriteRawTag(32);
+        output.WriteInt64(NextOpId);
+      }
+      if (ScopeState != global::CloudIsle.Proto.OperationScopeState.Unknown) {
+        output.WriteRawTag(40);
+        output.WriteEnum((int) ScopeState);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (OperationScopeId != 0L) {
+        output.WriteRawTag(8);
+        output.WriteInt64(OperationScopeId);
+      }
+      if (OpId != 0L) {
+        output.WriteRawTag(16);
+        output.WriteInt64(OpId);
+      }
+      if (Disposition != global::CloudIsle.Proto.CommandDisposition.Unspecified) {
+        output.WriteRawTag(24);
+        output.WriteEnum((int) Disposition);
+      }
+      if (HasNextOpId) {
+        output.WriteRawTag(32);
+        output.WriteInt64(NextOpId);
+      }
+      if (ScopeState != global::CloudIsle.Proto.OperationScopeState.Unknown) {
+        output.WriteRawTag(40);
+        output.WriteEnum((int) ScopeState);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (OperationScopeId != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(OperationScopeId);
+      }
+      if (OpId != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(OpId);
+      }
+      if (Disposition != global::CloudIsle.Proto.CommandDisposition.Unspecified) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Disposition);
+      }
+      if (HasNextOpId) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(NextOpId);
+      }
+      if (ScopeState != global::CloudIsle.Proto.OperationScopeState.Unknown) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) ScopeState);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(CommandAck other) {
+      if (other == null) {
+        return;
+      }
+      if (other.OperationScopeId != 0L) {
+        OperationScopeId = other.OperationScopeId;
+      }
+      if (other.OpId != 0L) {
+        OpId = other.OpId;
+      }
+      if (other.Disposition != global::CloudIsle.Proto.CommandDisposition.Unspecified) {
+        Disposition = other.Disposition;
+      }
+      if (other.HasNextOpId) {
+        NextOpId = other.NextOpId;
+      }
+      if (other.ScopeState != global::CloudIsle.Proto.OperationScopeState.Unknown) {
+        ScopeState = other.ScopeState;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            OperationScopeId = input.ReadInt64();
+            break;
+          }
+          case 16: {
+            OpId = input.ReadInt64();
+            break;
+          }
+          case 24: {
+            Disposition = (global::CloudIsle.Proto.CommandDisposition) input.ReadEnum();
+            break;
+          }
+          case 32: {
+            NextOpId = input.ReadInt64();
+            break;
+          }
+          case 40: {
+            ScopeState = (global::CloudIsle.Proto.OperationScopeState) input.ReadEnum();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            OperationScopeId = input.ReadInt64();
+            break;
+          }
+          case 16: {
+            OpId = input.ReadInt64();
+            break;
+          }
+          case 24: {
+            Disposition = (global::CloudIsle.Proto.CommandDisposition) input.ReadEnum();
+            break;
+          }
+          case 32: {
+            NextOpId = input.ReadInt64();
+            break;
+          }
+          case 40: {
+            ScopeState = (global::CloudIsle.Proto.OperationScopeState) input.ReadEnum();
             break;
           }
         }

@@ -1,15 +1,20 @@
 using System;
 using System.Collections.Generic;
 using Game.Framework.Account;
+using Game.Framework.Gameplay;
+using Game.Framework.Home;
 using Game.Framework.UI;
 using XLua;
 
 namespace Game.Framework.Lua
 {
     /// <summary>
-    /// 主工程 xLua 生成清单。Gen 与运行时同属 Game.Framework，避免 Framework↔独立 XLua 循环。
-    /// GenPath 在 Editor 程序集配置，避免 Player 引用 Editor 特性。
-    /// m1-bridge-0.3：含 ViewHost/UiBridge/AccountBridge/ILuaUiController/Shutdown。
+    /// 主工程 xLua 生成清单。m2-bridge-0.4：LuaGameplayFacade + 必要 lease/int64 面。
+    /// Binding/SessionContext/Dispatcher/Codec/Port/Proto/ClientGameplayClock 消息与控制类型不导出。
+    /// T017：LuaGameplayFacade 新增 GetStatusJson/IsWritable/EstimateNowMs/RemainingMs/IsClockSynchronized。
+    /// T035：LuaHomeFarmFacade 家园输入门控/手势/显示；Root 须 GenAll 重生 wrap，禁止手改 Gen。
+    /// T041：HomeFarmNodeSelectHandler / ApplyNodeDisplays / TryResolveNodeAtScreen / AttachNodeDisplayTick / AttachRecoveryPoll；公开桥面增量 → 新基包，非纯 Lua 补丁。
+    /// RemainingMs 为规范十进制 string（非 long）。
     /// </summary>
     public static class LuaGenConfig
     {
@@ -27,6 +32,26 @@ namespace Game.Framework.Lua
             typeof(UILayer),
             typeof(AccountBridge),
             typeof(AccountFlow),
+            typeof(LuaGameplayFacade),
+            typeof(CommandObservation),
+            typeof(GameplaySubscriptionLease),
+            typeof(LuaHomeFarmFacade),
+        };
+
+        /// <summary>
+        /// 显式黑名单：即使误加入 CallCSharp 也不得导出会话控制面。
+        /// </summary>
+        [BlackList]
+        public static List<List<string>> LuaBlackList = new List<List<string>>
+        {
+            new List<string> { "Game.Framework.Gameplay.GameplayBridgeBinding", "ConfigureHost" },
+            new List<string> { "Game.Framework.Gameplay.GameplayBridgeBinding", "BindPort" },
+            new List<string> { "Game.Framework.Gameplay.GameplayBridgeBinding", "UnbindPort" },
+            new List<string> { "Game.Framework.Gameplay.GameplayBridgeBinding", "Shutdown" },
+            new List<string> { "Game.Framework.Gameplay.GameplaySessionContext", "MarkReady" },
+            new List<string> { "Game.Framework.Gameplay.GameplaySessionContext", "BeginAuthentication" },
+            new List<string> { "Game.Framework.Gameplay.GameplaySessionContext", "Invalidate" },
+            new List<string> { "Game.Framework.Gameplay.ClientGameplayClock", "Synchronize" },
         };
 
         /// <summary>C# 回调 Lua 的入口与异步委托。</summary>
@@ -37,6 +62,10 @@ namespace Game.Framework.Lua
             typeof(LuaCallback),
             typeof(ILuaUiController),
             typeof(LuaClickHandler),
+            typeof(LuaHomeFarmFacade.HomeFarmGestureHandler),
+            typeof(LuaHomeFarmFacade.HomeFarmCancelHandler),
+            typeof(LuaHomeFarmFacade.HomeFarmDisplayTickHandler),
+            typeof(LuaHomeFarmFacade.HomeFarmNodeSelectHandler),
         };
     }
 

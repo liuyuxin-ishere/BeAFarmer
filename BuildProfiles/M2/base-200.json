@@ -1,0 +1,9 @@
+{
+  "appVersion": "0.4.0",
+  "bridgeContract": "m2-bridge-0.4",
+  "protoVersion": 1,
+  "resVersion": 200,
+  "configVersion": 200,
+  "evidenceRoot": "../../Docs/Delivery/M2/Evidence/Base 200",
+  "contentPolicy": "M2Formal"
+}

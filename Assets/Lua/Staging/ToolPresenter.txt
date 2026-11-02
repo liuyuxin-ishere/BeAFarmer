@@ -1,0 +1,658 @@
+-- U03 ToolPresenter：共同生命周期 + upgrade(toolId, done)。
+-- 显示当前等级/下一档门槛与成本（只读规则）；意图只发 toolId；成本不完整不默认免费。
+-- 已有高等级工具采集资格不受下一升级门槛禁用（门槛只影响本窗升级按钮）。
+
+local Tool = require("Services/ToolService")
+local Catalog = require("Services/GameplayDisplayCatalog")
+local ErrorPolicy = require("Services/GameplayErrorPolicy")
+local Dialog = require("UI/DialogService")
+
+local M = {}
+
+local UNKNOWN_WAIT = ErrorPolicy.message({ code = 0, kind = "unknown" })
+
+local function safe_call(fn, ...)
+  if type(fn) ~= "function" then return end
+  local ok, err = pcall(fn, ...)
+  if not ok then _ = err end
+end
+
+local function release_obs(obs)
+  if obs == nil then return end
+  pcall(function()
+    if obs.Dispose ~= nil then obs:Dispose()
+    elseif obs.dispose ~= nil then obs:dispose() end
+  end)
+end
+
+local function feedback_text(code, result)
+  if type(result) == "table" and type(result.message) == "string" and result.message ~= "" then
+    local msg = result.message
+    if not (msg:find("disposition", 1, true) or msg:find("^{", 1, true)) then
+      local kind = result.kind
+      if kind ~= "unknown" and result.disposition ~= "Unknown" then
+        return msg
+      end
+    end
+  end
+  return ErrorPolicy.message({
+    code = code,
+    kind = type(result) == "table" and result.kind or nil,
+    message = type(result) == "table" and result.message or nil,
+    disposition = type(result) == "table" and result.disposition or nil,
+  })
+end
+
+local function is_unknown_recovery_outcome(result)
+  if type(result) ~= "table" then return false end
+  if result.kind == "unknown" then return true end
+  if result.action == "wait_recover" then return true end
+  local d = result.disposition
+  return d == "Unknown"
+end
+
+local function as_int(v)
+  if type(v) == "number" then return math.floor(v) end
+  if type(v) == "string" and v:match("^-?%d+$") then return tonumber(v) end
+  return nil
+end
+
+local function bag_count(bag, itemId)
+  if type(bag) ~= "table" then return 0 end
+  local n = 0
+  for i = 1, #bag do
+    local row = bag[i]
+    if type(row) == "table" and row.itemId == itemId then
+      local c = as_int(row.count) or 0
+      if c > 0 then n = n + c end
+    end
+  end
+  return n
+end
+
+local function owned_tool_level(tools, toolId)
+  if type(tools) ~= "table" then return 0 end
+  for i = 1, #tools do
+    local t = tools[i]
+    if type(t) == "table" and t.toolId == toolId then
+      return as_int(t.level) or 0
+    end
+  end
+  return 0
+end
+
+local function format_materials(mats, bag)
+  if mats == nil then return "成本信息不完整", false end
+  if type(mats) ~= "table" then return "成本信息不完整", false end
+  if #mats == 0 then return "无需材料", true end
+  local parts = {}
+  for i = 1, #mats do
+    local m = mats[i]
+    local item = Catalog.getItem(m.itemId)
+    local name = item and item.name or ("物品")
+    local have = bag_count(bag, m.itemId)
+    parts[#parts + 1] = string.format("%s %d（持有%d）", name, m.count or 0, have)
+  end
+  return table.concat(parts, "；"), true
+end
+
+--- confirmFn 可选：假确认 (title,message,done)->lease；缺省走 DialogService。
+function M.new(service, store, clock, catalog, confirmFn)
+  local self = {
+    _service = service or Tool,
+    _store = store,
+    _clock = clock,
+    _catalog = catalog or Catalog,
+    _confirm = type(confirmFn) == "function" and confirmFn or nil,
+    _view = nil,
+    _sub = nil,
+    _cmdObs = nil,
+    _gen = 0,
+    _opSeq = 0,
+    _uiOp = 0,
+    _pendingOp = nil,
+    _heldOp = nil,
+    _closed = true,
+    _destroyed = false,
+    _busy = false,
+    _confirming = false,
+    _confirmGen = 0,
+    _confirmConsumed = false,
+    _lastFeedback = "",
+    _selIndex = 1,
+    _toolRows = {},
+    _recoveryArmed = false,
+    _recoveryGen = 0,
+    _recoveryOp = 0,
+    _recoveryPollEpoch = 0,
+  }
+
+  local function bump_gen()
+    self._gen = self._gen + 1
+    return self._gen
+  end
+
+  local function alive(gen)
+    return (not self._destroyed) and (not self._closed) and self._gen == gen and self._view ~= nil
+  end
+
+  local function clear_recovery_track()
+    self._recoveryArmed = false
+    self._recoveryGen = 0
+    self._recoveryOp = 0
+  end
+
+  local function clear_cmd_obs()
+    local obs = self._cmdObs
+    self._cmdObs = nil
+    self._heldOp = nil
+    self._pendingOp = nil
+    release_obs(obs)
+  end
+
+  local function begin_op()
+    clear_recovery_track()
+    self._opSeq = self._opSeq + 1
+    local op = self._opSeq
+    self._uiOp = op
+    self._pendingOp = op
+    return op
+  end
+
+  local function release_owned_op(op)
+    if self._heldOp == op then
+      local obs = self._cmdObs
+      self._cmdObs = nil
+      self._heldOp = nil
+      release_obs(obs)
+    end
+    if self._pendingOp == op then
+      self._pendingOp = nil
+    end
+  end
+
+  local function hold_cmd_obs(op, gen, lease)
+    if lease == nil then
+      if self._pendingOp == op then self._pendingOp = nil end
+      return nil
+    end
+    -- 同步完成：finish 已清 pending → 立即释放，不滞留
+    if self._pendingOp ~= op then
+      release_obs(lease)
+      return nil
+    end
+    if not alive(gen) or self._uiOp ~= op then
+      release_obs(lease)
+      if self._pendingOp == op then self._pendingOp = nil end
+      return nil
+    end
+    self._pendingOp = nil
+    if self._heldOp ~= nil and self._heldOp ~= op then
+      release_obs(lease)
+      return nil
+    end
+    if self._cmdObs ~= nil and self._cmdObs ~= lease then
+      release_obs(self._cmdObs)
+    end
+    self._cmdObs = lease
+    self._heldOp = op
+    return lease
+  end
+
+  local function service_writable()
+    local svc = self._service
+    if type(svc) ~= "table" or type(svc.isWritable) ~= "function" then
+      return false, "service-not-writable"
+    end
+    local ok, writable, reason = pcall(function() return svc.isWritable() end)
+    if not ok then return false, "service-not-writable" end
+    if writable == true then return true, reason or "ok" end
+    return false, tostring(reason or "not-writable")
+  end
+
+  local function writable_block_message(reason)
+    reason = tostring(reason or "")
+    if reason:find("expired", 1, true) or reason:find("Expired", 1, true) then
+      return "操作已过期，请同步后确认"
+    end
+    if reason:find("unknown", 1, true) or reason:find("recover", 1, true) or reason:find("pending", 1, true) then
+      return UNKNOWN_WAIT
+    end
+    if reason:find("busy", 1, true) then
+      return "操作进行中"
+    end
+    return ErrorPolicy.message({
+      code = -10, kind = "local_block", disposition = "NotReady", message = reason,
+    })
+  end
+
+  local set_status
+  local function arm_recovery_track(gen, op)
+    self._recoveryArmed = true
+    self._recoveryGen = gen
+    self._recoveryOp = op
+  end
+
+  local function try_resolve_recovery_feedback()
+    if not self._recoveryArmed then return end
+    if self._destroyed or self._closed then return end
+    if self._gen ~= self._recoveryGen then
+      clear_recovery_track()
+      return
+    end
+    if self._recoveryOp ~= 0 and self._uiOp ~= self._recoveryOp then
+      clear_recovery_track()
+      return
+    end
+    if self._lastFeedback ~= UNKNOWN_WAIT then
+      clear_recovery_track()
+      return
+    end
+    local okW = service_writable()
+    if not okW then return end
+    clear_recovery_track()
+    set_status("可继续")
+  end
+
+  set_status = function(text)
+    text = tostring(text or "")
+    if text ~= UNKNOWN_WAIT then
+      clear_recovery_track()
+    end
+    self._lastFeedback = text
+    if self._view and self._view.SetText then
+      safe_call(function() self._view:SetText("StatusLabel", self._lastFeedback) end)
+    end
+  end
+
+  local function ensure_writable(done)
+    local okW, reason = service_writable()
+    if okW then return true end
+    local msg = writable_block_message(reason)
+    set_status(msg)
+    safe_call(done, -10, {
+      code = -10, kind = "local_block", message = msg, disposition = "NotReady",
+    })
+    return false
+  end
+
+  local function set_busy(busy)
+    self._busy = busy and true or false
+  end
+
+  local function evaluate_upgrade(toolId, currentLevel, playerLevel, gold, bag)
+    local nextLv = currentLevel + 1
+    local nextSpec = self._catalog.getToolLevel and self._catalog.getToolLevel(toolId, nextLv) or nil
+    if currentLevel < 1 then
+      return false, "尚未拥有该工具", nil
+    end
+    if nextSpec == nil then
+      return false, "已达最高等级", nil
+    end
+    if nextSpec.costComplete ~= true then
+      return false, "下一档成本信息不完整，不可升级", nextSpec
+    end
+    if playerLevel < (nextSpec.needPlayerLevel or 0) then
+      return false, string.format("需玩家等级 %d", nextSpec.needPlayerLevel or 0), nextSpec
+    end
+    local goldNeed = nextSpec.goldCost or 0
+    local goldHave = as_int(gold) or 0
+    if goldHave < goldNeed then
+      return false, string.format("金币不足（需%d）", goldNeed), nextSpec
+    end
+    local mats = nextSpec.materials
+    if mats == nil then
+      return false, "下一档成本信息不完整，不可升级", nextSpec
+    end
+    for i = 1, #mats do
+      local m = mats[i]
+      local have = bag_count(bag, m.itemId)
+      if have < (m.count or 0) then
+        local item = self._catalog.getItem(m.itemId)
+        local name = item and item.name or "材料"
+        return false, string.format("%s不足", name), nextSpec
+      end
+    end
+    return true, "可升级", nextSpec
+  end
+
+  local function refresh_selection(snapshot)
+    if not self._view or not self._view.SetText then return end
+    local rows = self._toolRows
+    if #rows == 0 then
+      safe_call(function()
+        self._view:SetText("SelectedLabel", "未拥有工具")
+        self._view:SetText("CostLabel", "")
+        if self._view.SetInteractable then
+          self._view:SetInteractable("UpgradeButton", false)
+        end
+      end)
+      return
+    end
+    if self._selIndex < 1 then self._selIndex = 1 end
+    if self._selIndex > #rows then self._selIndex = #rows end
+    local row = rows[self._selIndex]
+    local item = self._catalog.getItem(row.toolId)
+    local name = item and item.name or ("工具")
+    local level = 0
+    local gold = "0"
+    local bag = {}
+    local tools = {}
+    if type(snapshot) == "table" then
+      level = snapshot.level or 0
+      gold = tostring(snapshot.gold or "0")
+      bag = type(snapshot.bag) == "table" and snapshot.bag or {}
+      tools = type(snapshot.tools) == "table" and snapshot.tools or {}
+    end
+    local cur = owned_tool_level(tools, row.toolId)
+    local okUp, reason, nextSpec = evaluate_upgrade(row.toolId, cur, level, gold, bag)
+    local costLine = ""
+    if nextSpec == nil then
+      costLine = "已是最高等级"
+    elseif nextSpec.costComplete ~= true then
+      costLine = "下一档成本不完整（不可升级）"
+    else
+      local matText = format_materials(nextSpec.materials, bag)
+      costLine = string.format("下一档 Lv.%d · 需玩家Lv.%d · 金币%d · %s",
+        nextSpec.level, nextSpec.needPlayerLevel or 0, nextSpec.goldCost or 0, matText)
+    end
+    local okW = service_writable()
+    local can = okUp and (not self._busy) and (not self._confirming) and okW and (not self._recoveryArmed)
+    safe_call(function()
+      self._view:SetText("SelectedLabel", string.format("已选：%s 当前 Lv.%d — %s", name, cur, reason))
+      self._view:SetText("CostLabel", costLine)
+      if self._view.SetInteractable then
+        self._view:SetInteractable("UpgradeButton", can)
+        self._view:SetInteractable("PrevButton", not self._busy)
+        self._view:SetInteractable("NextButton", not self._busy)
+      end
+    end)
+  end
+
+  function self:OnCreate(view)
+    self._view = view
+    if view and view.SetText then
+      safe_call(function()
+        view:SetText("Title", "工具")
+        view:SetText("StatusLabel", "")
+        view:SetText("SelectedLabel", "未选中工具")
+        view:SetText("CostLabel", "")
+        view:SetText("ToolListLabel", "")
+      end)
+    end
+  end
+
+  function self:OnOpen(argsJson)
+    self._closed = false
+    self._destroyed = false
+    -- 新代际；不在此清除「属于旧 gen」的确认回调副作用（回调内先核验 gen）
+    self._confirming = false
+    self._confirmGen = 0
+    self._confirmConsumed = true
+    local gen = bump_gen()
+    if self._sub then
+      safe_call(function() self._sub.dispose() end)
+      self._sub = nil
+    end
+    if self._store and self._store.subscribe then
+      self._sub = self._store.subscribe(nil, function(snap, _)
+        if not alive(gen) then return end
+        self:render(snap)
+      end)
+    end
+    -- 独立恢复轮询：模型可先于写解锁到达；不抢 Farm/Gather tick；关窗退订
+    local hf = CS.Game.Framework.Home.LuaHomeFarmFacade
+    if hf and hf.AttachRecoveryPoll then
+      -- 所有 alive 视图只读轮询动作资格（含他窗遗留全局锁）；本窗 Unknown 仍仅由 try_resolve 条件解旗
+      local function on_poll()
+        if not alive(gen) then return end
+        try_resolve_recovery_feedback()
+        local snap = self._store and self._store.getSnapshot and self._store.getSnapshot() or nil
+        refresh_selection(snap)
+      end
+      local okP, pollEp = pcall(function() return hf.AttachRecoveryPoll(on_poll) end)
+      if okP then self._recoveryPollEpoch = pollEp or 0 end
+    end
+    self:render(self._store and self._store.getSnapshot and self._store.getSnapshot() or nil)
+    _ = argsJson
+  end
+
+  function self:OnClose()
+    bump_gen()
+    self._closed = true
+    self._busy = false
+    -- 关窗作废本窗确认；旧回调须先核验 gen，不得清新窗 _confirming
+    self._confirming = false
+    self._confirmGen = 0
+    self._confirmConsumed = true
+    if self._recoveryArmed and self._lastFeedback == UNKNOWN_WAIT then
+      self._lastFeedback = ""
+      if self._view and self._view.SetText then
+        safe_call(function() self._view:SetText("StatusLabel", "") end)
+      end
+    end
+    clear_recovery_track()
+    clear_cmd_obs()
+    local hf = CS.Game.Framework.Home.LuaHomeFarmFacade
+    if hf and hf.DetachRecoveryPoll and self._recoveryPollEpoch ~= 0 then
+      pcall(function() hf.DetachRecoveryPoll(self._recoveryPollEpoch) end)
+      self._recoveryPollEpoch = 0
+    end
+    if self._sub then
+      safe_call(function() self._sub.dispose() end)
+      self._sub = nil
+    end
+  end
+
+  function self:OnDestroy()
+    self:OnClose()
+    self._destroyed = true
+    self._view = nil
+  end
+
+  function self:render(snapshot)
+    if self._destroyed or self._view == nil then return end
+    -- 同一刷新事件：先解 recovery 再算升级按钮
+    try_resolve_recovery_feedback()
+    local gold = "0"
+    local level = 0
+    local tools = {}
+    local bag = {}
+    if type(snapshot) == "table" then
+      gold = tostring(snapshot.gold or "0")
+      level = snapshot.level or 0
+      tools = type(snapshot.tools) == "table" and snapshot.tools or {}
+      bag = type(snapshot.bag) == "table" and snapshot.bag or {}
+    end
+    local ids = self._catalog.listToolIds and self._catalog.listToolIds() or { 5101, 5102, 5103 }
+    self._toolRows = {}
+    local lines = {}
+    for i = 1, #ids do
+      local tid = ids[i]
+      local item = self._catalog.getItem(tid)
+      local name = item and item.name or tostring(tid)
+      local cur = owned_tool_level(tools, tid)
+      local owned = cur >= 1
+      if owned then
+        self._toolRows[#self._toolRows + 1] = { toolId = tid, level = cur }
+      end
+      local mark = ""
+      if self._toolRows[self._selIndex] and self._toolRows[self._selIndex].toolId == tid then
+        mark = "▶ "
+      else
+        mark = "  "
+      end
+      local nextSpec = self._catalog.getToolLevel and self._catalog.getToolLevel(tid, cur + 1) or nil
+      local nextHint = "满级"
+      if cur < 1 then
+        nextHint = "未拥有"
+      elseif nextSpec == nil then
+        nextHint = "满级"
+      elseif nextSpec.costComplete ~= true then
+        nextHint = "下一档成本不完整"
+      else
+        nextHint = string.format("升%d需Lv%d/%d金", cur + 1, nextSpec.needPlayerLevel or 0, nextSpec.goldCost or 0)
+      end
+      lines[#lines + 1] = string.format("%s%s Lv.%d · %s", mark, name, cur, nextHint)
+    end
+    if #self._toolRows == 0 then
+      self._selIndex = 1
+    elseif self._selIndex > #self._toolRows then
+      self._selIndex = #self._toolRows
+    end
+    if self._view.SetText then
+      safe_call(function()
+        self._view:SetText("GoldLabel", "金币: " .. gold)
+        self._view:SetText("LevelLabel", "Lv." .. tostring(level))
+        self._view:SetText("ToolListLabel", #lines > 0 and table.concat(lines, "\n") or "(无工具配置)")
+      end)
+    end
+    refresh_selection(snapshot)
+    _ = bag
+  end
+
+  function self:selectPrev()
+    if self._closed or self._destroyed or self._busy or #self._toolRows == 0 then return end
+    self._selIndex = self._selIndex - 1
+    if self._selIndex < 1 then self._selIndex = #self._toolRows end
+    self:render(self._store and self._store.getSnapshot and self._store.getSnapshot() or nil)
+  end
+
+  function self:selectNext()
+    if self._closed or self._destroyed or self._busy or #self._toolRows == 0 then return end
+    self._selIndex = self._selIndex + 1
+    if self._selIndex > #self._toolRows then self._selIndex = 1 end
+    self:render(self._store and self._store.getSnapshot and self._store.getSnapshot() or nil)
+  end
+
+  function self:selectedToolId()
+    local r = self._toolRows[self._selIndex]
+    return r and r.toolId or nil
+  end
+
+  --- upgrade(toolId, done)：公开面；只发 toolId；带确认与忙态。
+  function self:upgrade(toolId, done)
+    local gen = self._gen
+    if self._closed or self._destroyed then
+      safe_call(done, -10, { code = -10, kind = "local_block", message = "窗口已关闭", disposition = "NotReady" })
+      return nil
+    end
+    if self._busy or self._confirming or self._recoveryArmed then
+      set_status(self._recoveryArmed and UNKNOWN_WAIT or "操作进行中")
+      safe_call(done, -10, { code = -10, kind = "local_block", message = "操作进行中", disposition = "NotReady" })
+      return nil
+    end
+    if not ensure_writable(done) then return nil end
+    local id = toolId or self:selectedToolId()
+    if id == nil then
+      set_status("请先选择工具")
+      safe_call(done, -12, { code = -12, kind = "malformed_intent", message = "请先选择工具" })
+      return nil
+    end
+    if type(id) == "string" then id = tonumber(id) end
+    if type(id) ~= "number" or id ~= math.floor(id) or id < 1 then
+      safe_call(done, -12, { code = -12, kind = "malformed_intent", message = "toolId-invalid" })
+      return nil
+    end
+
+    local snap = self._store and self._store.getSnapshot and self._store.getSnapshot() or nil
+    local level = 0
+    local gold = "0"
+    local bag = {}
+    local tools = {}
+    if type(snap) == "table" then
+      level = snap.level or 0
+      gold = tostring(snap.gold or "0")
+      bag = type(snap.bag) == "table" and snap.bag or {}
+      tools = type(snap.tools) == "table" and snap.tools or {}
+    end
+    local cur = owned_tool_level(tools, id)
+    local okUp, reason, nextSpec = evaluate_upgrade(id, cur, level, gold, bag)
+    if not okUp then
+      set_status(reason)
+      safe_call(done, -10, { code = -10, kind = "local_block", message = reason, disposition = "NotReady" })
+      return nil
+    end
+
+    local item = self._catalog.getItem(id)
+    local name = item and item.name or "工具"
+    local matText = select(1, format_materials(nextSpec.materials, bag))
+    local msg = string.format("将 %s 升至 Lv.%d？\n金币 %d\n%s", name, cur + 1, nextSpec.goldCost or 0, matText)
+
+    self._confirming = true
+    self._confirmGen = gen
+    self._confirmConsumed = false
+    set_busy(false)
+    if self._view and self._view.SetInteractable then
+      safe_call(function() self._view:SetInteractable("UpgradeButton", false) end)
+    end
+
+    local function do_send()
+      if not alive(gen) then
+        safe_call(done, -10, { code = -10, kind = "local_block", message = "窗口已关闭", disposition = "NotReady" })
+        return nil
+      end
+      local op = begin_op()
+      set_busy(true)
+      set_status("升级中…")
+      local function finish(code, result)
+        release_owned_op(op)
+        if not alive(gen) or self._uiOp ~= op then
+          return
+        end
+        set_busy(false)
+        local disposition = type(result) == "table" and result.disposition or nil
+        if is_unknown_recovery_outcome(result) then
+          set_status(UNKNOWN_WAIT)
+          arm_recovery_track(gen, op)
+          try_resolve_recovery_feedback()
+        elseif code == 0 and (disposition == "Recorded" or disposition == "SyncApplied") then
+          set_status("已提交")
+        else
+          set_status(feedback_text(code, result))
+        end
+        -- 资产/工具等级只认 Model 整批
+        self:render(self._store and self._store.getSnapshot and self._store.getSnapshot() or nil)
+        safe_call(done, code, result)
+      end
+      return hold_cmd_obs(op, gen, self._service.upgrade(id, finish))
+    end
+
+    local confirm = self._confirm or Dialog.confirm
+    local lease = confirm("确认升级", msg, function(code, _)
+      -- 先核验所属代际；旧确认不得解开新窗口确认忙态
+      if self._confirmGen ~= gen or self._gen ~= gen then
+        return
+      end
+      if self._confirmConsumed then
+        return
+      end
+      self._confirmConsumed = true
+      if not alive(gen) then
+        -- 本窗已关：只消费，不清其他代际 confirming
+        return
+      end
+      self._confirming = false
+      if code == 1 then
+        do_send()
+      else
+        set_status("已取消")
+        self:render(self._store and self._store.getSnapshot and self._store.getSnapshot() or nil)
+        safe_call(done, -10, { code = -10, kind = "local_block", message = "已取消", disposition = "NotReady" })
+      end
+    end)
+    return lease
+  end
+
+  function self:getFeedback()
+    return self._lastFeedback
+  end
+
+  function self:isBusy()
+    return self._busy or self._confirming or self._recoveryArmed
+  end
+
+  return self
+end
+
+return M

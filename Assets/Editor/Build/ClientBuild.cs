@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using CSObjectWrapEditor;
 using Game.Framework.Boot;
+using Game.Framework.Build;
 using Game.Framework.Lua;
 using Game.Framework.Resource;
 using UnityEditor;
@@ -20,14 +21,21 @@ using YooAsset.Editor;
 namespace Game.Editor.Build
 {
     /// <summary>
-    /// T58：正式 Win64 IL2CPP 基包。-executeMethod Game.Editor.Build.ClientBuild.BuildWindows
+    /// T58/T027：正式 Win64 IL2CPP 基包。-executeMethod Game.Editor.Build.ClientBuild.BuildWindows
     /// CLI：--m1-output= --m1-app-version= --m1-res-version= --m1-phase=all|gen|yoo|player|boot
+    /// M2：--m2-profile=BuildProfiles/M2/base-200.json（必填版本/策略；Output 建议显式唯一候选目录）
+    /// GenAll 入口：CSObjectWrapEditor.Generator.GenAll（本方法 phase=gen|all）
     /// </summary>
     public static class ClientBuild
     {
         const string OutputArg = "--m1-output=";
         const string AppVerArg = "--m1-app-version=";
+        /// <summary>M2 早期 Native/基包：优先于 --m1-app-version。</summary>
+        const string AppVerArgM2 = "--m2-app-version=";
         const string ResVerArg = "--m1-res-version=";
+        const string ResVerArgM2 = "--m2-res-version=";
+        /// <summary>T007/T027：读 M2BuildProfile；未传时保持 M1 默认证据路径兼容。</summary>
+        const string ProfileArgM2 = "--m2-profile=";
         const string PhaseArg = "--m1-phase=";
         const string BootScenePath = "Assets/Scenes/M1/M1_Boot.unity";
 
@@ -38,15 +46,54 @@ namespace Game.Editor.Build
             {
                 string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
                 string output = Arg(OutputArg, Path.Combine(projectRoot, "Docs/Acceptance/M1/20261020-xLua/StageD/Freeze100"));
-                string appVer = Arg(AppVerArg, "0.3.0");
-                int resVer = ArgInt(ResVerArg, 100);
+                // M2：首次 Native（T027）须能传 0.4.0 / bridge m2-bridge-0.4，不等到 T068。
+                string appVer = FirstArg(AppVerArgM2, AppVerArg, "0.3.0");
+                int resVer = FirstArgInt(ResVerArgM2, ResVerArg, 100);
+                int cfgVer = resVer;
                 string phase = Arg(PhaseArg, "all").ToLowerInvariant();
+                string profilePath = Arg(ProfileArgM2, null);
+                M2BuildProfile m2Profile = null;
+                string contentPolicy = M2PatchContentPolicy.PolicyM1LegacyImplicit;
+                if (!string.IsNullOrEmpty(profilePath))
+                {
+                    if (!Path.IsPathRooted(profilePath))
+                        profilePath = Path.GetFullPath(Path.Combine(projectRoot, profilePath));
+                    m2Profile = M2BuildProfile.Load(profilePath);
+                    appVer = m2Profile.AppVersion;
+                    resVer = m2Profile.ResVersion;
+                    cfgVer = m2Profile.ConfigVersion;
+                    contentPolicy = m2Profile.ContentPolicy;
+                    // 仅当未显式 --m1-output 时落到 profile EvidenceRoot；脚本应传唯一候选目录以免覆盖。
+                    if (string.IsNullOrEmpty(Arg(OutputArg, null)))
+                        output = m2Profile.EvidenceRoot;
+                    if (!string.Equals(BridgeApi.BridgeContractValue, m2Profile.BridgeContract, StringComparison.Ordinal))
+                        throw new InvalidOperationException(
+                            "bridgeContract mismatch code=" + BridgeApi.BridgeContractValue
+                            + " profile=" + m2Profile.BridgeContract);
+                    if (BridgeApi.RequiredProtoVersion != m2Profile.ProtoVersion)
+                        throw new InvalidOperationException(
+                            "protoVersion mismatch code=" + BridgeApi.RequiredProtoVersion
+                            + " profile=" + m2Profile.ProtoVersion);
+                }
+
                 Directory.CreateDirectory(output);
                 var report = new StringBuilder();
                 report.AppendLine("phase=" + phase);
                 report.AppendLine("output=" + output);
                 report.AppendLine("app=" + appVer);
                 report.AppendLine("res=" + resVer);
+                report.AppendLine("config=" + cfgVer);
+                report.AppendLine("bridgeContract=" + BridgeApi.BridgeContractValue);
+                report.AppendLine("scriptingBackend=IL2CPP");
+                report.AppendLine("contentPolicy=" + (string.IsNullOrEmpty(contentPolicy) ? "(m1-legacy)" : contentPolicy));
+                if (m2Profile != null)
+                {
+                    report.AppendLine("m2Profile=" + m2Profile.SourcePath);
+                    report.AppendLine("m2ContentPolicy=" + m2Profile.ContentPolicy);
+                    report.AppendLine("m2EvidenceRoot=" + m2Profile.EvidenceRoot);
+                    report.AppendLine("note=T027 M2Formal 0.4/200 IL2CPP chain; no PatchDemo; unique OutputDir recommended");
+                }
+
                 report.AppendLine("when=" + DateTime.UtcNow.ToString("o"));
 
                 if (EditorApplication.isCompiling || EditorApplication.isUpdating)
@@ -65,12 +112,24 @@ namespace Game.Editor.Build
 
                 if (phase == "gen" || phase == "all")
                 {
+                    // 基包 ClientBuild 永不注入 PatchDemo；M1 101 演示仅走 PatchBuild + 显式策略。
                     StageFormalLua(resVer, appVer, report);
+                    if (M2PatchContentPolicy.IncludePatchDemo(contentPolicy, resVer))
+                    {
+                        report.AppendLine("patchDemo=deferred-to-PatchBuild policy-would-include=true");
+                    }
+                    else
+                    {
+                        report.AppendLine("patchDemo=excluded policy="
+                                         + (string.IsNullOrEmpty(contentPolicy) ? "m1-legacy-or-below-101" : contentPolicy));
+                    }
+
+                    // 实际 GenAll 入口（AOT/导出变更后由 Root 执行本 phase，禁止手改 Gen wrappers）
                     Generator.ClearAll();
                     Generator.GenAll();
                     AssetDatabase.SaveAssets();
                     AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
-                    report.AppendLine("genAll=ok");
+                    report.AppendLine("genAll=ok entry=CSObjectWrapEditor.Generator.GenAll");
                     File.WriteAllText(Path.Combine(output, "clientbuild-report.txt"), report.ToString(), new UTF8Encoding(false));
                     if (phase == "gen")
                     {
@@ -87,8 +146,8 @@ namespace Game.Editor.Build
                         Fail(output, report, "yoo-default-failed", 5);
                     if (!BuildYooPackage("GameLua", resVer.ToString(), publish, report))
                         Fail(output, report, "yoo-lua-failed", 6);
-                    WriteVersionJson(Path.Combine(output, "Publish"), resVer, appVer, publish);
-                    ValidatePackageAddresses(publish, resVer, report);
+                    WriteVersionJson(Path.Combine(output, "Publish"), resVer, cfgVer, appVer, publish);
+                    ValidatePackageAddresses(publish, resVer, contentPolicy, report);
                 }
 
                 if (phase == "player" || phase == "all")
@@ -112,7 +171,17 @@ namespace Game.Editor.Build
                     File.WriteAllText(Path.Combine(output, "player-build-report.txt"), report.ToString(), new UTF8Encoding(false));
                     if (br.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
                         Fail(output, report, "player-build-failed", 7);
-                    WriteBaselineManifest(output, appVer, resVer, exe, report);
+                    WriteBaselineManifest(output, appVer, resVer, cfgVer, exe, report);
+                    if (m2Profile != null)
+                    {
+                        Dictionary<string, string> baselineCollect = BaselineFingerprint.Collect();
+                        M2CandidateFingerprint.CaptureResult cap =
+                            M2CandidateFingerprint.Capture(m2Profile, projectRoot, output, baselineCollect);
+                        report.AppendLine("candidateFingerprint=ok exe=" + cap.ExeSha256);
+                        report.AppendLine("candidateGa=" + cap.GameAssemblySha256);
+                        report.AppendLine("candidateMeta=" + cap.GlobalMetadataSha256);
+                        report.AppendLine("candidateProvenanceCount=" + cap.ProvenanceFileCount);
+                    }
                 }
 
                 File.WriteAllText(Path.Combine(output, "clientbuild-report.txt"), report.ToString(), new UTF8Encoding(false));
@@ -186,6 +255,9 @@ namespace Game.Editor.Build
                 ("entry", "entry.txt", "entry"),
                 ("AccountService", "AccountService.txt", "AccountService"),
                 ("PlayerModel", "PlayerModel.txt", "PlayerModel"),
+                ("Models/ModelStore", "Models/ModelStore.txt", "ModelStore"),
+                ("Services/GameplayService", "Services/GameplayService.txt", "GameplayService"),
+                ("Services/GameplayErrorPolicy", "Services/GameplayErrorPolicy.txt", "GameplayErrorPolicy"),
                 ("Json", "Json.txt", "Json"),
                 ("panel_base", "panel_base.txt", "panel_base"),
                 ("UI/UIManager", "UI/UIManager.txt", "UIManager"),
@@ -194,6 +266,25 @@ namespace Game.Editor.Build
                 ("UI/ToastService", "UI/ToastService.txt", "ToastService"),
                 ("UI/Windows/LoginWindow", "UI/Windows/LoginWindow.txt", "LoginWindow"),
                 ("UI/Windows/HomeHudWindow", "UI/Windows/HomeHudWindow.txt", "HomeHudWindow"),
+                ("UI/Windows/BagWindow", "UI/Windows/BagWindow.txt", "BagWindow"),
+                ("UI/Windows/ShopWindow", "UI/Windows/ShopWindow.txt", "ShopWindow"),
+                ("UI/Windows/FarmWindow", "UI/Windows/FarmWindow.txt", "FarmWindow"),
+                ("UI/Windows/GatherWindow", "UI/Windows/GatherWindow.txt", "GatherWindow"),
+                ("UI/Windows/ToolWindow", "UI/Windows/ToolWindow.txt", "ToolWindow"),
+                ("UI/Presenters/BagPresenter", "UI/Presenters/BagPresenter.txt", "BagPresenter"),
+                ("UI/Presenters/ShopPresenter", "UI/Presenters/ShopPresenter.txt", "ShopPresenter"),
+                ("UI/Presenters/ProgressionPresenter", "UI/Presenters/ProgressionPresenter.txt", "ProgressionPresenter"),
+                ("UI/Presenters/FarmPresenter", "UI/Presenters/FarmPresenter.txt", "FarmPresenter"),
+                ("UI/Presenters/GatherPresenter", "UI/Presenters/GatherPresenter.txt", "GatherPresenter"),
+                ("UI/Presenters/ToolPresenter", "UI/Presenters/ToolPresenter.txt", "ToolPresenter"),
+                ("Services/InventoryService", "Services/InventoryService.txt", "InventoryService"),
+                ("Services/ShopService", "Services/ShopService.txt", "ShopService"),
+                ("Services/ProgressionService", "Services/ProgressionService.txt", "ProgressionService"),
+                ("Services/FarmService", "Services/FarmService.txt", "FarmService"),
+                ("Services/GatherService", "Services/GatherService.txt", "GatherService"),
+                ("Services/ToolService", "Services/ToolService.txt", "ToolService"),
+                ("Services/GameplayDisplayCatalog", "Services/GameplayDisplayCatalog.txt", "GameplayDisplayCatalog"),
+                ("Services/GameplayDisplayCatalogData", "Services/GameplayDisplayCatalogData.txt", "GameplayDisplayCatalogData"),
             };
 
             // cfg_runtime 仅为 JSON 配置地址，不得进 modules（CompileOnly 会当 Lua 解析失败）。
@@ -245,6 +336,33 @@ namespace Game.Editor.Build
                 File.Delete(Path.Combine(staging, "m1_patch_message.txt"));
             if (File.Exists(Path.Combine(staging, "PatchDemoWindow.txt")))
                 File.Delete(Path.Combine(staging, "PatchDemoWindow.txt"));
+        }
+
+        /// <summary>
+        /// M2 验收入口：只按显式 profile 同步正式 Lua/catalog，不运行 GenAll 或修改 PlayerSettings。
+        /// -executeMethod Game.Editor.Build.ClientBuild.StageM2LuaForVerification --m2-profile=...
+        /// </summary>
+        public static void StageM2LuaForVerification()
+        {
+            try
+            {
+                if (EditorUtility.scriptCompilationFailed)
+                    throw new InvalidOperationException("scriptCompilationFailed");
+                string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
+                string path = Arg(ProfileArgM2, "BuildProfiles/M2/base-200.json");
+                if (!Path.IsPathRooted(path)) path = Path.Combine(projectRoot, path);
+                M2BuildProfile profile = M2BuildProfile.Load(path);
+                var report = new StringBuilder();
+                StageFormalLua(profile.ResVersion, profile.AppVersion, report);
+                AssetDatabase.SaveAssets();
+                Debug.Log("[M2Verification] Lua staging complete: " + report);
+                EditorApplication.Exit(0);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                EditorApplication.Exit(1);
+            }
         }
 
         /// <summary>101：在已 Stage 的正式 Lua 上追加 PatchDemo 模块并重写 catalog。</summary>
@@ -384,7 +502,7 @@ namespace Game.Editor.Build
             return true;
         }
 
-        static void WriteVersionJson(string publishRoot, int resVer, string appVer, string versionDir)
+        static void WriteVersionJson(string publishRoot, int resVer, int cfgVer, string appVer, string versionDir)
         {
             Directory.CreateDirectory(publishRoot);
             // BaseUrl 由 run_server / 验收时按实际 HTTP 端口覆写；占位 localhost。
@@ -393,20 +511,23 @@ namespace Game.Editor.Build
                 + "  \"MinAppVersion\": \"" + appVer + "\",\n"
                 + "  \"ResVersion\": " + resVer + ",\n"
                 + "  \"ProtoVersion\": " + BridgeApi.RequiredProtoVersion + ",\n"
-                + "  \"ConfigVersion\": " + resVer + ",\n"
+                + "  \"ConfigVersion\": " + cfgVer + ",\n"
                 + "  \"PackageVersion\": \"" + resVer + "\",\n"
+                + "  \"BridgeContract\": \"" + BridgeApi.BridgeContractValue + "\",\n"
                 + "  \"BaseUrl\": \"http://localhost:18080/" + resVer + "/\"\n"
                 + "}\n";
             File.WriteAllText(Path.Combine(versionDir, "version.json"), json, new UTF8Encoding(false));
             File.WriteAllText(Path.Combine(publishRoot, "version.json"), json, new UTF8Encoding(false));
         }
 
-        static void ValidatePackageAddresses(string publishDir, int resVer, StringBuilder report)
+        static void ValidatePackageAddresses(string publishDir, int resVer, string contentPolicy, StringBuilder report)
         {
             string[] mustExist =
             {
                 Path.Combine(Application.dataPath, "Res/UI/LoginWindow.prefab"),
                 Path.Combine(Application.dataPath, "Res/UI/HomeHudWindow.prefab"),
+                Path.Combine(Application.dataPath, "Res/UI/BagWindow.prefab"),
+                Path.Combine(Application.dataPath, "Res/UI/ShopWindow.prefab"),
                 Path.Combine(Application.dataPath, "Scenes/M1/M1_Login.unity"),
                 Path.Combine(Application.dataPath, "Scenes/M1/M1_Home.unity"),
                 Path.Combine(Application.dataPath, "Lua/Staging/catalog.txt"),
@@ -419,42 +540,82 @@ namespace Game.Editor.Build
             }
 
             string catalog = File.ReadAllText(Path.Combine(Application.dataPath, "Lua/Staging/catalog.txt"));
-            if (catalog.Contains("m1_patch_message"))
-                throw new InvalidOperationException("100-catalog-must-not-contain-m1_patch_message");
-            if (catalog.Contains("PatchDemoWindow") || catalog.Contains("UI/Windows/PatchDemoWindow"))
-                throw new InvalidOperationException("100-catalog-must-not-contain-PatchDemo");
-            if (!catalog.Contains("\"resVersion\": \"" + resVer + "\""))
-                throw new InvalidOperationException("catalog-resVersion-mismatch");
-            if (File.Exists(Path.Combine(Application.dataPath, "Res/UI/PatchDemoWindow.prefab")))
-                throw new InvalidOperationException("PatchDemo-still-under-Assets/Res/UI");
             string flat = Directory.Exists(publishDir)
                 ? string.Join("\n", Directory.GetFiles(publishDir, "*", SearchOption.AllDirectories))
                 : "";
-            if (flat.IndexOf("PatchDemoWindow", StringComparison.OrdinalIgnoreCase) >= 0)
-                throw new InvalidOperationException("100-publish-contains-PatchDemoWindow");
+            M2PatchContentPolicy.RejectPatchDemoArtifacts(contentPolicy, catalog, flat);
+            // M1 基包（无 M2Formal）：保留原 100 门禁
+            if (string.IsNullOrEmpty(contentPolicy)
+                || !string.Equals(contentPolicy, M2BuildProfile.ContentPolicyM2Formal, StringComparison.Ordinal))
+            {
+                if (catalog.Contains("m1_patch_message"))
+                    throw new InvalidOperationException("100-catalog-must-not-contain-m1_patch_message");
+                if (catalog.Contains("PatchDemoWindow") || catalog.Contains("UI/Windows/PatchDemoWindow"))
+                    throw new InvalidOperationException("100-catalog-must-not-contain-PatchDemo");
+                if (flat.IndexOf("PatchDemoWindow", StringComparison.OrdinalIgnoreCase) >= 0)
+                    throw new InvalidOperationException("100-publish-contains-PatchDemoWindow");
+            }
+
+            if (!catalog.Contains("\"resVersion\": \"" + resVer + "\""))
+                throw new InvalidOperationException("catalog-resVersion-mismatch");
+            if (!catalog.Contains("\"bridgeContract\": \"" + BridgeApi.BridgeContractValue + "\""))
+                throw new InvalidOperationException("catalog-bridgeContract-mismatch");
+            if (File.Exists(Path.Combine(Application.dataPath, "Res/UI/PatchDemoWindow.prefab")))
+                throw new InvalidOperationException("PatchDemo-still-under-Assets/Res/UI");
+
+            if (string.Equals(contentPolicy, M2BuildProfile.ContentPolicyM2Formal, StringComparison.Ordinal))
+            {
+                string[] formalMods =
+                {
+                    "\"name\":\"UI/Windows/BagWindow\"",
+                    "\"name\":\"UI/Windows/ShopWindow\"",
+                    "\"name\":\"UI/Presenters/BagPresenter\"",
+                    "\"name\":\"UI/Presenters/ShopPresenter\"",
+                    "\"name\":\"UI/Presenters/ProgressionPresenter\"",
+                    "\"name\":\"Services/InventoryService\"",
+                    "\"name\":\"Services/ShopService\"",
+                    "\"name\":\"Services/ProgressionService\"",
+                    "\"name\":\"Models/ModelStore\"",
+                };
+                foreach (string m in formalMods)
+                {
+                    if (!catalog.Contains(m))
+                        throw new InvalidOperationException("m2formal-catalog-missing-module:" + m);
+                }
+            }
+
             report.AppendLine("addressValidate=ok");
         }
 
-        static void WriteBaselineManifest(string output, string appVer, int resVer, string exePath, StringBuilder report)
+        static void WriteBaselineManifest(
+            string output, string appVer, int resVer, int cfgVer, string exePath, StringBuilder report)
         {
             string ga = Path.Combine(Path.GetDirectoryName(exePath) ?? "", "GameAssembly.dll");
             string meta = Path.Combine(Path.GetDirectoryName(exePath) ?? "", "Farming_Data", "il2cpp_data", "Metadata", "global-metadata.dat");
+            if (!File.Exists(ga))
+                throw new FileNotFoundException("IL2CPP GameAssembly.dll missing after player build", ga);
+            if (!File.Exists(meta))
+                throw new FileNotFoundException("IL2CPP global-metadata.dat missing after player build", meta);
             var sb = new StringBuilder();
             sb.AppendLine("{");
             sb.AppendLine("  \"appVersion\": \"" + appVer + "\",");
             sb.AppendLine("  \"resVersion\": " + resVer + ",");
+            sb.AppendLine("  \"configVersion\": " + cfgVer + ",");
             sb.AppendLine("  \"protoVersion\": " + BridgeApi.RequiredProtoVersion + ",");
             sb.AppendLine("  \"bridgeContract\": \"" + BridgeApi.BridgeContractValue + "\",");
             sb.AppendLine("  \"exeSha256\": \"" + Sha256File(exePath) + "\",");
-            sb.AppendLine("  \"gameAssemblySha256\": \"" + (File.Exists(ga) ? Sha256File(ga) : "") + "\",");
-            sb.AppendLine("  \"globalMetadataSha256\": \"" + (File.Exists(meta) ? Sha256File(meta) : "") + "\",");
+            sb.AppendLine("  \"gameAssemblySha256\": \"" + Sha256File(ga) + "\",");
+            sb.AppendLine("  \"globalMetadataSha256\": \"" + Sha256File(meta) + "\",");
             sb.AppendLine("  \"bridgeApiCs\": \"" + Sha256File(Path.Combine(Application.dataPath, "Framework/Lua/BridgeApi.cs")) + "\",");
             sb.AppendLine("  \"luaGenConfigCs\": \"" + Sha256File(Path.Combine(Application.dataPath, "Framework/Lua/LuaGenConfig.cs")) + "\",");
             sb.AppendLine("  \"accountBridgeCs\": \"" + Sha256File(Path.Combine(Application.dataPath, "Framework/Account/AccountBridge.cs")) + "\",");
             sb.AppendLine("  \"accountSessionCs\": \"" + Sha256File(Path.Combine(Application.dataPath, "Framework/Account/AccountSession.cs")) + "\",");
+            sb.AppendLine("  \"acceptLocalDriverCs\": \"" + Sha256File(Path.Combine(Application.dataPath, "Framework/Boot/AcceptLocalDriver.cs")) + "\",");
+            sb.AppendLine("  \"launcherCs\": \"" + Sha256File(Path.Combine(Application.dataPath, "Framework/Boot/Launcher.cs")) + "\",");
             sb.AppendLine("  \"accountProto\": \"" + Sha256File(Path.Combine(Application.dataPath, "..", "Shared", "Proto", "account.proto")) + "\",");
             sb.AppendLine("  \"linkXml\": \"" + Sha256File(Path.Combine(Application.dataPath, "link.xml")) + "\",");
             sb.AppendLine("  \"catalogSha256\": \"" + Sha256File(Path.Combine(Application.dataPath, "Lua/Staging/catalog.txt")) + "\",");
+            sb.AppendLine("  \"configManifestSha256\": \"" + Sha256File(Path.Combine(Application.dataPath, "ConfigLuban/config_manifest.json")) + "\",");
             sb.AppendLine("  \"unityVersion\": \"" + Application.unityVersion + "\",");
             sb.AppendLine("  \"scriptingBackend\": \"IL2CPP\",");
             sb.AppendLine("  \"when\": \"" + DateTime.UtcNow.ToString("o") + "\"");
@@ -470,6 +631,45 @@ namespace Game.Editor.Build
             BaselineFingerprint.Write(output, report);
         }
 
+        /// <summary>
+        /// T027：批处理核对「磁盘候选 fingerprint」与「当前源 BaselineFingerprint.Collect + supplemental」。
+        /// CLI：--m2-candidate= --m2-profile=BuildProfiles/M2/base-200.json
+        /// 固化 C# / 正式 Lua / 配置变更后，即便旧 Native 三文件字节未变也必须非 0 退出。
+        /// </summary>
+        public static void ValidateM2CandidateAgainstCurrentSourceBatch()
+        {
+            try
+            {
+                string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
+                string candidate = Arg("--m2-candidate=", null);
+                string profilePath = Arg(ProfileArgM2, null);
+                if (string.IsNullOrWhiteSpace(candidate))
+                    throw new InvalidOperationException("missing --m2-candidate=");
+                if (string.IsNullOrWhiteSpace(profilePath))
+                    throw new InvalidOperationException("missing --m2-profile=");
+                if (!Path.IsPathRooted(candidate))
+                    candidate = Path.GetFullPath(Path.Combine(projectRoot, candidate));
+                if (!Path.IsPathRooted(profilePath))
+                    profilePath = Path.GetFullPath(Path.Combine(projectRoot, profilePath));
+
+                M2BuildProfile profile = M2BuildProfile.Load(profilePath);
+                string fingerPath = Path.Combine(candidate, "candidate-fingerprint.json");
+                M2CandidateFingerprint.CaptureResult loaded = M2CandidateFingerprint.Load(fingerPath);
+                Dictionary<string, string> collect = BaselineFingerprint.Collect();
+                M2CandidateFingerprint.CaptureResult current =
+                    M2CandidateFingerprint.BuildCurrentSnapshot(profile, projectRoot, candidate, collect);
+                M2CandidateFingerprint.ValidateCompatible(loaded, current);
+                Debug.Log("[ClientBuild] ValidateM2CandidateAgainstCurrentSourceBatch ok count="
+                          + loaded.ProvenanceFileCount);
+                EditorApplication.Exit(0);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                EditorApplication.Exit(8);
+            }
+        }
+
         static void Fail(string output, StringBuilder report, string reason, int code)
         {
             report.AppendLine("FAIL=" + reason);
@@ -482,24 +682,48 @@ namespace Game.Editor.Build
 
         static string Arg(string prefix, string fallback)
         {
+            string found = ArgOrNull(prefix);
+            return found ?? fallback;
+        }
+
+        /// <summary>找不到前缀时返回 null（用于 M2 参数优先）。</summary>
+        static string ArgOrNull(string prefix)
+        {
             foreach (string a in Environment.GetCommandLineArgs())
             {
                 if (!a.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                     continue;
                 string v = a.Substring(prefix.Length).Trim().Trim('"');
-                if (!string.IsNullOrEmpty(v))
-                    return Path.IsPathRooted(v) || prefix != OutputArg
-                        ? v
-                        : Path.GetFullPath(Path.Combine(Path.Combine(Application.dataPath, ".."), v));
+                if (string.IsNullOrEmpty(v))
+                    continue;
+                return Path.IsPathRooted(v) || prefix != OutputArg
+                    ? v
+                    : Path.GetFullPath(Path.Combine(Path.Combine(Application.dataPath, ".."), v));
             }
 
-            return fallback;
+            return null;
+        }
+
+        static string FirstArg(string preferredPrefix, string fallbackPrefix, string defaultValue)
+        {
+            string preferred = ArgOrNull(preferredPrefix);
+            if (!string.IsNullOrEmpty(preferred))
+                return preferred;
+            return Arg(fallbackPrefix, defaultValue);
         }
 
         static int ArgInt(string prefix, int fallback)
         {
-            string v = Arg(prefix, null);
+            string v = ArgOrNull(prefix);
             return int.TryParse(v, out int n) ? n : fallback;
+        }
+
+        static int FirstArgInt(string preferredPrefix, string fallbackPrefix, int defaultValue)
+        {
+            string preferred = ArgOrNull(preferredPrefix);
+            if (int.TryParse(preferred, out int n))
+                return n;
+            return ArgInt(fallbackPrefix, defaultValue);
         }
 
         static string Sha256File(string path)

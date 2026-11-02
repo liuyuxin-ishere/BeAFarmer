@@ -57,10 +57,11 @@ message PlotResult {
   PlotData plot = 3;
 }
 
-// 采集点。next_ready_time 为下次可采集的 Unix 毫秒。
+// 采集点实例。node_id 为持久实例身份；config_node_id 为配置表类型 Id。
 message NodeData {
   int32 node_id = 1;
   int64 next_ready_time = 2;
+  int32 config_node_id = 3;
 }
 
 // 工具等级。
@@ -91,6 +92,13 @@ message FacilityData {
   repeated SlotData slots = 3;
 }
 
+// 订单生成降级原因。成功写出的订单不会使用 EMPTY_CANDIDATE。
+enum OrderDegradeReason {
+  ORDER_DEGRADE_NONE = 0;
+  ORDER_DEGRADE_INVENTORY_SHORT = 1;
+  ORDER_DEGRADE_EMPTY_CANDIDATE = 2;
+}
+
 // 一条订单。slot 为 0~5；status 为 0 进行中、1 已完成。
 message OrderData {
   int32 order_id = 1;
@@ -100,6 +108,12 @@ message OrderData {
   int32 difficulty = 5;
   bool rare = 6;
   int32 status = 7;
+  // M2：当前库存是否可提交（真正可提交）。
+  bool submit_ready = 8;
+  // M2：是否已解锁可生产（不依赖当前库存）。
+  bool producible = 9;
+  // M2：生成时降级原因；无降级为 NONE。
+  OrderDegradeReason degrade_reason = 10;
 }
 
 // 当日订单进度。next_refresh_time 为 Unix 毫秒。
@@ -166,4 +180,44 @@ message PlayerFullData {
   AvatarData avatar = 10;
   repeated GachaPoolState gacha_states = 11;
   repeated ActivityInfo activities = 12;
+  // M2：家园经济状态 revision；全量同步与增量对齐用。
+  int64 revision = 13;
+  // M2：玩法域初始化版本；可重入，已完成域不再发放。
+  int32 grant_version = 14;
+}
+
+// ========== M2-T010：写命令 Ack / 查询状态（无独立 MsgId；嵌入配对 Resp）==========
+
+// 命令处置：0 未指定；1 预受理拒绝（未消费 op）；2 已记账（含业务拒绝）；3 账本详情过期。
+enum CommandDisposition {
+  COMMAND_DISPOSITION_UNSPECIFIED = 0;
+  COMMAND_DISPOSITION_NOT_ACCEPTED = 1;
+  COMMAND_DISPOSITION_RECORDED = 2;
+  COMMAND_DISPOSITION_EXPIRED = 3;
+}
+
+// 写权限 scope 状态。
+enum OperationScopeState {
+  OPERATION_SCOPE_STATE_UNKNOWN = 0;
+  OPERATION_SCOPE_STATE_OPEN = 1;
+  OPERATION_SCOPE_STATE_CLOSED = 2;
+}
+
+// Query 结果态：NotRecorded 用 code=0 + 本字段显式表达，不另造错误码。
+enum CommandResultState {
+  COMMAND_RESULT_STATE_UNSPECIFIED = 0;
+  COMMAND_RESULT_STATE_RECORDED = 1;
+  COMMAND_RESULT_STATE_NOT_RECORDED = 2;
+  COMMAND_RESULT_STATE_EXPIRED = 3;
+}
+
+// 写命令配对响应上的权威 Ack。next_op_id 仅在服务端已知/拥有该 scope 时为正；缺省有意义（未认证前不得伪造）。
+// disposition=UNSPECIFIED(0) 永不表示已记账。
+message CommandAck {
+  int64 operation_scope_id = 1;
+  int64 op_id = 2;
+  CommandDisposition disposition = 3;
+  // proto3 optional：未设置 ≠ 权威 0；正数才是权威 next。
+  optional int64 next_op_id = 4;
+  OperationScopeState scope_state = 5;
 }

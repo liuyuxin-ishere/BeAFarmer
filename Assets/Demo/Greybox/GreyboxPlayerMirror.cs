@@ -1,6 +1,6 @@
 using System;
 using CloudIsle.Net;
-using CloudIsle.Proto;
+using CloudIsle.Proto.Greybox;
 using LoginResp = CloudIsle.Proto.Poc.LoginResp;
 
 namespace Game.Demo.Greybox

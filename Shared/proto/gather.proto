@@ -1,0 +1,46 @@
+syntax = "proto3";
+package cloudisle;
+option csharp_namespace = "CloudIsle.Proto";
+import "common.proto";
+
+// 4001 采集。node_id 为实例身份。
+message GatherReq {
+  int64 op_id = 1;
+  int32 node_id = 2;
+  int64 operation_scope_id = 3;
+  int64 expected_revision = 4;
+  int32 config_version = 5;
+}
+
+message GatherResp {
+  int32 code = 1;
+  repeated ItemStack gained = 2;
+  bool rare_hit = 3;
+  NodeData node = 4;
+  int64 committed_revision = 5;
+  CommandAck ack = 6;
+}
+
+// 4003 工具升级。
+message ToolUpgradeReq {
+  int64 op_id = 1;
+  int32 tool_id = 2;
+  int64 operation_scope_id = 3;
+  int64 expected_revision = 4;
+  int32 config_version = 5;
+}
+
+message ToolUpgradeResp {
+  int32 code = 1;
+  ToolData tool = 2;
+  int64 committed_revision = 3;
+  CommandAck ack = 4;
+}
+
+message NodeChangeNtf {
+  repeated NodeData nodes = 1;
+}
+
+message ToolChangeNtf {
+  repeated ToolData tools = 1;
+}

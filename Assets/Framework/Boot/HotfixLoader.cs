@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Game.Framework.Lua;
+using Game.Framework.UI;
 using UnityEngine;
 using UnityEngine.UI;
 using XLua;
@@ -26,8 +27,8 @@ namespace Game.Framework.Boot
         /// <summary>宿主要求的协议版本。</summary>
         public const int HostProtoVersion = BridgeApi.RequiredProtoVersion;
 
-        /// <summary>默认内置资源版本号（开发基包内的 Lua 基线）。</summary>
-        public const string BuiltinResVersion = "100";
+        /// <summary>默认内置资源版本号（正式 Staging catalog resVersion）。</summary>
+        public const string BuiltinResVersion = "200";
 
         /// <summary>YooAsset 包名（补丁路径专用，与 DefaultPackage 配置包分开）。</summary>
         public const string LuaPackageName = "GameLua";
@@ -94,6 +95,10 @@ namespace Game.Framework.Boot
         /// <summary>StartAsync 完成回调；宿主销毁时也必须触发以免永久 Pending。</summary>
         Action _startAsyncDone;
         Exception _startAsyncError;
+        /// <summary>本 loader 在 BootEntry 中 EnsureManager 取得的精确引用；未启动则为 null。</summary>
+        UiManager _ownedUiManager;
+        /// <summary>true=本 loader 创建了 _ownedUiManager（非外来）。</summary>
+        bool _ownedUiManagerCreatedHere;
 
         /// <summary>测试用：提交前额外等待帧数；&gt;0 时进入可控屏障，供中途取消/销毁验证。</summary>
         static int s_testPreCommitWaitFrames;
@@ -726,40 +731,31 @@ namespace Game.Framework.Boot
             }
         }
 
-        /// <summary>从 Assets/Lua（编辑器）或 StreamingAssets/Lua（Player）加载并跑通入口。</summary>
+        /// <summary>
+        /// 正式 Staging catalog 全量模块（当前 entry 依赖 AccountService 等）。
+        /// 旧 4 模块字面量目录无法驱动正式 entry，保留在 LuaModulePreloader.TryLoadBuiltin 供显式合成负例。
+        /// </summary>
         IEnumerator BootFromBuiltin()
         {
             if (IsCancel())
                 yield break;
 
-            var catalog = BuildBuiltinCatalog();
-            var loaded = new List<LoadedModule>();
-            foreach (var module in catalog.modules)
+            if (!LuaModulePreloader.TryLoadFormalFromDisk(
+                    out _, out Dictionary<string, byte[]> modules, out byte[] configBytes, out RuntimeCatalog catalog)
+                || catalog == null || modules == null || configBytes == null)
             {
-                if (IsCancel())
-                    yield break;
-                byte[] bytes = ReadBuiltinBytes(module.address);
-                if (bytes == null)
-                {
-                    Fail("missing module " + module.name + " address " + module.address);
-                    yield break;
-                }
-
-                var hash = HashUtil.Sha256(bytes);
-                if (!string.Equals(hash, module.sha256, StringComparison.OrdinalIgnoreCase))
-                    module.sha256 = hash;
-
-                loaded.Add(new LoadedModule { Name = module.name, Bytes = bytes });
-            }
-
-            byte[] configBytes = ReadBuiltinBytes(catalog.configAddress);
-            if (configBytes == null)
-            {
-                Fail("config load failed");
+                Fail("formal-catalog-missing");
                 yield break;
             }
 
-            catalog.configSha256 = HashUtil.Sha256(configBytes);
+            var loaded = new List<LoadedModule>();
+            foreach (var pair in modules)
+            {
+                if (IsCancel())
+                    yield break;
+                loaded.Add(new LoadedModule { Name = pair.Key, Bytes = pair.Value });
+            }
+
             yield return ActivateCandidate(catalog, loaded, configBytes);
         }
 
@@ -1074,6 +1070,12 @@ namespace Game.Framework.Boot
             try
             {
                 _luaEnv.AddLoader(LoadModule);
+                // 正式 entry 在 Start 内 UiBridge.Register；须先取得本 loader 拥有的 manager。
+                // 外来已存在：明确拒绝且不 rebind/Dispose。
+                if (UiBridge.Manager != null)
+                    throw new InvalidOperationException("ui-manager-foreign");
+                _ownedUiManager = UiBridge.EnsureManager(null, _luaEnv);
+                _ownedUiManagerCreatedHere = true;
                 _luaEnv.DoString("Entry = require('" + _entryModule + "')", "boot");
             }
             catch (Exception ex)
@@ -1138,7 +1140,9 @@ namespace Game.Framework.Boot
         {
             if (_cancelLease == null || !_cancelLease.WasRegistered || _liveLease == null || !_liveLease.WasRegistered)
             {
-                Fail("async lease was not registered");
+                // 正式 catalog 不含 async_case：与 LuaLoader.AdvanceAsyncProducers 一致允许跳过。
+                if (_modules.ContainsKey("async_case"))
+                    Fail("async lease was not registered");
                 return;
             }
 
@@ -1209,6 +1213,17 @@ namespace Game.Framework.Boot
         void CleanupAfterFailure()
         {
             CleanupLeasesAndOwned(rollbackPanels: true);
+            try
+            {
+                ClearOwnedUiBridge();
+            }
+            catch (Exception ex)
+            {
+                _disposeError = string.IsNullOrEmpty(_disposeError)
+                    ? ("ClearOwnedUiBridge " + ex.GetType().Name + ": " + ex.Message)
+                    : (_disposeError + " | ClearOwnedUiBridge " + ex.GetType().Name + ": " + ex.Message);
+            }
+
             if (_luaEnv != null)
             {
                 try
@@ -1218,7 +1233,8 @@ namespace Game.Framework.Boot
                 }
                 catch (Exception ex)
                 {
-                    _disposeError = ex.GetType().Name + ": " + ex.Message;
+                    string msg = ex.GetType().Name + ": " + ex.Message;
+                    _disposeError = string.IsNullOrEmpty(_disposeError) ? msg : (_disposeError + " | " + msg);
                 }
 
                 _luaEnv = null;
@@ -1226,6 +1242,25 @@ namespace Game.Framework.Boot
 
             AsyncLease.EndHostScope(this);
             TestPreCommitWaiting = false;
+        }
+
+        /// <summary>
+        /// 仅释放本 loader 精确创建/取得的 owned manager；未启动或无 owned 引用时不碰全局。
+        /// Clear 全局仅当仍是同一引用；不吞异常伪装绿。
+        /// </summary>
+        void ClearOwnedUiBridge()
+        {
+            UiManager owned = _ownedUiManager;
+            bool createdHere = _ownedUiManagerCreatedHere;
+            _ownedUiManager = null;
+            _ownedUiManagerCreatedHere = false;
+            if (owned == null || !createdHere)
+                return;
+
+            // Dispose 内部仅在 ReferenceEquals 时 ClearManager；外来全局保持不变。
+            owned.Dispose();
+            if (ReferenceEquals(UiBridge.Manager, owned))
+                UiBridge.ClearManager(owned);
         }
 
         void DisposeOwnedLuaObjects()
@@ -1292,6 +1327,7 @@ namespace Game.Framework.Boot
                 }
 
                 DisposeOwnedLuaObjects();
+                ClearOwnedUiBridge();
 
                 if (_luaEnv != null)
                 {
@@ -1433,34 +1469,12 @@ namespace Game.Framework.Boot
             BridgeApi.BindPanelRoot(root.transform, font);
         }
 
-        /// <summary>构建内置 100 基线目录（地址为 Assets/Lua 下文件名不含扩展）。</summary>
+        /// <summary>正式 Staging catalog；失败时返回 null（调用方 Fail）。</summary>
         RuntimeCatalog BuildBuiltinCatalog()
         {
-            var modules = new[] { "entry", "panel_base", "proto_case", "async_case" };
-            var list = new List<CatalogModule>();
-            foreach (var name in modules)
-            {
-                var bytes = ReadBuiltinBytes(name);
-                list.Add(new CatalogModule
-                {
-                    name = name,
-                    address = name,
-                    sha256 = bytes == null ? "" : HashUtil.Sha256(bytes)
-                });
-            }
-
-            var cfg = ReadBuiltinBytes("cfg_runtime");
-            return new RuntimeCatalog
-            {
-                resVersion = BuiltinResVersion,
-                entryModule = "entry",
-                configAddress = "cfg_runtime",
-                configSha256 = cfg == null ? "" : HashUtil.Sha256(cfg),
-                bridgeContract = BridgeContract,
-                requiredAppVersion = Application.version,
-                protoVersion = HostProtoVersion,
-                modules = list.ToArray()
-            };
+            if (!LuaModulePreloader.TryLoadFormalFromDisk(out _, out _, out _, out RuntimeCatalog catalog))
+                return null;
+            return catalog;
         }
 
         /// <summary>读取内置 TextAsset 字节。address 是不含扩展的文件名。</summary>

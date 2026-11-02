@@ -14,13 +14,15 @@ localhost静态补丁HTTP端口，默认18080。
 .PARAMETER ConfigDirectory
 带config_manifest.json的正式Luban输出。
 .PARAMETER ConfigVersion
-启动必须精确加载的配置版本。
+启动必须精确加载的配置版本（生产M2默认200）。
 .PARAMETER RequiredConfigVersion
-登录最低配置版本，可以低于兼容的启动数据版本。
+登录最低配置版本（生产M2默认200）。
 .PARAMETER ResVersion
-登录最低资源版本。
+登录最低资源版本（生产M2默认200）。
 .PARAMETER AppVersion
-登录最低安装包版本，默认M1固定桥的0.3.0。
+登录最低安装包版本（生产M2默认0.4.0）。
+.PARAMETER BridgeContract
+登录桥契约（生产M2默认m2-bridge-0.4）。
 .PARAMETER ProtoVersion
 客户端必须精确匹配的正式协议整数。
 .PARAMETER LogDirectory
@@ -40,10 +42,11 @@ param(
     [ValidateRange(1,65535)][int]$HttpPort = 18080,
     [string]$ContentRoot = 'Server/PatchContent/M1',
     [string]$ConfigDirectory = 'Server/ConfigLuban',
-    [ValidateRange(1,2147483647)][int]$ConfigVersion = 100,
-    [ValidateRange(1,2147483647)][int]$RequiredConfigVersion = 100,
-    [ValidateRange(1,2147483647)][int]$ResVersion = 100,
-    [string]$AppVersion = '0.3.0',
+    [ValidateRange(1,2147483647)][int]$ConfigVersion = 200,
+    [ValidateRange(1,2147483647)][int]$RequiredConfigVersion = 200,
+    [ValidateRange(1,2147483647)][int]$ResVersion = 200,
+    [string]$AppVersion = '0.4.0',
+    [string]$BridgeContract = 'm2-bridge-0.4',
     [ValidateRange(1,2147483647)][int]$ProtoVersion = 1,
     [string]$LogDirectory = 'Server/Logs/M1',
     [string]$StopFile,
@@ -87,7 +90,8 @@ try {
         '--config-dir', $config, '--config-version', [string]$ConfigVersion,
         '--content-root', $content, '--log-dir', $logs,
         '--tcp-port', [string]$TcpPort, '--http-port', [string]$HttpPort,
-        '--min-app-version', $AppVersion, '--proto-version', [string]$ProtoVersion,
+        '--min-app-version', $AppVersion, '--bridge-contract', $BridgeContract,
+        '--proto-version', [string]$ProtoVersion,
         '--res-version', [string]$ResVersion, '--required-config-version', [string]$RequiredConfigVersion
     )
     if (-not [string]::IsNullOrWhiteSpace($StopFile)) {

@@ -1,3 +1,5 @@
+using CloudIsle.Domain.Farm;
+using CloudIsle.Domain.Trade;
 using CloudIsle.Proto;
 using CloudIsle.Server.Data;
 
@@ -11,6 +13,8 @@ public sealed class PlayerCache
 {
     readonly object _gate = new();
     readonly Dictionary<long, Entry> _entries = new();
+    // 持有属于玩家生命周期，独立于会被替换/逐出的缓存数据条目。
+    readonly Dictionary<long, int> _holds = new();
     readonly PlayerStore _store;
 
     /// <summary>使用指定的玩家存储。缓存不自己打开数据库连接。</summary>
@@ -95,7 +99,9 @@ public sealed class PlayerCache
         {
             if (!_entries.TryGetValue(playerId, out Entry? cached))
             {
-                cached = new Entry(loaded.Data, loaded.Revision, loaded.SavedRevision);
+                cached = new Entry(
+                    loaded.Data, loaded.Revision, loaded.SavedRevision,
+                    loaded.ShopPurchases, loaded.AcceptedTasks);
                 _entries.Add(playerId, cached);
             }
 
@@ -122,10 +128,41 @@ public sealed class PlayerCache
             Entry entry = Required(playerId);
             if (entry.Revision != entry.SavedRevision)
                 throw new InvalidOperationException("玩家仍有未保存修改，拒绝移除");
-            if (entry.Holds > 0)
+            if (_holds.TryGetValue(playerId, out int holds) && holds > 0)
                 throw new InvalidOperationException("玩家仍被活跃持有，拒绝移除");
             _entries.Remove(playerId);
         }
+    }
+
+    /// <summary>
+    /// 安装已 COMMIT 快照（Revision==SavedRevision）。覆盖脏条目；须在玩家 lane。
+    /// 不接受未提交候选。
+    /// </summary>
+    internal void ReplaceWithCommitted(long playerId, PlayerState committed)
+    {
+        RequireCurrent(playerId);
+        if (committed == null) throw new ArgumentNullException(nameof(committed));
+        if (committed.PlayerId != playerId)
+            throw new ArgumentException("committed.PlayerId mismatch", nameof(committed));
+        if (committed.Revision != committed.SavedRevision)
+            throw new ArgumentException("committed state must be clean (Revision==SavedRevision)");
+        if (committed.Data.Info == null)
+            throw new ArgumentException("committed missing Info", nameof(committed));
+
+        lock (_gate)
+        {
+            _entries[playerId] = new Entry(
+                committed.Data.Clone(), committed.Revision, committed.Revision,
+                committed.ShopPurchases, committed.AcceptedTasks);
+        }
+    }
+
+    /// <summary>发布失败隔离：强制逐出（忽略脏/持有）。须在玩家 lane。</summary>
+    internal void ForceEvict(long playerId)
+    {
+        RequireCurrent(playerId);
+        lock (_gate)
+            _entries.Remove(playerId);
     }
 
     /// <summary>确认某个版本已经成功写入。不大于当前版本时才前移 SavedRevision；期间又有修改则仍算脏。</summary>
@@ -150,14 +187,12 @@ public sealed class PlayerCache
 
     /// <summary>只读尚未释放的持有次数。不要求处在玩家队列，不改数据和版本。</summary>
     /// <param name="playerId">要观察的玩家主键。</param>
-    /// <returns>未缓存时为 0；已缓存时为当前持有计数。</returns>
+    /// <returns>当前未释放的持有计数；缓存失效不会使旧句柄失效。</returns>
     internal int CopyHoldCount(long playerId)
     {
         lock (_gate)
         {
-            if (!_entries.TryGetValue(playerId, out Entry? entry))
-                return 0;
-            return entry.Holds;
+            return _holds.TryGetValue(playerId, out int holds) ? holds : 0;
         }
     }
 
@@ -169,7 +204,9 @@ public sealed class PlayerCache
         RequireCurrent(playerId);
         lock (_gate)
         {
-            Required(playerId).Holds++;
+            Required(playerId);
+            _holds.TryGetValue(playerId, out int holds);
+            _holds[playerId] = checked(holds + 1);
             return new Hold(this, playerId);
         }
     }
@@ -215,15 +252,15 @@ public sealed class PlayerCache
     }
 
     /// <summary>在缓存锁内把持有计数减一。不改数据和两个版本。</summary>
-    /// <param name="playerId">要释放的玩家。必须已经在缓存中，且持有计数大于 0。</param>
+    /// <param name="playerId">要释放的玩家，持有计数须大于0；数据条目可已被替换或失效。</param>
     void ReleaseHoldMetadata(long playerId)
     {
         lock (_gate)
         {
-            Entry entry = Required(playerId);
-            if (entry.Holds <= 0)
+            if (!_holds.TryGetValue(playerId, out int holds) || holds <= 0)
                 throw new InvalidOperationException("玩家没有可释放的持有");
-            entry.Holds--;
+            if (holds == 1) _holds.Remove(playerId);
+            else _holds[playerId] = holds - 1;
         }
     }
 
@@ -260,11 +297,20 @@ public sealed class PlayerCache
         /// <param name="data">缓存持有的玩家数据。</param>
         /// <param name="revision">当前内存版本。</param>
         /// <param name="savedRevision">已确认保存的版本。</param>
-        public Entry(PlayerFullData data, long revision, long savedRevision)
+        /// <param name="shopPurchases">当日商店购买计数 sidecar。</param>
+        /// <param name="acceptedTasks">已接受任务规格 sidecar。</param>
+        public Entry(
+            PlayerFullData data,
+            long revision,
+            long savedRevision,
+            ShopPurchaseCounts? shopPurchases = null,
+            AcceptedTaskState? acceptedTasks = null)
         {
             Data = data;
             Revision = revision;
             SavedRevision = savedRevision;
+            ShopPurchases = shopPurchases?.Clone() ?? ShopPurchaseCounts.Empty;
+            AcceptedTasks = acceptedTasks?.Clone() ?? AcceptedTaskState.Empty;
         }
 
         /// <summary>缓存持有的玩家数据。</summary>
@@ -276,14 +322,18 @@ public sealed class PlayerCache
         /// <summary>已确认保存的版本。</summary>
         public long SavedRevision { get; set; }
 
-        /// <summary>尚未释放的活跃持有次数。</summary>
-        public int Holds { get; set; }
+        /// <summary>当日商店购买计数 sidecar。</summary>
+        public ShopPurchaseCounts ShopPurchases { get; }
 
-        /// <summary>同时拷贝数据和两个版本。</summary>
+        /// <summary>已接受任务规格 sidecar。</summary>
+        public AcceptedTaskState AcceptedTasks { get; }
+
+        /// <summary>同时拷贝数据、sidecar 和两个版本。</summary>
         /// <param name="playerId">缓存键上的玩家主键。不从可变的 Info 里重新取值。</param>
         public PlayerState Capture(long playerId)
         {
-            return new PlayerState(playerId, Data.Clone(), Revision, SavedRevision);
+            return new PlayerState(
+                playerId, Data.Clone(), Revision, SavedRevision, ShopPurchases, AcceptedTasks);
         }
     }
 

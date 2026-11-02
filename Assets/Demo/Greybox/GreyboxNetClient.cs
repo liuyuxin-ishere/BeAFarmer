@@ -5,7 +5,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using CloudIsle.Net;
-using CloudIsle.Proto;
+using CloudIsle.Proto.Greybox;
 using LoginReq = CloudIsle.Proto.Poc.LoginReq;
 using LoginResp = CloudIsle.Proto.Poc.LoginResp;
 using Google.Protobuf;

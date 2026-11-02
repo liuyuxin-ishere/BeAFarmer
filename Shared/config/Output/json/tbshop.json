@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1001,
+    "category": "Seed",
+    "itemId": 2001,
+    "priceCurrency": 9001,
+    "price": 10,
+    "limitCount": 0,
+    "unlockLevel": 1
+  },
+  {
+    "id": 1002,
+    "category": "Seed",
+    "itemId": 2002,
+    "priceCurrency": 9001,
+    "price": 15,
+    "limitCount": 0,
+    "unlockLevel": 2
+  },
+  {
+    "id": 1003,
+    "category": "Seed",
+    "itemId": 2003,
+    "priceCurrency": 9001,
+    "price": 20,
+    "limitCount": 0,
+    "unlockLevel": 3
+  },
+  {
+    "id": 1004,
+    "category": "Seed",
+    "itemId": 2004,
+    "priceCurrency": 9001,
+    "price": 30,
+    "limitCount": 0,
+    "unlockLevel": 5
+  },
+  {
+    "id": 1005,
+    "category": "Seed",
+    "itemId": 2005,
+    "priceCurrency": 9001,
+    "price": 40,
+    "limitCount": 0,
+    "unlockLevel": 7
+  },
+  {
+    "id": 1006,
+    "category": "Seed",
+    "itemId": 2006,
+    "priceCurrency": 9001,
+    "price": 60,
+    "limitCount": 0,
+    "unlockLevel": 9
+  },
+  {
+    "id": 1007,
+    "category": "Seed",
+    "itemId": 2007,
+    "priceCurrency": 9001,
+    "price": 80,
+    "limitCount": 0,
+    "unlockLevel": 12
+  },
+  {
+    "id": 2001,
+    "category": "Consumable",
+    "itemId": 5001,
+    "priceCurrency": 9001,
+    "price": 60,
+    "limitCount": 0,
+    "unlockLevel": 1
+  }
+]

@@ -29,6 +29,7 @@ message RegisterResp {
 }
 
 // 1005 登录请求。版本字段用于判断安装包、资源和协议是否兼容。
+// bridge_contract 为 M2 追加字段；旧客户端可省略，服务端按门槛策略处理（运行接入见 T009）。
 message LoginReq {
   string username = 1;
   string password = 2;
@@ -37,6 +38,8 @@ message LoginReq {
   int32 proto_version = 5;
   int32 config_version = 6;
   string device_id = 7;
+  // 固定桥契约名，例如 m1-bridge-0.3 / m2-bridge-0.4。
+  string bridge_contract = 8;
 }
 
 // 1006 登录响应。data 是全量玩家数据；token 只出现在这里，不写入日志。
@@ -47,12 +50,22 @@ message LoginResp {
   int32 need_res_version = 4;
   int32 need_config_version = 5;
   PlayerFullData data = 6;
+  // M2：本会话写命令 scope；旧字段 1–6 语义不变。
+  int64 operation_scope_id = 7;
+  // M2-T010：新登录权威 next_op（恒为 1）；成功时 optional 给出；拒绝响应不设置。
+  optional int64 next_op_id = 8;
+  OperationScopeState scope_state = 9;
 }
 
 // 1007 重连请求。用已保存的 token 恢复会话，不再提交密码。
+// app/res/config/bridge 为 M2 追加，供重连同样做版本门槛（缺省或不兼容 → 106，见 T009）。
 message ReconnectReq {
   string token = 1;
   int32 proto_version = 2;
+  string app_version = 3;
+  int32 res_version = 4;
+  int32 config_version = 5;
+  string bridge_contract = 6;
 }
 
 // 1008 重连响应。成功时 data 覆盖客户端当前玩家数据。
@@ -60,6 +73,11 @@ message ReconnectResp {
   int32 code = 1;
   int64 server_time = 2;
   PlayerFullData data = 3;
+  // M2：恢复的写命令 scope（与登录签发的同一有效 scope）。
+  int64 operation_scope_id = 4;
+  // M2-T010：持久存储的实际 next_op（非恒 1）；拒绝响应不设置。
+  optional int64 next_op_id = 5;
+  OperationScopeState scope_state = 6;
 }
 
 // 1009 登出请求。没有响应消息。

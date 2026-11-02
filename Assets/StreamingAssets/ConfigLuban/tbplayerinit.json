@@ -1,0 +1,11 @@
+[
+  {
+    "initialPlotCount": 6,
+    "starterTools": "5101;5103",
+    "starterSeeds": "",
+    "starterFacilityInstances": "",
+    "unlockGiftTools": "5102",
+    "grantSchemaVersion": 1,
+    "note": "M2灰盒：初始6地解锁+斧头5101+采集篮5103；种子空买种起步；设施仅地图未建造占位不赠送；unlockGiftTools=5102 门槛取 Item.unlockLevel=3（ADR一次赠镐）；货币仍 Global/player 默认，不二次发放"
+  }
+]

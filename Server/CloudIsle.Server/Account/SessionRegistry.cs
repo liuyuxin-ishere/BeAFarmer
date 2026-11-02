@@ -117,7 +117,8 @@ public sealed class SessionRegistry
 
     /// <summary>
     /// 把连接登记为该玩家的唯一在线会话。同一会话重复绑定不踢自己。
-    /// 已经处在该玩家队列动作中时直接执行，避免再次入队死锁。
+    /// 已在该玩家 lane 内：只改映射并观察退役，立即返回（不 await Flush）。
+    /// 在 lane 外：入队只做映射，释放 lane 后再 await 退役预算（对外语义仍等到 Kick/关闭预算结束）。
     /// </summary>
     /// <param name="playerId">要占线的玩家。必须是正数。不从客户端报文读取。</param>
     /// <param name="session">服务端这条连接。已关闭或正在因顶号关闭时拒绝。</param>
@@ -131,9 +132,34 @@ public sealed class SessionRegistry
 
         ct.ThrowIfCancellationRequested();
         if (PlayerQueue.IsCurrentPlayer(playerId))
-            return BindCoreAsync(playerId, session, ct);
+        {
+            // 已在 lane：映射后观察退役，身份绑定立即完成。
+            Task? retirement = BindCore(playerId, session, ct);
+            if (retirement != null)
+                Observe(retirement);
+            return Task.CompletedTask;
+        }
 
-        return _queue.EnqueueAsync(playerId, token => BindCoreAsync(playerId, session, token), ct);
+        return BindOutsideAsync(playerId, session, ct);
+    }
+
+    /// <summary>lane 外：入队映射 → 释放队列 → 在队列外 await 退役。</summary>
+    async Task BindOutsideAsync(long playerId, ClientSession session, CancellationToken ct)
+    {
+        var box = new RetirementBox();
+        await _queue.EnqueueAsync(playerId, token =>
+        {
+            box.Task = BindCore(playerId, session, token);
+            return Task.CompletedTask;
+        }, ct).ConfigureAwait(false);
+
+        if (box.Task != null)
+            await box.Task.ConfigureAwait(false);
+    }
+
+    sealed class RetirementBox
+    {
+        public Task? Task;
     }
 
     /// <summary>这名玩家的当前连接是不是这条会话。</summary>
@@ -208,11 +234,12 @@ public sealed class SessionRegistry
         return new RequestContext(session.SessionId, playerId, msgId, seq);
     }
 
-    /// <summary>在玩家队列内完成一次绑定。调用方保证同一玩家不会并发进入这里。</summary>
-    /// <param name="playerId">本次占线的玩家。</param>
-    /// <param name="session">要成为当前连接的会话。</param>
-    /// <param name="ct">改映射前取消则原样抛出，并且不改字典。</param>
-    async Task BindCoreAsync(long playerId, ClientSession session, CancellationToken ct)
+    /// <summary>
+    /// 唯一映射核心：改字典、挂观察；若有旧连接则返回退役 Task（由调用方决定 Observe 或 await）。
+    /// 调用方保证同一玩家不会并发进入这里。
+    /// </summary>
+    /// <returns>需要退役旧连接时为 RetireAsync 任务；否则 null。</returns>
+    Task? BindCore(long playerId, ClientSession session, CancellationToken ct)
     {
         ClientSession? retiring = null;
         TaskCompletionSource? watch = null;
@@ -265,8 +292,7 @@ public sealed class SessionRegistry
         if (watch != null)
             Observe(RunWatchAsync(session, watch));
 
-        if (retiring != null)
-            await RetireAsync(retiring, playerId).ConfigureAwait(false);
+        return retiring != null ? RetireAsync(retiring, playerId) : null;
     }
 
     /// <summary>等会话结束后，仅当反向索引仍是它时才删除。然后丢掉观察项。</summary>
@@ -349,6 +375,32 @@ public sealed class SessionRegistry
             _bySession.Remove(sessionId);
             _retiring.Add(sessionId);
         }
+    }
+
+    /// <summary>
+    /// 持久身份已提交但新目标无法绑定：使旧连接失去权威映射，踢线预算内观察关闭（不占 lane await）。
+    /// 必须在该玩家队列动作内调用。
+    /// </summary>
+    internal void RetireCurrentIfAny(long playerId)
+    {
+        if (playerId <= 0)
+            throw new ArgumentOutOfRangeException(nameof(playerId), "玩家编号必须为正数");
+        if (!PlayerQueue.IsCurrentPlayer(playerId))
+            throw new InvalidOperationException("只能在该玩家的队列内退役当前会话");
+
+        ClientSession? retiring = null;
+        lock (_gate)
+        {
+            if (!_byPlayer.TryGetValue(playerId, out ClientSession? current))
+                return;
+            _byPlayer.Remove(playerId);
+            _bySession.Remove(current.SessionId);
+            _retiring.Add(current.SessionId);
+            retiring = current;
+        }
+
+        if (retiring != null)
+            Observe(RetireAsync(retiring, playerId));
     }
 
     /// <summary>调用方必须已经持有字典锁。只删除仍然指向这个会话编号的索引。</summary>

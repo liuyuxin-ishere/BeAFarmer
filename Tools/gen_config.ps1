@@ -322,6 +322,321 @@ function Assert-GlobalKeyValues {
 
 <#
 .SYNOPSIS
+M2：校验 Shop/地图实例/初始化与材料字符串。失败时尚未发布，不污染正式目录。
+.PARAMETER DataDir
+暂存 JSON 目录。
+#>
+function Assert-M2ConfigSemantics {
+    param([Parameter(Mandatory = $true)][string]$DataDir)
+
+    try {
+    function Get-JsonRows([string]$Name) {
+        $path = Join-Path $DataDir $Name
+        if (-not (Test-Path -LiteralPath $path)) {
+            Stop-GenConfig -Message "暂存缺少 $Name" -Code 4
+        }
+        $doc = Read-JsonDocument -Path $path
+        if ($null -eq $doc) {
+            Stop-GenConfig -Message "暂存 JSON 为空: $Name" -Code 4
+        }
+        if ($doc -is [System.Collections.IDictionary]) {
+            return @($doc)
+        }
+        return @($doc)
+    }
+
+    function Get-IdMap([string]$Name, [string]$Field) {
+        $map = @{}
+        foreach ($row in (Get-JsonRows $Name)) {
+            $key = [int]$row[$Field]
+            $map[$key] = $true
+        }
+        return $map
+    }
+
+    function Parse-MaterialList {
+        param(
+            [AllowNull()][string]$Raw,
+            [Parameter(Mandatory = $true)][string]$Context
+        )
+        if ([string]::IsNullOrWhiteSpace($Raw)) {
+            return , @()
+        }
+        $seen = @{}
+        $result = @()
+        foreach ($piece in @($Raw -split ';')) {
+            $trim = [string]$piece.Trim()
+            if ($trim.Length -eq 0) {
+                Stop-GenConfig -Message "材料空段: $Context" -Code 4
+            }
+            $colon = $trim.IndexOf([char]':')
+            if ($colon -le 0 -or $colon -ge ($trim.Length - 1)) {
+                Stop-GenConfig -Message "材料格式须为 id:count @ $Context /$trim" -Code 4
+            }
+            $idText = $trim.Substring(0, $colon)
+            $countText = $trim.Substring($colon + 1)
+            try {
+                $id = [int]::Parse($idText, [System.Globalization.CultureInfo]::InvariantCulture)
+                $countLong = [long]::Parse($countText, [System.Globalization.CultureInfo]::InvariantCulture)
+            }
+            catch {
+                Stop-GenConfig -Message "材料数字非法: $Context /$trim" -Code 4
+            }
+            if ($id -le 0 -or $countLong -le 0) {
+                Stop-GenConfig -Message "材料 id/count 必须为正: $Context /$trim" -Code 4
+            }
+            if ($countLong -gt [int]::MaxValue) {
+                Stop-GenConfig -Message "材料 count 溢出: $Context /$trim" -Code 4
+            }
+            if ($seen.ContainsKey($id)) {
+                Stop-GenConfig -Message ("材料重复 itemId={0} @ {1}" -f $id, $Context) -Code 4
+            }
+            $seen[$id] = $true
+            $result += , ([pscustomobject]@{ ItemId = $id; Count = [int]$countLong })
+        }
+        return , $result
+    }
+
+    $itemIds = Get-IdMap 'tbitem.json' 'id'
+    $nodeIds = Get-IdMap 'tbgathernode.json' 'id'
+    $facilityIds = Get-IdMap 'tbfacility.json' 'id'
+
+    # 材料 / 奖励字段
+    foreach ($row in (Get-JsonRows 'tbrecipe.json')) {
+        $ctx = "recipe#$($row['id'])"
+        foreach ($field in @('inputs', 'output')) {
+            $stacks = Parse-MaterialList -Raw ([string]$row[$field]) -Context "$ctx.$field"
+            foreach ($s in $stacks) {
+                if (-not $itemIds.ContainsKey([int]$s.ItemId)) {
+                    Stop-GenConfig -Message "材料缺物品引用 $($s.ItemId) @ $ctx.$field" -Code 4
+                }
+            }
+        }
+    }
+    foreach ($row in (Get-JsonRows 'tbtool.json')) {
+        $ctx = "tool#$($row['toolId'])@$($row['level'])"
+        $stacks = Parse-MaterialList -Raw ([string]$row['materials']) -Context $ctx
+        foreach ($s in $stacks) {
+            if (-not $itemIds.ContainsKey([int]$s.ItemId)) {
+                Stop-GenConfig -Message "材料缺物品引用 $($s.ItemId) @ $ctx" -Code 4
+            }
+        }
+    }
+    foreach ($row in (Get-JsonRows 'tbfacilitylevel.json')) {
+        $ctx = "facilitylevel#$($row['level'])"
+        $stacks = Parse-MaterialList -Raw ([string]$row['materials']) -Context $ctx
+        foreach ($s in $stacks) {
+            if (-not $itemIds.ContainsKey([int]$s.ItemId)) {
+                Stop-GenConfig -Message "材料缺物品引用 $($s.ItemId) @ $ctx" -Code 4
+            }
+        }
+    }
+
+    # Shop：禁止 BagExpand 占位（扩容走 BagExpandReq/Global 档位）
+    $shopIds = @{}
+    foreach ($row in (Get-JsonRows 'tbshop.json')) {
+        $id = [int]$row['id']
+        if ($shopIds.ContainsKey($id)) {
+            Stop-GenConfig -Message "Shop id 重复: $id" -Code 4
+        }
+        $shopIds[$id] = $true
+        $category = [string]$row['category']
+        $itemId = [int]$row['itemId']
+        $currency = [int]$row['priceCurrency']
+        if ($category -eq 'BagExpand' -or $category -eq '3') {
+            Stop-GenConfig -Message "Shop 不得含 BagExpand；扩容走 BagExpandReq shop=$id" -Code 4
+        }
+        if ($category -eq 'Furniture' -or $category -eq 'Avatar' -or $category -eq '4' -or $category -eq '5') {
+            Stop-GenConfig -Message ("Shop 本阶段不允许分类={0} shop={1}" -f $category, $id) -Code 4
+        }
+        if ($itemId -le 0 -or -not $itemIds.ContainsKey($itemId)) {
+            Stop-GenConfig -Message ("Shop 缺物品引用 itemId={0} shop={1}" -f $itemId, $id) -Code 4
+        }
+        if (-not $itemIds.ContainsKey($currency)) {
+            Stop-GenConfig -Message ("Shop 缺货币引用 {0} shop={1}" -f $currency, $id) -Code 4
+        }
+        if ([int]$row['price'] -lt 0 -or [int]$row['limitCount'] -lt 0) {
+            Stop-GenConfig -Message "Shop 价格/限购非法 shop=$id" -Code 4
+        }
+    }
+
+    # GatherNode.count / Plot.max / Facility 全集（布局数量权威）
+    $nodeExpected = @{}
+    foreach ($row in (Get-JsonRows 'tbgathernode.json')) {
+        $nid = [int]$row['id']
+        $nodeExpected[$nid] = [int]$row['count']
+    }
+    $maxPlots = 0
+    foreach ($row in (Get-JsonRows 'tbplot.json')) {
+        $tp = [int]$row['totalPlots']
+        if ($tp -gt $maxPlots) { $maxPlots = $tp }
+    }
+    if ($maxPlots -le 0) {
+        Stop-GenConfig -Message "Plot.totalPlots 无效" -Code 4
+    }
+
+    # MapInstance（坐标单位：米，与 Demo 一致；非协议 cm）
+    $instanceIds = @{}
+    $facilityInstances = @{}
+    $facilityTypesSeen = @{}
+    $plotCount = 0
+    $nodeActual = @{}
+    foreach ($row in (Get-JsonRows 'tbmapinstance.json')) {
+        $iid = [int]$row['instanceId']
+        if ($instanceIds.ContainsKey($iid)) {
+            Stop-GenConfig -Message "地图实例 id 重复: $iid" -Code 4
+        }
+        $instanceIds[$iid] = $true
+        $kind = [string]$row['kind']
+        $typeId = [int]$row['typeId']
+        if ($kind -eq 'Plot' -or $kind -eq '1') {
+            if ($typeId -ne 0) {
+                Stop-GenConfig -Message "Plot typeId 必须为 0 instance=$iid" -Code 4
+            }
+            $plotCount++
+        }
+        elseif ($kind -eq 'Node' -or $kind -eq '2') {
+            if (-not $nodeIds.ContainsKey($typeId)) {
+                Stop-GenConfig -Message ("Node 缺 GatherNode 引用 typeId={0} instance={1}" -f $typeId, $iid) -Code 4
+            }
+            if ($nodeActual.ContainsKey($typeId)) {
+                $nodeActual[$typeId] = [int]$nodeActual[$typeId] + 1
+            }
+            else {
+                $nodeActual[$typeId] = 1
+            }
+        }
+        elseif ($kind -eq 'Facility' -or $kind -eq '3') {
+            if (-not $facilityIds.ContainsKey($typeId)) {
+                Stop-GenConfig -Message ("Facility 缺引用 typeId={0} instance={1}" -f $typeId, $iid) -Code 4
+            }
+            if ($facilityTypesSeen.ContainsKey($typeId)) {
+                Stop-GenConfig -Message ("Facility 类型重复布局 typeId={0} instance={1}" -f $typeId, $iid) -Code 4
+            }
+            $facilityTypesSeen[$typeId] = $true
+            $facilityInstances[$iid] = $true
+        }
+        else {
+            Stop-GenConfig -Message ("未知 MapInstanceKind={0} instance={1}" -f $kind, $iid) -Code 4
+        }
+    }
+    if ($plotCount -ne $maxPlots) {
+        Stop-GenConfig -Message ("Plot 实例数须等于 max totalPlots={0}，实际={1}" -f $maxPlots, $plotCount) -Code 4
+    }
+    foreach ($nid in $nodeExpected.Keys) {
+        $want = [int]$nodeExpected[$nid]
+        $got = 0
+        if ($nodeActual.ContainsKey($nid)) { $got = [int]$nodeActual[$nid] }
+        if ($got -ne $want) {
+            Stop-GenConfig -Message ("GatherNode typeId={0} 要求 count={1}，实际实例={2}" -f $nid, $want, $got) -Code 4
+        }
+    }
+    foreach ($nid in $nodeActual.Keys) {
+        if (-not $nodeExpected.ContainsKey($nid)) {
+            Stop-GenConfig -Message ("Node 实例含未知 GatherNode typeId={0}" -f $nid) -Code 4
+        }
+    }
+    foreach ($fid in $facilityIds.Keys) {
+        if (-not $facilityTypesSeen.ContainsKey($fid)) {
+            Stop-GenConfig -Message ("缺少 Facility 类型布局 typeId={0}" -f $fid) -Code 4
+        }
+    }
+
+    function Parse-StrictIdList {
+        param(
+            [AllowNull()][string]$Raw,
+            [Parameter(Mandatory = $true)][string]$Context,
+            [switch]$AllowEmpty
+        )
+        if ([string]::IsNullOrWhiteSpace($Raw)) {
+            if ($AllowEmpty) { return , @() }
+            Stop-GenConfig -Message "$Context 不能为空" -Code 4
+        }
+        $ids = @()
+        $seen = @{}
+        foreach ($piece in @($Raw -split ';')) {
+            $t = [string]$piece.Trim()
+            if ($t.Length -eq 0) {
+                Stop-GenConfig -Message "$Context 含空段" -Code 4
+            }
+            try {
+                $id = [int]::Parse($t, [System.Globalization.CultureInfo]::InvariantCulture)
+            }
+            catch {
+                Stop-GenConfig -Message "$Context 含非法 id: $t" -Code 4
+            }
+            if ($id -le 0) {
+                Stop-GenConfig -Message "$Context 含非法 id: $t" -Code 4
+            }
+            if ($seen.ContainsKey($id)) {
+                Stop-GenConfig -Message ("{0} 重复 id={1}" -f $Context, $id) -Code 4
+            }
+            $seen[$id] = $true
+            $ids += , $id
+        }
+        return , $ids
+    }
+
+    # PlayerInit
+    $initRows = @(Get-JsonRows 'tbplayerinit.json')
+    if ($initRows.Count -ne 1) {
+        Stop-GenConfig -Message "PlayerInit 必须恰好 1 行，实际 $($initRows.Count)" -Code 4
+    }
+    $init = $initRows[0]
+    if ([int]$init['initialPlotCount'] -le 0) {
+        Stop-GenConfig -Message "PlayerInit.initialPlotCount 必须为正" -Code 4
+    }
+    if ([int]$init['grantSchemaVersion'] -le 0) {
+        Stop-GenConfig -Message "PlayerInit.grantSchemaVersion 必须为正" -Code 4
+    }
+    $toolIds = Parse-StrictIdList -Raw ([string]$init['starterTools']) -Context 'PlayerInit.starterTools'
+    foreach ($tid in $toolIds) {
+        if (-not $itemIds.ContainsKey([int]$tid)) {
+            Stop-GenConfig -Message "PlayerInit 工具缺物品引用: $tid" -Code 4
+        }
+    }
+    $seedIds = Parse-StrictIdList -Raw ([string]$init['starterSeeds']) -Context 'PlayerInit.starterSeeds' -AllowEmpty
+    foreach ($sid in $seedIds) {
+        if (-not $itemIds.ContainsKey([int]$sid)) {
+            Stop-GenConfig -Message "PlayerInit 种子缺物品引用: $sid" -Code 4
+        }
+    }
+    $facIds = Parse-StrictIdList -Raw ([string]$init['starterFacilityInstances']) -Context 'PlayerInit.starterFacilityInstances' -AllowEmpty
+    foreach ($fid in $facIds) {
+        if (-not $facilityInstances.ContainsKey([int]$fid)) {
+            Stop-GenConfig -Message "PlayerInit 设施实例无效: $fid" -Code 4
+        }
+    }
+    $giftRaw = ''
+    if ($null -ne $init['unlockGiftTools']) {
+        $giftRaw = [string]$init['unlockGiftTools']
+    }
+    $giftIds = Parse-StrictIdList -Raw $giftRaw -Context 'PlayerInit.unlockGiftTools' -AllowEmpty
+    $itemUnlock = @{}
+    foreach ($row in (Get-JsonRows 'tbitem.json')) {
+        $itemUnlock[[int]$row['id']] = [int]$row['unlockLevel']
+    }
+    foreach ($gid in $giftIds) {
+        if (-not $itemIds.ContainsKey([int]$gid)) {
+            Stop-GenConfig -Message "PlayerInit unlockGiftTools 缺物品引用: $gid" -Code 4
+        }
+        if (-not $itemUnlock.ContainsKey([int]$gid) -or [int]$itemUnlock[[int]$gid] -le 0) {
+            Stop-GenConfig -Message "PlayerInit unlockGiftTools 缺 unlockLevel: $gid" -Code 4
+        }
+    }
+    }
+    catch {
+        $msg = [string]$_.Exception.Message
+        if ($msg -eq '参数类型不匹配' -or $_.Exception -is [System.Management.Automation.ParameterBindingException]) {
+            [Console]::Error.WriteLine(("M2语义校验绑定失败: {0}`n{1}" -f $msg, $_.InvocationInfo.PositionMessage))
+            Stop-GenConfig -Message ("M2语义校验参数绑定失败 @ {0}" -f $_.InvocationInfo.ScriptLineNumber) -Code 4
+        }
+        throw
+    }
+}
+
+<#
+.SYNOPSIS
 为暂存 JSON 写清单。清单文件自己不进入 files，避免哈希自引用。
 .PARAMETER DataDir
 暂存 JSON 目录。
@@ -857,6 +1172,7 @@ try {
 
     Invoke-LubanExporter -ExporterPath $exporterFull -ConfPath $confPath -CodeDir $codeStage -DataDir $dataStage
     Assert-GlobalKeyValues -DataDir $dataStage -ConfigVersion $ConfigVersion
+    Assert-M2ConfigSemantics -DataDir $dataStage
     Write-ConfigManifest -DataDir $dataStage -ConfigVersion $ConfigVersion
 
     # data 目标四处：Shared 历史输出、Server、StreamingAssets 直读副本、Assets/ConfigLuban（Yoo EditorSimulate 可收集镜像）。

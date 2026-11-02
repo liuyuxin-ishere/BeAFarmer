@@ -1,0 +1,95 @@
+syntax = "proto3";
+package cloudisle;
+option csharp_namespace = "CloudIsle.Proto";
+import "common.proto";
+
+// 3001 解锁地块。
+message PlotUnlockReq {
+  int64 op_id = 1;
+  int64 operation_scope_id = 2;
+  int64 expected_revision = 3;
+  int32 config_version = 4;
+}
+
+message PlotUnlockResp {
+  int32 code = 1;
+  int64 committed_revision = 2;
+  CommandAck ack = 3;
+}
+
+// 单次播种项。
+message PlantItem {
+  int32 plot_id = 1;
+  int32 seed_id = 2;
+}
+
+// 3003 播种。items 最多 24；重复 plot_id 整包拒绝。
+message PlantReq {
+  int64 op_id = 1;
+  repeated PlantItem items = 2;
+  int64 operation_scope_id = 3;
+  int64 expected_revision = 4;
+  int32 config_version = 5;
+}
+
+message PlantResp {
+  int32 code = 1;
+  repeated PlotResult results = 2;
+  int64 committed_revision = 3;
+  CommandAck ack = 4;
+}
+
+// 3005 收获。plot_ids 最多 24。
+message HarvestReq {
+  int64 op_id = 1;
+  repeated int32 plot_ids = 2;
+  int64 operation_scope_id = 3;
+  int64 expected_revision = 4;
+  int32 config_version = 5;
+}
+
+message HarvestResp {
+  int32 code = 1;
+  repeated PlotResult results = 2;
+  repeated ItemStack gained = 3;
+  int32 exp_gained = 4;
+  int64 committed_revision = 5;
+  CommandAck ack = 6;
+}
+
+// 3007 浇水。
+message WaterReq {
+  int64 op_id = 1;
+  int32 plot_id = 2;
+  int64 operation_scope_id = 3;
+  int64 expected_revision = 4;
+  int32 config_version = 5;
+}
+
+message WaterResp {
+  int32 code = 1;
+  PlotData plot = 2;
+  int64 committed_revision = 3;
+  CommandAck ack = 4;
+}
+
+// 3009 施肥。
+message FertilizeReq {
+  int64 op_id = 1;
+  int32 plot_id = 2;
+  int64 operation_scope_id = 3;
+  int64 expected_revision = 4;
+  int32 config_version = 5;
+}
+
+message FertilizeResp {
+  int32 code = 1;
+  PlotData plot = 2;
+  int64 committed_revision = 3;
+  CommandAck ack = 4;
+}
+
+// 3101 地块变化推送。
+message PlotChangeNtf {
+  repeated PlotData plots = 1;
+}

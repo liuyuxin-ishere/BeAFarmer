@@ -1,0 +1,20 @@
+syntax = "proto3";
+package cloudisle;
+option csharp_namespace = "CloudIsle.Proto";
+import "common.proto";
+
+// 7001 商店购买。价格/限购以服务端配置为准；客户端只提交商品 ID 与数量。
+message ShopBuyReq {
+  int64 op_id = 1;
+  int32 shop_item_id = 2;
+  int32 count = 3;
+  int64 operation_scope_id = 4;
+  int64 expected_revision = 5;
+  int32 config_version = 6;
+}
+
+message ShopBuyResp {
+  int32 code = 1;
+  int64 committed_revision = 2;
+  CommandAck ack = 3;
+}

@@ -17,9 +17,10 @@
   仅跑 ValidateBaseline（须另有已 Stage 的 101 内容时不用）。
 #>
 param(
-    [string]$RepoRoot = 'E:\Workbench\UnityWorkBench\Farming',
-    [string]$UnityEditorPath = 'D:\Program Files\Unity\Hub\Editor\6000.3.22f1\Editor\Unity.exe',
+    [string]$RepoRoot = '',
+    [string]$UnityEditorPath = '',
     [string]$OutputDir = '',
+    [string]$ProfilePath = '',
     [int]$ResVersion = 101,
     [int]$ConfigVersion = 101,
     [string]$BaseBuildManifest = '',
@@ -27,7 +28,13 @@ param(
     [switch]$ValidateOnly
 )
 $ErrorActionPreference = 'Stop'
+if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
+    $RepoRoot = Split-Path -Parent $PSScriptRoot
+}
 $root = [IO.Path]::GetFullPath($RepoRoot)
+if ([string]::IsNullOrWhiteSpace($UnityEditorPath)) {
+    throw 'UnityEditorPath required（传入本机 Unity.exe，禁止脚本内硬编码盘符）'
+}
 if ([string]::IsNullOrWhiteSpace($OutputDir)) {
     $OutputDir = Join-Path $root 'Docs\Acceptance\M1\20261020-xLua\StageD\Publish'
 }
@@ -36,7 +43,12 @@ if ([string]::IsNullOrWhiteSpace($BaseBuildManifest)) {
     $BaseBuildManifest = Join-Path $root 'Docs\Acceptance\M1\20261020-xLua\StageD\Freeze100\baseline-manifest.json'
 }
 $base = [IO.Path]::GetFullPath($BaseBuildManifest)
-$evidence = Join-Path $root 'Docs\Acceptance\M1\20261020-xLua\StageD'
+$m2Mode = -not [string]::IsNullOrWhiteSpace($ProfilePath)
+if ($m2Mode) {
+    $evidence = Join-Path ([IO.Path]::GetDirectoryName($out)) '_build-logs'
+} else {
+    $evidence = Join-Path $root 'Docs\Acceptance\M1\20261020-xLua\StageD'
+}
 New-Item -ItemType Directory -Path $out, $evidence -Force | Out-Null
 
 if (-not (Test-Path -LiteralPath $UnityEditorPath -PathType Leaf)) {
@@ -61,6 +73,17 @@ $argLine += ' --m1-res-version=' + $ResVersion
 $argLine += ' --m1-config-version=' + $ConfigVersion
 $argLine += ' --m1-app-version=' + $AppVersion
 $argLine += ' "--m1-base-manifest=' + $base + '"'
+if ($m2Mode) {
+    $profileFull = if ([IO.Path]::IsPathRooted($ProfilePath)) {
+        [IO.Path]::GetFullPath($ProfilePath)
+    } else {
+        [IO.Path]::GetFullPath((Join-Path $root $ProfilePath))
+    }
+    if (-not (Test-Path -LiteralPath $profileFull -PathType Leaf)) {
+        throw "ProfilePath missing: $profileFull"
+    }
+    $argLine += ' "--m2-profile=' + $profileFull + '"'
+}
 $argLine += ' -logFile "' + $log + '"'
 Set-Content -LiteralPath (Join-Path $evidence 'build-patch-command.txt') -Value ($UnityEditorPath + ' ' + $argLine) -Encoding utf8
 $p = Start-Process -FilePath $UnityEditorPath -ArgumentList $argLine -WorkingDirectory $root -WindowStyle Hidden -PassThru

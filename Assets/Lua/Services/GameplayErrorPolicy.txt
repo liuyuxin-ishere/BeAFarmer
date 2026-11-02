@@ -1,0 +1,227 @@
+-- C08：玩法错误分类与可读文案。窗口不得各自 StopReconnect；204/106 仅提示，终止由 C# 账号拥有者恰好一次委托。
+
+local M = {}
+
+local ACTIONS = {
+  none = "none",
+  toast = "toast",
+  sync_then_manual = "sync_then_manual",
+  wait_recover = "wait_recover",
+  archive_resync = "archive_resync",
+  block_write = "block_write",
+  return_login = "return_login",
+  update_required = "update_required",
+  no_auto_retry = "no_auto_retry",
+}
+
+local function norm_disp(d)
+  d = tostring(d or "")
+  if d == "" then return "Unknown" end
+  return d
+end
+
+local function is_true(v)
+  return v == true or v == 1 or v == "true" or v == "1"
+end
+
+--- classify(code, disposition, sessionState) -> { kind, action, retryable, preservePending, terminal }
+-- sessionState 可选：{ authReady, writable, reason, epoch, cleared }
+-- cleared 由 Service 传入 parsed.cleared（权威 owner 是否已清槽）
+function M.classify(code, disposition, sessionState)
+  code = tonumber(code) or 0
+  disposition = norm_disp(disposition)
+  sessionState = sessionState or {}
+
+  local out = {
+    kind = "unknown",
+    action = ACTIONS.toast,
+    retryable = false,
+    preservePending = false,
+    terminal = false,
+    switchOpForbidden = true,
+  }
+
+  -- 安全业务码先于 Local/Unknown 等通用 disposition（SyncState 错误可能使用 Local）。
+  if code == 204 or code == 106 then
+    out.kind = code == 204 and "terminal_auth" or "terminal_version"
+    out.action = code == 204 and ACTIONS.return_login or ACTIONS.update_required
+    out.terminal = true
+    out.preservePending = true
+    return out
+  end
+  if code == 112 or disposition == "PayloadConflict" then
+    out.kind = "payload_conflict"
+    out.action = ACTIONS.no_auto_retry
+    out.preservePending = true
+    return out
+  end
+
+  if code == 0 and (disposition == "Recorded" or disposition == "SyncApplied") then
+    out.kind = "ok"
+    out.action = ACTIONS.none
+    out.retryable = false
+    return out
+  end
+
+  -- code=0 + Unknown 绝不当成功
+  if code == 0 and disposition == "Unknown" then
+    out.kind = "unknown"
+    out.action = ACTIONS.wait_recover
+    out.retryable = false
+    out.preservePending = true
+    return out
+  end
+
+  -- 本地忙 / 冻写 / 损坏：挡新写，允许读与 FullSync
+  if code == -10 or disposition == "NotReady" or disposition == "Local" then
+    local reason = tostring(sessionState.reason or "")
+    out.kind = "local_block"
+    out.action = ACTIONS.block_write
+    out.retryable = false
+    out.preservePending = reason:find("pending", 1, true) ~= nil
+        or reason:find("busy", 1, true) ~= nil
+        or reason:find("corrupt", 1, true) ~= nil
+        or reason:find("not-accepted-retain", 1, true) ~= nil
+    return out
+  end
+
+  if code == -11 or code == -12 then
+    out.kind = "malformed_intent"
+    out.action = ACTIONS.no_auto_retry
+    out.retryable = false
+    return out
+  end
+
+  if disposition == "Expired" or code == 111 then
+    out.kind = "expired"
+    out.action = ACTIONS.archive_resync
+    out.retryable = false
+    -- preservePending 由实际 owner clearance（parsed.cleared）决定，不臆测
+    out.preservePending = not is_true(sessionState.cleared)
+    return out
+  end
+
+  -- NotAccepted（含 101/104/105/110）：单次未受理 ≠ 此前永久未执行；保留 pending
+  if disposition == "NotAccepted" or code == 101 or code == 104 or code == 105 or code == 110 then
+    out.kind = "not_accepted"
+    out.action = ACTIONS.no_auto_retry
+    out.retryable = false
+    out.preservePending = true
+    return out
+  end
+
+  if disposition == "Unknown" then
+    out.kind = "unknown"
+    out.action = ACTIONS.wait_recover
+    out.retryable = false
+    out.preservePending = true
+    return out
+  end
+
+  -- Recorded 业务拒绝：满包/不足/未成熟/109 版本冲突等 — 不盲自动重试、不换 op/payload
+  if disposition == "Recorded" and code ~= 0 then
+    out.kind = "business_refusal"
+    out.retryable = false
+    out.switchOpForbidden = true
+    if code == 301 then
+      out.action = ACTIONS.toast
+    elseif code == 302 or code == 303 or code == 304 or code == 305 or code == 306 then
+      out.action = ACTIONS.toast
+    elseif code == 403 then
+      out.action = ACTIONS.toast
+    elseif code == 109 then
+      out.action = ACTIONS.sync_then_manual
+    else
+      out.action = ACTIONS.no_auto_retry
+    end
+    return out
+  end
+
+  out.kind = "unknown"
+  out.action = ACTIONS.wait_recover
+  out.retryable = false
+  out.preservePending = true
+  return out
+end
+
+local MESSAGES = {
+  [0] = "",
+  [-10] = "暂时无法操作，请稍候",
+  [-11] = "未知操作",
+  [-12] = "参数无效",
+  [101] = "操作失败",
+  [104] = "操作过快，请稍候",
+  [105] = "服务器繁忙，请稍候",
+  [106] = "需要更新客户端后继续",
+  [108] = "等级不足或功能未解锁",
+  [109] = "状态已变化，请同步后再试",
+  [110] = "会话已失效，请重新登录",
+  [111] = "操作已过期，请同步后确认",
+  [112] = "命令冲突，请勿重复提交",
+  [204] = "登录已失效，请重新登录",
+  [301] = "背包已满",
+  [302] = "物品不足",
+  [303] = "金币不足",
+  [304] = "钻石不足",
+  [305] = "抽卡券不足",
+  [306] = "物品不可操作",
+  [401] = "地块未解锁",
+  [402] = "地块非空",
+  [403] = "作物尚未成熟",
+  [404] = "作物未解锁",
+  [405] = "已浇水或已施肥",
+  [406] = "采集点冷却中",
+  [407] = "缺少所需工具",
+}
+
+local UNKNOWN_RECOVERY = "结果未确认，请等待原操作恢复"
+
+local function looks_internal(msg)
+  if type(msg) ~= "string" or msg == "" then return true end
+  if msg:find("^{", 1, true) then return true end
+  if msg:find("disposition", 1, true) then return true end
+  if msg:find("Exception", 1, true) then return true end
+  if msg:find("recorded%-refusal", 1) then return true end
+  if msg == "recorded-refusal" then return true end
+  if msg:find("Timeout", 1, true) then return true end
+  return false
+end
+
+--- message(error) -> text；已知业务码优先映射，不得被内部 message 覆盖
+function M.message(error)
+  if type(error) == "number" then
+    local mapped = MESSAGES[error]
+    if mapped and mapped ~= "" then return mapped end
+    if error == 0 then return UNKNOWN_RECOVERY end
+    return "错误 " .. tostring(error)
+  end
+  if type(error) ~= "table" then
+    return tostring(error or "")
+  end
+  local code = tonumber(error.code) or 0
+  local mapped = MESSAGES[code]
+  if mapped and mapped ~= "" then
+    return mapped
+  end
+  if error.kind == "unknown" or (code == 0 and error.kind ~= "ok") then
+    return UNKNOWN_RECOVERY
+  end
+  if error.kind == "local_block" then
+    return MESSAGES[-10] or "暂时无法操作，请稍候"
+  end
+  if error.kind == "business_refusal" then
+    return "操作被拒绝"
+  end
+  local raw = error.message
+  if type(raw) == "string" and raw ~= "" and not looks_internal(raw) then
+    return raw
+  end
+  if code ~= 0 then
+    return "错误 " .. tostring(code)
+  end
+  return UNKNOWN_RECOVERY
+end
+
+M.ACTIONS = ACTIONS
+
+return M

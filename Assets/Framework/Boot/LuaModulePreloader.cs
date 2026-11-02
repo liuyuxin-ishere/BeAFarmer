@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -206,7 +207,169 @@ namespace Game.Framework.Boot
         }
 
         /// <summary>
-        /// 从内置 Lua 构建索引。Editor 优先 Assets/Lua；Player 读 StreamingAssets/Lua 或 Resources/Lua。
+        /// 正式 catalog + 全部精确模块。
+        /// Editor：可读工程 Staging（UNITY_EDITOR）；Player：仅 StreamingAssets/Resources 已打包路径，
+        /// 禁止 Application.dataPath/Lua 工程回落；失败明确返回 false，不旁路依赖/不重算受信 hash。
+        /// </summary>
+        public static bool TryLoadFormalFromDisk(
+            out LuaIndex index,
+            out Dictionary<string, byte[]> modules,
+            out byte[] configBytes,
+            out RuntimeCatalog catalog)
+        {
+            index = null;
+            modules = new Dictionary<string, byte[]>(StringComparer.Ordinal);
+            configBytes = null;
+            catalog = null;
+
+            if (!TryReadFormalCatalogJson(out string catalogJson, out string stagingBase))
+                return false;
+
+            catalog = ParseRuntimeCatalog(catalogJson);
+            if (catalog == null || catalog.modules == null || catalog.modules.Length == 0)
+                return false;
+            if (string.IsNullOrEmpty(catalog.configAddress))
+                return false;
+            if (!string.Equals(catalog.bridgeContract, BridgeApi.BridgeContractValue, StringComparison.Ordinal))
+                return false;
+            if (catalog.protoVersion != BridgeApi.RequiredProtoVersion)
+                return false;
+            if (string.IsNullOrEmpty(catalog.requiredAppVersion))
+                return false;
+
+            var names = new HashSet<string>(StringComparer.Ordinal);
+            var addresses = new HashSet<string>(StringComparer.Ordinal);
+            for (int i = 0; i < catalog.modules.Length; i++)
+            {
+                CatalogModule module = catalog.modules[i];
+                if (module == null || string.IsNullOrEmpty(module.name) || string.IsNullOrEmpty(module.address))
+                    return false;
+                if (!names.Add(module.name) || !addresses.Add(module.address))
+                    return false;
+                if (!IsSafeRelativeAddress(module.address))
+                    return false;
+                byte[] bytes = ReadFormalModuleBytesUnderBase(stagingBase, module.name, module.address);
+                if (bytes == null)
+                    return false;
+                // 仅校验声明 SHA；失败不改写 catalog / 不发明受信 hash。
+                if (string.IsNullOrEmpty(module.sha256)
+                    || !string.Equals(HashUtil.Sha256(bytes), module.sha256, StringComparison.OrdinalIgnoreCase))
+                    return false;
+                modules[module.name] = bytes;
+            }
+
+            if (!IsSafeRelativeAddress(catalog.configAddress))
+                return false;
+            configBytes = ReadFormalModuleBytesUnderBase(stagingBase, catalog.configAddress, catalog.configAddress);
+            if (configBytes == null)
+                return false;
+            if (string.IsNullOrEmpty(catalog.configSha256)
+                || !string.Equals(HashUtil.Sha256(configBytes), catalog.configSha256, StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            index = LuaIndex.FromCatalog(catalog);
+            string reject = index.Validate(
+                modules, configBytes, BridgeApi.BridgeContractValue, BridgeApi.RequiredProtoVersion, Application.version);
+            if (reject != null)
+            {
+                index = null;
+                modules.Clear();
+                configBytes = null;
+                catalog = null;
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Editor=Assets/Lua/Staging；Player=StreamingAssets 或 Resources（无工程 dataPath 旁路）。
+        /// </summary>
+        static bool TryReadFormalCatalogJson(out string catalogJson, out string stagingBase)
+        {
+            catalogJson = null;
+            stagingBase = null;
+#if UNITY_EDITOR
+            string editorCatalog = Path.Combine(Application.dataPath, "Lua", "Staging", "catalog.txt");
+            if (File.Exists(editorCatalog))
+            {
+                catalogJson = File.ReadAllText(editorCatalog, Encoding.UTF8);
+                stagingBase = Path.GetFullPath(Path.Combine(Application.dataPath, "Lua", "Staging"));
+                return true;
+            }
+#endif
+            string streamingCatalog = Path.Combine(
+                Application.streamingAssetsPath, "Lua", "Staging", "catalog.txt");
+            if (File.Exists(streamingCatalog))
+            {
+                catalogJson = File.ReadAllText(streamingCatalog, Encoding.UTF8);
+                stagingBase = Path.GetFullPath(Path.Combine(Application.streamingAssetsPath, "Lua", "Staging"));
+                return true;
+            }
+
+            TextAsset resource = Resources.Load<TextAsset>("Lua/Staging/catalog");
+            if (resource != null)
+            {
+                catalogJson = resource.text;
+                stagingBase = null; // Resources 无磁盘基路径；模块须同包 Resources 提供
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>禁止绝对路径与 .. 逃逸；地址须为相对安全段。</summary>
+        static bool IsSafeRelativeAddress(string address)
+        {
+            if (string.IsNullOrEmpty(address))
+                return false;
+            string norm = address.Replace('\\', '/');
+            if (Path.IsPathRooted(address) || Path.IsPathRooted(norm))
+                return false;
+            if (norm.StartsWith("/", StringComparison.Ordinal) || norm.StartsWith("../", StringComparison.Ordinal)
+                || norm.Contains("/../") || norm.EndsWith("/..", StringComparison.Ordinal)
+                || string.Equals(norm, "..", StringComparison.Ordinal))
+                return false;
+            return true;
+        }
+
+        static byte[] ReadFormalModuleBytesUnderBase(string stagingBase, string moduleName, string address)
+        {
+            string addr = string.IsNullOrEmpty(address) ? moduleName : address;
+            if (!IsSafeRelativeAddress(addr))
+                return null;
+
+            if (!string.IsNullOrEmpty(stagingBase))
+            {
+                string baseFull = Path.GetFullPath(stagingBase);
+                string candidate = Path.GetFullPath(Path.Combine(baseFull, addr.Replace('/', Path.DirectorySeparatorChar) + ".txt"));
+                string prefix = baseFull.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal)
+                    ? baseFull
+                    : baseFull + Path.DirectorySeparatorChar;
+                if (!candidate.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                    return null;
+                if (File.Exists(candidate))
+                    return File.ReadAllBytes(candidate);
+
+                // Staging 扁平：address 可能是 LoginWindow，文件在 Staging/LoginWindow.txt
+                string flat = Path.GetFullPath(Path.Combine(baseFull, Path.GetFileName(addr.Replace('\\', '/')) + ".txt"));
+                if (flat.StartsWith(prefix, StringComparison.OrdinalIgnoreCase) && File.Exists(flat))
+                    return File.ReadAllBytes(flat);
+            }
+
+            // 打包 Resources（Player 或 Editor 无磁盘 Staging 时）
+            TextAsset resource = Resources.Load<TextAsset>("Lua/Staging/" + Path.GetFileName(addr.Replace('\\', '/')));
+            if (resource != null)
+                return CopyBytes(resource.bytes);
+            resource = Resources.Load<TextAsset>("Lua/" + addr.Replace('\\', '/'));
+            if (resource != null)
+                return CopyBytes(resource.bytes);
+            return null;
+        }
+
+        /// <summary>
+        /// 旧字面量 4 模块（entry/panel_base/proto_case/async_case）+ cfg_runtime。
+        /// 仅供显式合成/负例或历史探测；正式 entry 集成须用 <see cref="TryLoadFormalFromDisk"/>。
         /// </summary>
         public static bool TryLoadBuiltin(
             out LuaIndex index,
@@ -249,17 +412,37 @@ namespace Game.Framework.Boot
             return true;
         }
 
-        /// <summary>读取内置 TextAsset 字节；与 HotfixLoader 同源回退链。</summary>
+        /// <summary>
+        /// 正式模块字节。Editor 可经 Staging 基路径；Player 不走工程 dataPath。
+        /// 保留公开 API；新路径请用 TryLoadFormalFromDisk（含逃逸校验）。
+        /// </summary>
+        public static byte[] ReadFormalModuleBytes(string moduleName, string address)
+        {
+            string stagingBase = null;
+#if UNITY_EDITOR
+            stagingBase = Path.GetFullPath(Path.Combine(Application.dataPath, "Lua", "Staging"));
+#else
+            string streamingStaging = Path.Combine(Application.streamingAssetsPath, "Lua", "Staging");
+            if (Directory.Exists(streamingStaging))
+                stagingBase = Path.GetFullPath(streamingStaging);
+#endif
+            string addr = string.IsNullOrEmpty(address) ? moduleName : address;
+            if (!IsSafeRelativeAddress(addr))
+                return null;
+            return ReadFormalModuleBytesUnderBase(stagingBase, moduleName, addr);
+        }
+
+        /// <summary>读取内置 TextAsset 字节；与 HotfixLoader 同源回退链（旧字面量路径）。</summary>
         public static byte[] ReadBuiltinBytes(string address)
         {
 #if UNITY_EDITOR
-            string editorPath = System.IO.Path.Combine(Application.dataPath, "Lua", address + ".txt");
-            if (System.IO.File.Exists(editorPath))
-                return System.IO.File.ReadAllBytes(editorPath);
+            string editorPath = Path.Combine(Application.dataPath, "Lua", address + ".txt");
+            if (File.Exists(editorPath))
+                return File.ReadAllBytes(editorPath);
 #endif
-            string streaming = System.IO.Path.Combine(Application.streamingAssetsPath, "Lua", address + ".txt");
-            if (System.IO.File.Exists(streaming))
-                return System.IO.File.ReadAllBytes(streaming);
+            string streaming = Path.Combine(Application.streamingAssetsPath, "Lua", address + ".txt");
+            if (File.Exists(streaming))
+                return File.ReadAllBytes(streaming);
 
             TextAsset resource = Resources.Load<TextAsset>("Lua/" + address);
             if (resource != null)

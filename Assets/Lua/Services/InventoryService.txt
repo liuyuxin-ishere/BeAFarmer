@@ -1,0 +1,75 @@
+-- C08/U01：背包意图入口。只传 itemId/count；不本地算收入/改 Model/订 RawNtf。
+
+local Gameplay = require("Services/GameplayService")
+
+local M = {}
+
+local function normalize_items(items)
+  if type(items) ~= "table" then
+    return nil, "items-must-be-table"
+  end
+  local out = {}
+  for i = 1, #items do
+    local row = items[i]
+    if type(row) ~= "table" then
+      return nil, "items-row-not-table"
+    end
+    local itemId = row.itemId
+    local count = row.count
+    if type(itemId) == "string" then
+      if not itemId:match("^%d+$") or itemId:match("^0%d") then
+        return nil, "itemId-invalid"
+      end
+      itemId = tonumber(itemId)
+    end
+    if type(count) == "string" then
+      if not count:match("^%d+$") or count:match("^0%d") then
+        return nil, "count-invalid"
+      end
+      count = tonumber(count)
+    end
+    if type(itemId) ~= "number" or itemId ~= math.floor(itemId) or itemId < 1 then
+      return nil, "itemId-invalid"
+    end
+    if type(count) ~= "number" or count ~= math.floor(count) or count < 1 then
+      return nil, "count-invalid"
+    end
+    if itemId > 2147483647 or count > 2147483647 then
+      return nil, "int32-overflow"
+    end
+    out[#out + 1] = { itemId = itemId, count = count }
+  end
+  if #out == 0 then
+    return nil, "items-empty"
+  end
+  return out
+end
+
+--- sell(items, done) -> observation；items 仅 {itemId,count}[]
+function M.sell(items, done)
+  assert(type(done) == "function", "sell requires done")
+  local clean, err = normalize_items(items)
+  if not clean then
+    done(-12, {
+      code = -12,
+      disposition = "NotAccepted",
+      kind = "malformed_intent",
+      message = err or "参数无效",
+      retryable = false,
+    })
+    return nil
+  end
+  return Gameplay.execute("BagSell", { items = clean }, done)
+end
+
+--- expand(done) -> observation；无经济参数
+function M.expand(done)
+  assert(type(done) == "function", "expand requires done")
+  return Gameplay.execute("BagExpand", {}, done)
+end
+
+function M.isWritable()
+  return Gameplay.isWritable()
+end
+
+return M

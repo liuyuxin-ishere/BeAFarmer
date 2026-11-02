@@ -1,0 +1,74 @@
+syntax = "proto3";
+package cloudisle;
+option csharp_namespace = "CloudIsle.Proto";
+import "common.proto";
+
+// 6001 拉取当日订单（只读；跨日校正由服务端在处理前完成）。
+message OrderListReq {}
+
+message OrderListResp {
+  int32 code = 1;
+  repeated OrderData orders = 2;
+  OrderProgress progress = 3;
+}
+
+// 6003 交付订单。日里程碑奖不在本响应发放。
+message OrderSubmitReq {
+  int64 op_id = 1;
+  int32 order_id = 2;
+  int64 operation_scope_id = 3;
+  int64 expected_revision = 4;
+  int32 config_version = 5;
+}
+
+message OrderSubmitResp {
+  int32 code = 1;
+  // 订单本身奖励结果摘要。
+  Reward reward = 2;
+  // 历史字段：原“里程碑奖励”。M2 日奖改走 6007/6008，本字段恒为空；保留字段号不改义为其它用途。
+  Reward bonus = 3;
+  bool rare_applied = 4;
+  int64 committed_revision = 5;
+  CommandAck ack = 6;
+}
+
+// 6005 刷新单条订单。
+message OrderRerollReq {
+  int64 op_id = 1;
+  int32 order_id = 2;
+  int64 operation_scope_id = 3;
+  int64 expected_revision = 4;
+  int32 config_version = 5;
+}
+
+message OrderRerollResp {
+  int32 code = 1;
+  OrderData order = 2;
+  int64 gold_cost = 3;
+  int64 committed_revision = 4;
+  CommandAck ack = 5;
+}
+
+// 6007 显式领取每日 3/6 里程碑奖励。milestone 为 3 或 6。
+message OrderMilestoneClaimReq {
+  int64 op_id = 1;
+  int32 milestone = 2;
+  int64 operation_scope_id = 3;
+  int64 expected_revision = 4;
+  int32 config_version = 5;
+}
+
+message OrderMilestoneClaimResp {
+  int32 code = 1;
+  Reward reward = 2;
+  OrderProgress progress = 3;
+  int64 committed_revision = 4;
+  CommandAck ack = 5;
+}
+
+// 6101 订单列表/进度变化（含每日刷新）。
+message OrderChangeNtf {
+  repeated OrderData orders = 1;
+  OrderProgress progress = 2;
+  bool daily_refreshed = 3;
+}

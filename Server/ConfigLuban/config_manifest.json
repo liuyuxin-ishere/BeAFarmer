@@ -1,6 +1,6 @@
 {
   "schema": "m1.config-manifest.v1",
-  "configVersion": 100,
+  "configVersion": 200,
   "globals": {
     "file": "tbglobalkv.json",
     "format": "luban-map",
@@ -28,9 +28,12 @@
     {"name": "tbglobalkv.json", "sha256": "ffd517ee550c82c847b03985ded60f069a48bcc1770147f7e8912fb0e9351642", "length": 1408},
     {"name": "tbitem.json", "sha256": "efd7440d55c7c344d95b684bb735a83f8380abbbbff08b25c0d8f903ebfdf1d3", "length": 7836},
     {"name": "tblevel.json", "sha256": "b1d3c0ebea82390f9c655da4496633e6e5d2d7ecb2a77cecbbe35c61b8753ab5", "length": 923},
+    {"name": "tbmapinstance.json", "sha256": "1fd30af8d742421fcdf0d23b436cb9c20f5338ac3499b4d96055b262a20c29db", "length": 6278},
     {"name": "tborderrule.json", "sha256": "2debbf3e492a6ffaa10b72581d3fedaf368a2d2c950ff88ba12b390aba76d0f2", "length": 1512},
+    {"name": "tbplayerinit.json", "sha256": "8f4dd0841ff9b8253aedbdb67175546dc82205e8a5fac9ce2834b60b5f4e0145", "length": 458},
     {"name": "tbplot.json", "sha256": "6349f3786bcc8bd17880472062144c589236cf68a64dbbd236b5ccdd1225c2af", "length": 611},
     {"name": "tbrecipe.json", "sha256": "799a12c7fd047096bde6d6d297f5363171a5f69ce04c8f447851ec3aba41bc4d", "length": 2295},
+    {"name": "tbshop.json", "sha256": "7b6d0a4d7be7a6295aaa92ba3ee3206f06ad94c3a321f1467d071fc68a5599a8", "length": 1322},
     {"name": "tbtool.json", "sha256": "60b15c95d7663d8fa32110a3f3e45c8829da128a24551ae476a1664197fe46d4", "length": 1584}
   ]
 }

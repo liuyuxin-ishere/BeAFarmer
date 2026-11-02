@@ -1,0 +1,786 @@
+-- U03 GatherPresenter：共同生命周期 + gather(nodeInstanceId, done)。
+-- 冷却只读 Model+C09 持续 tick；结果从 Model 整批渲染；不本地掷随机；关窗只退订视图观察。
+
+local Gather = require("Services/GatherService")
+local Catalog = require("Services/GameplayDisplayCatalog")
+local ErrorPolicy = require("Services/GameplayErrorPolicy")
+
+local M = {}
+
+local UNKNOWN_WAIT = ErrorPolicy.message({ code = 0, kind = "unknown" })
+
+local function safe_call(fn, ...)
+  if type(fn) ~= "function" then return end
+  local ok, err = pcall(fn, ...)
+  if not ok then _ = err end
+end
+
+local function release_obs(obs)
+  if obs == nil then return end
+  pcall(function()
+    if obs.Dispose ~= nil then obs:Dispose()
+    elseif obs.dispose ~= nil then obs:dispose() end
+  end)
+end
+
+local function facade_clock_remaining(deadline)
+  local f = CS.Game.Framework.Gameplay.LuaGameplayFacade
+  if f == nil or f.RemainingMs == nil then return "0" end
+  local ok, s = pcall(function() return f.RemainingMs(tostring(deadline or "0")) end)
+  if ok and type(s) == "string" then return s end
+  return "0"
+end
+
+local function facade_clock_synced()
+  local f = CS.Game.Framework.Gameplay.LuaGameplayFacade
+  if f == nil or f.IsClockSynchronized == nil then return false end
+  local ok, v = pcall(function() return f.IsClockSynchronized() end)
+  return ok and v == true
+end
+
+local function home_facade()
+  return CS.Game.Framework.Home.LuaHomeFarmFacade
+end
+
+local function format_remaining_ms(remStr)
+  if remStr == nil or remStr == "" or remStr == "…" then return "同步中…" end
+  local n = tonumber(remStr)
+  if n == nil then return "同步中…" end
+  if n <= 0 then return "可采集" end
+  local sec = math.floor(n / 1000)
+  local m = math.floor(sec / 60)
+  local s = sec % 60
+  if m > 0 then
+    return string.format("%d分%d秒", m, s)
+  end
+  return string.format("%d秒", s)
+end
+
+local function feedback_text(code, result)
+  if type(result) == "table" and type(result.message) == "string" and result.message ~= "" then
+    local msg = result.message
+    -- 内部 token 不直出；走 ErrorPolicy
+    if msg:find("disposition", 1, true) or msg:find("^{", 1, true) then
+      -- fallthrough
+    else
+      local kind = result.kind
+      if kind ~= "unknown" and result.disposition ~= "Unknown" then
+        return msg
+      end
+    end
+  end
+  return ErrorPolicy.message({
+    code = code,
+    kind = type(result) == "table" and result.kind or nil,
+    message = type(result) == "table" and result.message or nil,
+    disposition = type(result) == "table" and result.disposition or nil,
+  })
+end
+
+local function is_unknown_recovery_outcome(result)
+  if type(result) ~= "table" then return false end
+  if result.kind == "unknown" then return true end
+  if result.action == "wait_recover" then return true end
+  local d = result.disposition
+  return d == "Unknown"
+end
+
+local function bag_has_tool(tools, toolId)
+  if type(tools) ~= "table" or toolId == nil then return false, 0 end
+  for i = 1, #tools do
+    local t = tools[i]
+    if type(t) == "table" and t.toolId == toolId then
+      local lv = t.level
+      if type(lv) == "string" then lv = tonumber(lv) or 0 end
+      if type(lv) ~= "number" then lv = 0 end
+      -- 采集资格：已拥有等级≥1 即可；下一档升级门槛（如 Lv10）不得禁用
+      return lv >= 1, lv
+    end
+  end
+  return false, 0
+end
+
+local function find_node_row(nodes, nodeId)
+  if type(nodes) ~= "table" then return nil end
+  for i = 1, #nodes do
+    local row = nodes[i]
+    if type(row) == "table" and row.nodeId == nodeId then
+      return row
+    end
+  end
+  return nil
+end
+
+function M.new(service, store, clock, catalog)
+  local self = {
+    _service = service or Gather,
+    _store = store,
+    _clock = clock,
+    _catalog = catalog or Catalog,
+    _view = nil,
+    _sub = nil,
+    _cmdObs = nil,
+    _gen = 0,
+    _opSeq = 0,
+    _uiOp = 0,
+    _pendingOp = nil,
+    _heldOp = nil,
+    _closed = true,
+    _destroyed = false,
+    _busy = false,
+    _lastFeedback = "",
+    _selectedNodeId = nil,
+    _nodeEpoch = 0,
+    _tickEpoch = 0,
+    _listPage = 1,
+    _pageSize = 5,
+    _recoveryArmed = false,
+    _recoveryGen = 0,
+    _recoveryOp = 0,
+  }
+
+  local function bump_gen()
+    self._gen = self._gen + 1
+    return self._gen
+  end
+
+  local function alive(gen)
+    return (not self._destroyed) and (not self._closed) and self._gen == gen and self._view ~= nil
+  end
+
+  local function clear_recovery_track()
+    self._recoveryArmed = false
+    self._recoveryGen = 0
+    self._recoveryOp = 0
+  end
+
+  local function clear_cmd_obs()
+    local obs = self._cmdObs
+    self._cmdObs = nil
+    self._heldOp = nil
+    self._pendingOp = nil
+    release_obs(obs)
+  end
+
+  local function begin_op()
+    clear_recovery_track()
+    self._opSeq = self._opSeq + 1
+    local op = self._opSeq
+    self._uiOp = op
+    self._pendingOp = op
+    return op
+  end
+
+  local function release_owned_op(op)
+    if self._heldOp == op then
+      local obs = self._cmdObs
+      self._cmdObs = nil
+      self._heldOp = nil
+      release_obs(obs)
+    end
+    if self._pendingOp == op then
+      self._pendingOp = nil
+    end
+  end
+
+  -- 同步 callback-before-return：finish 已清 pending → 立即释放返回租约，不滞留已完成观察
+  local function hold_cmd_obs(op, gen, lease)
+    if lease == nil then
+      if self._pendingOp == op then self._pendingOp = nil end
+      return nil
+    end
+    if self._pendingOp ~= op then
+      release_obs(lease)
+      return nil
+    end
+    if not alive(gen) or self._uiOp ~= op then
+      release_obs(lease)
+      if self._pendingOp == op then self._pendingOp = nil end
+      return nil
+    end
+    self._pendingOp = nil
+    if self._heldOp ~= nil and self._heldOp ~= op then
+      release_obs(lease)
+      return nil
+    end
+    if self._cmdObs ~= nil and self._cmdObs ~= lease then
+      release_obs(self._cmdObs)
+    end
+    self._cmdObs = lease
+    self._heldOp = op
+    return lease
+  end
+
+  local function service_writable()
+    local svc = self._service
+    if type(svc) ~= "table" or type(svc.isWritable) ~= "function" then
+      return false, "service-not-writable"
+    end
+    local ok, writable, reason = pcall(function() return svc.isWritable() end)
+    if not ok then return false, "service-not-writable" end
+    if writable == true then return true, reason or "ok" end
+    return false, tostring(reason or "not-writable")
+  end
+
+  local function writable_block_message(reason)
+    reason = tostring(reason or "")
+    if reason:find("expired", 1, true) or reason:find("Expired", 1, true) then
+      return "操作已过期，请同步后确认"
+    end
+    if reason:find("unknown", 1, true) or reason:find("recover", 1, true) or reason:find("pending", 1, true) then
+      return UNKNOWN_WAIT
+    end
+    if reason:find("busy", 1, true) then
+      return "操作进行中"
+    end
+    return ErrorPolicy.message({
+      code = -10, kind = "local_block", disposition = "NotReady", message = reason,
+    })
+  end
+
+  local set_status
+  local function arm_recovery_track(gen, op)
+    self._recoveryArmed = true
+    self._recoveryGen = gen
+    self._recoveryOp = op
+  end
+
+  local function try_resolve_recovery_feedback()
+    if not self._recoveryArmed then return end
+    if self._destroyed or self._closed then return end
+    if self._gen ~= self._recoveryGen then
+      clear_recovery_track()
+      return
+    end
+    if self._recoveryOp ~= 0 and self._uiOp ~= self._recoveryOp then
+      clear_recovery_track()
+      return
+    end
+    if self._lastFeedback ~= UNKNOWN_WAIT then
+      clear_recovery_track()
+      return
+    end
+    local okW = service_writable()
+    if not okW then return end
+    clear_recovery_track()
+    set_status("可继续")
+  end
+
+  set_status = function(text)
+    text = tostring(text or "")
+    if text ~= UNKNOWN_WAIT then
+      clear_recovery_track()
+    end
+    self._lastFeedback = text
+    if self._view and self._view.SetText then
+      safe_call(function() self._view:SetText("StatusLabel", self._lastFeedback) end)
+    end
+  end
+
+  local function ensure_writable(done)
+    local okW, reason = service_writable()
+    if okW then return true end
+    local msg = writable_block_message(reason)
+    set_status(msg)
+    safe_call(done, -10, {
+      code = -10, kind = "local_block", message = msg, disposition = "NotReady",
+    })
+    return false
+  end
+
+  local function set_busy(busy)
+    self._busy = busy and true or false
+  end
+
+  local function apply_action_interactable(canGather)
+    if not self._view or not self._view.SetInteractable then return end
+    local okW = service_writable()
+    local enable = canGather and (not self._busy) and okW and (not self._recoveryArmed)
+    safe_call(function()
+      self._view:SetInteractable("GatherButton", enable)
+      self._view:SetInteractable("PrevButton", not self._busy)
+      self._view:SetInteractable("NextButton", not self._busy)
+    end)
+  end
+
+  -- 只读资格：按请求 nodeId 的最新 Model 行 / 玩家等级 / 所需工具 / 同 C09 RemainingMs。
+  -- 供 present_selected 与公开 gather 共用；不含 busy/writable/recovery（由调用方叠门控）。
+  local function read_gather_eligibility(nodeId, snapshot)
+    local mn = self._catalog.getMapNode and self._catalog.getMapNode(nodeId) or nil
+    local typeId = mn and mn.typeId or nil
+    local spec = typeId and self._catalog.getGatherNode and self._catalog.getGatherNode(typeId) or nil
+    local name = (spec and spec.name) or "采集点"
+    local label = mn and mn.label or ""
+    local level = 0
+    local tools = {}
+    local nodes = {}
+    if type(snapshot) == "table" then
+      level = snapshot.level or 0
+      tools = type(snapshot.tools) == "table" and snapshot.tools or {}
+      nodes = type(snapshot.nodes) == "table" and snapshot.nodes or {}
+    end
+    local unlocked = spec ~= nil and level >= (spec.unlockLevel or 0)
+    local toolId = spec and spec.toolId or 0
+    local toolItem = self._catalog.getItem and self._catalog.getItem(toolId) or nil
+    local toolName = toolItem and toolItem.name or "所需工具"
+    local owned, toolLv = bag_has_tool(tools, toolId)
+    local row = find_node_row(nodes, nodeId)
+    local synced = facade_clock_synced()
+    local coolText = "可采集"
+    local cooling = false
+    local awaitingSync = false
+    if row == nil then
+      coolText = "等待同步…"
+      awaitingSync = true
+    elseif not synced then
+      coolText = "时间同步中…"
+      awaitingSync = true
+    elseif row.nextReadyTime ~= nil then
+      local rem = facade_clock_remaining(row.nextReadyTime)
+      if rem ~= "0" and rem ~= "" then
+        coolText = "冷却 " .. format_remaining_ms(rem)
+        cooling = true
+      end
+    end
+    local lockHint = ""
+    local blockReason = ""
+    if not unlocked then
+      lockHint = string.format("（需玩家 Lv.%d）", spec and spec.unlockLevel or 0)
+      blockReason = string.format("需玩家 Lv.%d", spec and spec.unlockLevel or 0)
+    elseif not owned then
+      lockHint = "（缺少" .. toolName .. "）"
+      blockReason = "缺少" .. toolName
+    elseif awaitingSync then
+      lockHint = "（同步中）"
+      blockReason = "等待同步"
+    elseif cooling then
+      blockReason = "采集点冷却中"
+    end
+    local ready = unlocked and owned and (not cooling) and (not awaitingSync)
+    return {
+      ready = ready,
+      unlocked = unlocked,
+      owned = owned,
+      cooling = cooling,
+      awaitingSync = awaitingSync,
+      coolText = coolText,
+      lockHint = lockHint,
+      blockReason = blockReason,
+      toolName = toolName,
+      toolLv = toolLv,
+      name = name,
+      label = label,
+      row = row,
+      mn = mn,
+      spec = spec,
+    }
+  end
+
+  local function apply_node_displays(snapshot)
+    local hf = home_facade()
+    if hf == nil or hf.ApplyNodeDisplays == nil then return end
+    local synced = facade_clock_synced()
+    local byId = {}
+    local hasAnyNode = false
+    if type(snapshot) == "table" and type(snapshot.nodes) == "table" then
+      for i = 1, #snapshot.nodes do
+        local row = snapshot.nodes[i]
+        if type(row) == "table" and type(row.nodeId) == "number" then
+          byId[row.nodeId] = row
+          hasAnyNode = true
+        end
+      end
+    end
+    local level = 0
+    local tools = {}
+    if type(snapshot) == "table" then
+      level = snapshot.level or 0
+      tools = type(snapshot.tools) == "table" and snapshot.tools or {}
+    end
+    local okW = service_writable()
+    local parts = {}
+    local mapNodes = self._catalog.listMapNodes and self._catalog.listMapNodes() or {}
+    for i = 1, #mapNodes do
+      local mn = mapNodes[i]
+      local id = mn.instanceId
+      local typeId = mn.typeId
+      local spec = self._catalog.getGatherNode and self._catalog.getGatherNode(typeId) or nil
+      local kindInt = 1 -- Ready
+      if not spec then
+        kindInt = 6 -- Unknown
+      elseif level < (spec.unlockLevel or 0) then
+        kindInt = 0 -- Locked
+      elseif not hasAnyNode or byId[id] == nil then
+        -- Model 无节点行 / 未同步：恢复态，不可当就绪
+        kindInt = 2
+      else
+        local row = byId[id]
+        local ready = row and row.nextReadyTime
+        if ready ~= nil then
+          if not synced then
+            kindInt = 2
+          else
+            local rem = facade_clock_remaining(ready)
+            if rem ~= "0" and rem ~= "" then
+              kindInt = 2 -- Cooling
+            end
+          end
+        elseif not synced then
+          kindInt = 2
+        end
+        local needTool = spec.toolId
+        local owned = bag_has_tool(tools, needTool)
+        if not owned then
+          if kindInt == 1 then kindInt = 5 end
+        end
+      end
+      if self._busy or self._recoveryArmed or (not okW) then
+        if kindInt == 1 then kindInt = 4 end
+      end
+      if self._selectedNodeId == id then kindInt = 3 end
+      parts[#parts + 1] = string.format("%d:%d", id, kindInt)
+    end
+    if #parts > 0 then
+      pcall(function() hf.ApplyNodeDisplays(table.concat(parts, ";")) end)
+    end
+  end
+
+  local function present_selected(snapshot)
+    if not self._view or not self._view.SetText then return end
+    local id = self._selectedNodeId
+    if id == nil then
+      safe_call(function()
+        self._view:SetText("SelectedLabel", "点击家园采集点选择")
+        self._view:SetText("DetailLabel", "")
+        self._view:SetText("CooldownLabel", "")
+      end)
+      apply_action_interactable(false)
+      return
+    end
+    local elig = read_gather_eligibility(id, snapshot)
+    local okW, wReason = service_writable()
+    local can = elig.ready and (not self._busy) and okW and (not self._recoveryArmed)
+    local lockHint = elig.lockHint
+    if elig.ready then
+      if not okW then
+        lockHint = "（" .. writable_block_message(wReason) .. "）"
+        can = false
+      elseif self._recoveryArmed then
+        lockHint = "（等待恢复）"
+        can = false
+      end
+    end
+    safe_call(function()
+      self._view:SetText("SelectedLabel", string.format("%s · %s%s", elig.name, elig.label ~= "" and elig.label or tostring(id), lockHint))
+      self._view:SetText("DetailLabel", string.format("需要：%s（拥有 Lv.%d）", elig.toolName, elig.toolLv))
+      self._view:SetText("CooldownLabel", elig.coolText)
+    end)
+    apply_action_interactable(can)
+  end
+
+  local function render_list(snapshot)
+    if not self._view or not self._view.SetText then return end
+    local mapNodes = self._catalog.listMapNodes and self._catalog.listMapNodes() or {}
+    local n = #mapNodes
+    local pages = math.max(1, math.ceil(math.max(n, 1) / self._pageSize))
+    if self._listPage < 1 then self._listPage = 1 end
+    if self._listPage > pages then self._listPage = pages end
+    local start = (self._listPage - 1) * self._pageSize + 1
+    local stop = math.min(n, start + self._pageSize - 1)
+    local synced = facade_clock_synced()
+    local byId = {}
+    local hasAnyNode = false
+    if type(snapshot) == "table" and type(snapshot.nodes) == "table" then
+      for i = 1, #snapshot.nodes do
+        local row = snapshot.nodes[i]
+        if type(row) == "table" and type(row.nodeId) == "number" then
+          byId[row.nodeId] = row
+          hasAnyNode = true
+        end
+      end
+    end
+    local lines = { string.format("— 采集点 %d/%d页 —", self._listPage, pages) }
+    for i = start, stop do
+      local mn = mapNodes[i]
+      local spec = self._catalog.getGatherNode and self._catalog.getGatherNode(mn.typeId) or nil
+      local name = spec and spec.name or "未知"
+      local mark = (self._selectedNodeId == mn.instanceId) and "▶ " or "  "
+      local cool = "就绪"
+      local row = byId[mn.instanceId]
+      if (not hasAnyNode) or row == nil then
+        cool = "同步中"
+      elseif not synced then
+        cool = "同步中"
+      elseif row.nextReadyTime ~= nil then
+        local rem = facade_clock_remaining(row.nextReadyTime)
+        if rem ~= "0" and rem ~= "" then
+          cool = format_remaining_ms(rem)
+        end
+      end
+      lines[#lines + 1] = string.format("%s%s %s · %s", mark, name, mn.label or "", cool)
+    end
+    safe_call(function()
+      self._view:SetText("NodeListLabel", table.concat(lines, "\n"))
+    end)
+  end
+
+  function self:OnCreate(view)
+    self._view = view
+    if view and view.SetText then
+      safe_call(function()
+        view:SetText("Title", "采集")
+        view:SetText("StatusLabel", "")
+        view:SetText("SelectedLabel", "点击家园采集点选择")
+        view:SetText("DetailLabel", "")
+        view:SetText("CooldownLabel", "")
+        view:SetText("NodeListLabel", "")
+      end)
+    end
+  end
+
+  function self:OnOpen(argsJson)
+    self._closed = false
+    self._destroyed = false
+    local gen = bump_gen()
+    if self._sub then
+      safe_call(function() self._sub.dispose() end)
+      self._sub = nil
+    end
+    if self._store and self._store.subscribe then
+      self._sub = self._store.subscribe(nil, function(snap, _)
+        if not alive(gen) then return end
+        -- render 内已先解 recovery 再算按钮
+        self:render(snap)
+      end)
+    end
+
+    local hf = home_facade()
+    if hf and hf.AttachNodeSelectHandler then
+      local function on_node(nodeId)
+        if not alive(gen) then return end
+        self:selectNode(nodeId)
+      end
+      local ok, epoch = pcall(function() return hf.AttachNodeSelectHandler(on_node) end)
+      if ok then self._nodeEpoch = epoch end
+    end
+
+    -- 独立 Node 显示 tick：不抢 Farm AttachHandlers；关窗 Detach
+    if hf and hf.AttachNodeDisplayTick then
+      local function on_tick()
+        if not alive(gen) then return end
+        local snap = self._store and self._store.getSnapshot and self._store.getSnapshot() or nil
+        -- 同一刷新事件：先解 recovery 再算按钮/动作，避免滞后一拍
+        try_resolve_recovery_feedback()
+        render_list(snap)
+        present_selected(snap)
+        apply_node_displays(snap)
+      end
+      local okT, tickEp = pcall(function() return hf.AttachNodeDisplayTick(on_tick) end)
+      if okT then self._tickEpoch = tickEp or 0 end
+    end
+
+    if type(argsJson) == "string" and argsJson ~= "" and argsJson:find("{", 1, true) then
+      local Json = require("Json")
+      local ok, t = pcall(Json.decode, argsJson)
+      if ok and type(t) == "table" and t.nodeInstanceId ~= nil then
+        self:selectNode(t.nodeInstanceId)
+      end
+    end
+
+    self:render(self._store and self._store.getSnapshot and self._store.getSnapshot() or nil)
+  end
+
+  function self:OnClose()
+    bump_gen()
+    self._closed = true
+    self._busy = false
+    if self._recoveryArmed and self._lastFeedback == UNKNOWN_WAIT then
+      self._lastFeedback = ""
+      if self._view and self._view.SetText then
+        safe_call(function() self._view:SetText("StatusLabel", "") end)
+      end
+    end
+    clear_recovery_track()
+    -- 释放本窗命令观察租约；Dispose 不取消已受理全局事务
+    clear_cmd_obs()
+    local hf = home_facade()
+    if hf then
+      if hf.DetachNodeSelectHandler and self._nodeEpoch ~= 0 then
+        pcall(function() hf.DetachNodeSelectHandler(self._nodeEpoch) end)
+        self._nodeEpoch = 0
+      end
+      if hf.DetachNodeDisplayTick and self._tickEpoch ~= 0 then
+        pcall(function() hf.DetachNodeDisplayTick(self._tickEpoch) end)
+        self._tickEpoch = 0
+      end
+    end
+    if self._sub then
+      safe_call(function() self._sub.dispose() end)
+      self._sub = nil
+    end
+  end
+
+  function self:OnDestroy()
+    self:OnClose()
+    self._destroyed = true
+    self._view = nil
+  end
+
+  function self:render(snapshot)
+    if self._destroyed or self._view == nil then return end
+    -- 同一刷新事件：先解 recovery 标记，再算动作/按钮
+    try_resolve_recovery_feedback()
+    local gold = "0"
+    local level = 0
+    if type(snapshot) == "table" then
+      gold = tostring(snapshot.gold or "0")
+      level = snapshot.level or 0
+    end
+    if self._view.SetText then
+      safe_call(function()
+        self._view:SetText("GoldLabel", "金币: " .. gold)
+        self._view:SetText("LevelLabel", "Lv." .. tostring(level))
+      end)
+    end
+    render_list(snapshot)
+    present_selected(snapshot)
+    apply_node_displays(snapshot)
+  end
+
+  function self:selectNode(nodeInstanceId)
+    if self._closed or self._destroyed then return end
+    local id = nodeInstanceId
+    if type(id) == "string" then id = tonumber(id) end
+    if type(id) ~= "number" or id ~= math.floor(id) or id < 1 then return end
+    local mn = self._catalog.getMapNode and self._catalog.getMapNode(id)
+    if not mn then
+      set_status("未知采集点")
+      return
+    end
+    self._selectedNodeId = id
+    self:render(self._store and self._store.getSnapshot and self._store.getSnapshot() or nil)
+  end
+
+  function self:selectPrev()
+    if self._closed or self._destroyed or self._busy then return end
+    local mapNodes = self._catalog.listMapNodes and self._catalog.listMapNodes() or {}
+    if #mapNodes == 0 then return end
+    local idx = 1
+    for i = 1, #mapNodes do
+      if mapNodes[i].instanceId == self._selectedNodeId then idx = i; break end
+    end
+    idx = idx - 1
+    if idx < 1 then idx = #mapNodes end
+    self._listPage = math.floor((idx - 1) / self._pageSize) + 1
+    self:selectNode(mapNodes[idx].instanceId)
+  end
+
+  function self:selectNext()
+    if self._closed or self._destroyed or self._busy then return end
+    local mapNodes = self._catalog.listMapNodes and self._catalog.listMapNodes() or {}
+    if #mapNodes == 0 then return end
+    local idx = 1
+    for i = 1, #mapNodes do
+      if mapNodes[i].instanceId == self._selectedNodeId then idx = i; break end
+    end
+    idx = idx + 1
+    if idx > #mapNodes then idx = 1 end
+    self._listPage = math.floor((idx - 1) / self._pageSize) + 1
+    self:selectNode(mapNodes[idx].instanceId)
+  end
+
+  function self:selectedNodeId()
+    return self._selectedNodeId
+  end
+
+  --- gather(nodeInstanceId, done)：公开面；只发业务 nodeId。
+  function self:gather(nodeInstanceId, done)
+    local gen = self._gen
+    if self._closed or self._destroyed then
+      safe_call(done, -10, { code = -10, kind = "local_block", message = "窗口已关闭", disposition = "NotReady" })
+      return nil
+    end
+    if self._busy or self._recoveryArmed then
+      set_status(self._recoveryArmed and UNKNOWN_WAIT or "操作进行中")
+      safe_call(done, -10, { code = -10, kind = "local_block", message = "操作进行中", disposition = "NotReady" })
+      return nil
+    end
+    if not ensure_writable(done) then return nil end
+    local id = nodeInstanceId or self._selectedNodeId
+    if id == nil then
+      set_status("请先选择采集点")
+      safe_call(done, -12, { code = -12, kind = "malformed_intent", message = "请先选择采集点" })
+      return nil
+    end
+    if type(id) == "string" then id = tonumber(id) end
+    if type(id) ~= "number" or id ~= math.floor(id) or id < 1 then
+      safe_call(done, -12, { code = -12, kind = "malformed_intent", message = "nodeInstanceId-invalid" })
+      return nil
+    end
+    if not (self._catalog.getMapNode and self._catalog.getMapNode(id)) then
+      set_status("未知采集点")
+      safe_call(done, -12, { code = -12, kind = "malformed_intent", message = "未知采集点" })
+      return nil
+    end
+    -- 本地门控：按请求 id 重验最新 Model/只读规则/C09；与按钮资格一致，不靠禁用按钮充方法门控
+    local snap = self._store and self._store.getSnapshot and self._store.getSnapshot() or nil
+    local elig = read_gather_eligibility(id, snap)
+    -- 不同步/缺行：原路径保留（先于缺工具/锁/冷却）
+    if elig.awaitingSync then
+      set_status("等待同步…")
+      apply_action_interactable(false)
+      safe_call(done, -10, { code = -10, kind = "local_block", message = "等待同步", disposition = "NotReady" })
+      return nil
+    end
+    -- 缺工具 / 等级未解锁 / 冷却中：begin_op/忙态/租约/service 前一次 local_block；资产/deadline 不变
+    if not elig.ready then
+      local msg = elig.blockReason
+      if msg == nil or msg == "" then msg = "暂时无法采集" end
+      set_status(msg)
+      -- 按钮仍按当前选中资格；请求 id 可与选中不同，方法已按请求 id 重验拒绝
+      present_selected(snap)
+      safe_call(done, -10, { code = -10, kind = "local_block", message = msg, disposition = "NotReady" })
+      return nil
+    end
+    self._selectedNodeId = id
+    local op = begin_op()
+    set_busy(true)
+    set_status("采集中…")
+    apply_node_displays(snap)
+    apply_action_interactable(false)
+    local function finish(code, result)
+      release_owned_op(op)
+      if not alive(gen) or self._uiOp ~= op then
+        return
+      end
+      set_busy(false)
+      local disposition = type(result) == "table" and result.disposition or nil
+      if is_unknown_recovery_outcome(result) then
+        set_status(UNKNOWN_WAIT)
+        arm_recovery_track(gen, op)
+        try_resolve_recovery_feedback()
+      elseif code == 0 and (disposition == "Recorded" or disposition == "SyncApplied") then
+        set_status("已提交")
+      else
+        -- 容量等业务拒绝仍展示服务端反馈；不在 UI 预算掉落
+        set_status(feedback_text(code, result))
+      end
+      -- 仅 Model 整批驱动资产/冷却；Resp 成功而 Model 未变时 render 保持原冷却；零时只恢复可采不自动发奖
+      self:render(self._store and self._store.getSnapshot and self._store.getSnapshot() or nil)
+      safe_call(done, code, result)
+    end
+    return hold_cmd_obs(op, gen, self._service.gather(id, finish))
+  end
+
+  function self:getFeedback()
+    return self._lastFeedback
+  end
+
+  function self:isBusy()
+    return self._busy or self._recoveryArmed
+  end
+
+  return self
+end
+
+return M

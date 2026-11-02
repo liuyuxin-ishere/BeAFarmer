@@ -4,6 +4,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using Game.Framework.Boot;
+using Game.Framework.Build;
 using Game.Framework.Lua;
 using Game.Framework.Resource;
 using UnityEditor;
@@ -18,6 +19,7 @@ namespace Game.Editor.Build
     /// 已发布版本目录不可变；仅完整 staging 成功后原子切指针。
     /// -executeMethod Game.Editor.Build.PatchBuild.BuildPatch
     /// --m1-output= --m1-res-version=101 --m1-config-version=101 --m1-base-manifest=
+    /// M2：--m2-profile=… 时按 contentPolicy 决定是否注入 PatchDemo（M2Formal=永不）。
     /// </summary>
     public static class PatchBuild
     {
@@ -26,6 +28,10 @@ namespace Game.Editor.Build
         const string CfgVerArg = "--m1-config-version=";
         const string BaseArg = "--m1-base-manifest=";
         const string AppVerArg = "--m1-app-version=";
+        const string ProfileArgM2 = "--m2-profile=";
+        /// <summary>隔离 201 配置目录；仅当工程根存在 m2-owned-project.stamp 时允许覆盖 Assets/ConfigLuban。</summary>
+        const string ConfigLubanArg = "--m1-config-luban=";
+        const string OwnedStampFileName = "m2-owned-project.stamp";
         const string LuaPackageName = "GameLua";
 
         public static void BuildPatch()
@@ -34,14 +40,36 @@ namespace Game.Editor.Build
             {
                 string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
                 string output = Arg(OutputArg, Path.Combine(projectRoot, "Docs/Acceptance/M1/20261020-xLua/StageD/Publish"));
-                int resVer = ArgInt(ResVerArg, 101);
-                int cfgVer = ArgInt(CfgVerArg, resVer);
+                // CLI 显式 --m1-res-version / --m1-config-version 优先于 profile 冻结 200，
+                // 以便 T036 在保留 M2Formal 策略下发布隔离 201 补丁（不改 base-200.json）。
+                bool resCli = TryArgInt(ResVerArg, out int resVerCli);
+                bool cfgCli = TryArgInt(CfgVerArg, out int cfgVerCli);
+                int resVer = resCli ? resVerCli : 101;
+                int cfgVer = cfgCli ? cfgVerCli : resVer;
                 string appVer = Arg(AppVerArg, "0.3.0");
                 string baseManifest = Arg(BaseArg, "");
+                string contentPolicy = M2PatchContentPolicy.PolicyM1LegacyImplicit;
+                string profilePath = Arg(ProfileArgM2, null);
+                if (!string.IsNullOrEmpty(profilePath))
+                {
+                    if (!Path.IsPathRooted(profilePath))
+                        profilePath = Path.GetFullPath(Path.Combine(projectRoot, profilePath));
+                    M2BuildProfile profile = M2BuildProfile.Load(profilePath);
+                    appVer = profile.AppVersion;
+                    contentPolicy = profile.ContentPolicy;
+                    if (!resCli)
+                        resVer = profile.ResVersion;
+                    if (!cfgCli)
+                        cfgVer = resCli ? resVer : profile.ConfigVersion;
+                }
+
+                bool includeDemo = M2PatchContentPolicy.IncludePatchDemo(contentPolicy, resVer);
                 var report = new StringBuilder();
                 report.AppendLine("res=" + resVer + " config=" + cfgVer);
                 report.AppendLine("output=" + output);
                 report.AppendLine("base=" + baseManifest);
+                report.AppendLine("contentPolicy=" + (string.IsNullOrEmpty(contentPolicy) ? "(m1-legacy)" : contentPolicy));
+                report.AppendLine("includePatchDemo=" + includeDemo);
 
                 output = Path.GetFullPath(output);
                 if (string.IsNullOrEmpty(baseManifest) || !File.Exists(baseManifest))
@@ -67,10 +95,30 @@ namespace Game.Editor.Build
                     Directory.Delete(stagingDir, true);
                 Directory.CreateDirectory(stagingDir);
 
-                // 输入兼容：配置/Res 须存在；101 须有 PatchDemo 源与 Config 版本化输入提示。
-                if (!Directory.Exists(Path.Combine(Application.dataPath, "ConfigLuban")))
+                // 输入兼容：配置/Res 须存在；仅当策略要求 PatchDemo 时检查演示源。
+                string liveConfigLuban = Path.Combine(Application.dataPath, "ConfigLuban");
+                if (!Directory.Exists(liveConfigLuban))
                     Fail(output, report, "missing-ConfigLuban", 11);
-                if (resVer >= 101)
+
+                // 受限正式入口：仅 owned 工程副本可把隔离 201 配置打进 PatchBuild（禁止改 Main 冻结 200 再恢复）。
+                string configLubanOverride = Arg(ConfigLubanArg, null);
+                if (!string.IsNullOrEmpty(configLubanOverride))
+                {
+                    string stamp = Path.Combine(projectRoot, OwnedStampFileName);
+                    if (!File.Exists(stamp))
+                        Fail(output, report, "config-luban-overlay-requires-owned-stamp", 19);
+                    configLubanOverride = Path.GetFullPath(configLubanOverride);
+                    ValidateOwnedConfigOverlay(projectRoot, stamp, configLubanOverride);
+                    if (!Directory.Exists(configLubanOverride)
+                        || !File.Exists(Path.Combine(configLubanOverride, "config_manifest.json")))
+                        Fail(output, report, "config-luban-override-missing-manifest", 20);
+                    OverlayConfigLuban(liveConfigLuban, configLubanOverride, report);
+                    AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+                    report.AppendLine("configLubanOverlay=" + configLubanOverride);
+                    report.AppendLine("ownedStamp=true");
+                }
+
+                if (includeDemo)
                 {
                     string demoLua = Path.Combine(Application.dataPath, "Lua/UI/Windows/PatchDemoWindow.txt");
                     if (!File.Exists(demoLua))
@@ -78,7 +126,7 @@ namespace Game.Editor.Build
                 }
 
                 ClientBuild.StageFormalLua(resVer, appVer, report);
-                if (resVer >= 101)
+                if (includeDemo)
                 {
                     ClientBuild.AppendPatchDemoToStaging(resVer, appVer, report);
                     string catPath = Path.Combine(Application.dataPath, "Lua/Staging/catalog.txt");
@@ -86,14 +134,20 @@ namespace Game.Editor.Build
                     if (!cat.Contains("\"name\":\"UI/Windows/PatchDemoWindow\""))
                         Fail(output, report, "101-catalog-missing-PatchDemo-module", 17);
                 }
+                else if (string.Equals(contentPolicy, M2BuildProfile.ContentPolicyM2Formal, StringComparison.Ordinal))
+                {
+                    string catPath = Path.Combine(Application.dataPath, "Lua/Staging/catalog.txt");
+                    string cat = File.ReadAllText(catPath);
+                    M2PatchContentPolicy.RejectPatchDemoArtifacts(contentPolicy, cat, null);
+                }
 
-                // 101 Prefab：主副本在 UI_Patch101；构建期短暂放入 Res/UI 供 DefaultPackage 收集，结束后移除。
+                // PatchDemo Prefab：主副本在 UI_Patch101；构建期短暂放入 Res/UI 供 DefaultPackage 收集，结束后移除。
                 string demoMaster = Path.Combine(Application.dataPath, "Res/UI_Patch101/PatchDemoWindow.prefab");
                 string demoLive = Path.Combine(Application.dataPath, "Res/UI/PatchDemoWindow.prefab");
                 bool stagedDemo = false;
                 try
                 {
-                    if (resVer >= 101)
+                    if (includeDemo)
                     {
                         if (!File.Exists(demoMaster))
                             Fail(output, report, "missing-PatchDemo-prefab-master", 13);
@@ -129,11 +183,24 @@ namespace Game.Editor.Build
                     }
                 }
 
-                if (resVer >= 101)
+                if (includeDemo)
                 {
                     string flat = string.Join("\n", Directory.GetFiles(stagingDir, "*", SearchOption.AllDirectories));
                     if (flat.IndexOf("PatchDemoWindow", StringComparison.OrdinalIgnoreCase) < 0)
                         Fail(output, report, "101-missing-PatchDemoWindow-in-package", 14);
+                }
+                else if (string.Equals(contentPolicy, M2BuildProfile.ContentPolicyM2Formal, StringComparison.Ordinal))
+                {
+                    string flat = string.Join("\n", Directory.GetFiles(stagingDir, "*", SearchOption.AllDirectories));
+                    string cat = File.ReadAllText(Path.Combine(Application.dataPath, "Lua/Staging/catalog.txt"));
+                    try
+                    {
+                        M2PatchContentPolicy.RejectPatchDemoArtifacts(contentPolicy, cat, flat);
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        Fail(output, report, ex.Message, 18);
+                    }
                 }
 
                 string json =
@@ -298,6 +365,83 @@ namespace Game.Editor.Build
             return map;
         }
 
+        /// <summary>
+        /// 将隔离配置覆盖到当前工程 Assets/ConfigLuban（调用方须已确认 owned stamp）。
+        /// 不触碰调用方仓库外的 Main 冻结表；仅写本 projectPath 下公开配置树。
+        /// </summary>
+        static void OverlayConfigLuban(string liveDir, string sourceDir, StringBuilder report)
+        {
+            foreach (string file in Directory.GetFiles(sourceDir, "*", SearchOption.TopDirectoryOnly))
+            {
+                string name = Path.GetFileName(file);
+                if (string.IsNullOrEmpty(name))
+                    continue;
+                string dest = Path.Combine(liveDir, name);
+                File.Copy(file, dest, true);
+                report.AppendLine("overlay-config=" + name + " sha=" + Sha(dest));
+            }
+
+            // 删除 live 中 source 没有的同级 json（保持与 Server201 目录一致），但保留 .meta 由 Unity 管理。
+            var keep = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (string file in Directory.GetFiles(sourceDir, "*", SearchOption.TopDirectoryOnly))
+                keep.Add(Path.GetFileName(file));
+            foreach (string live in Directory.GetFiles(liveDir, "*", SearchOption.TopDirectoryOnly))
+            {
+                string name = Path.GetFileName(live);
+                if (name.EndsWith(".meta", StringComparison.OrdinalIgnoreCase))
+                    continue;
+                if (!keep.Contains(name))
+                {
+                    File.Delete(live);
+                    string meta = live + ".meta";
+                    if (File.Exists(meta))
+                        File.Delete(meta);
+                    report.AppendLine("overlay-removed=" + name);
+                }
+            }
+        }
+
+        static void ValidateOwnedConfigOverlay(string projectRoot, string stamp, string configDirectory)
+        {
+            var fields = new Dictionary<string, string>(StringComparer.Ordinal);
+            foreach (string line in File.ReadAllLines(stamp))
+            {
+                int split = line.IndexOf('=');
+                if (split <= 0) continue;
+                string key = line.Substring(0, split);
+                if (fields.ContainsKey(key))
+                    throw new InvalidDataException("owned-stamp-duplicate-key");
+                fields.Add(key, line.Substring(split + 1));
+            }
+            if (!fields.TryGetValue("schema", out string schema) || schema != "m2-owned-unity-stamp-v1"
+                || !fields.TryGetValue("runId", out string runId)
+                || !System.Text.RegularExpressions.Regex.IsMatch(runId, "^[A-Za-z0-9][A-Za-z0-9._-]{0,80}$")
+                || !fields.TryGetValue("sourceMirror", out string origin))
+                throw new InvalidDataException("owned-stamp-invalid");
+            string ownedRun = Path.GetFullPath(Path.Combine(origin, "Docs", "Acceptance", "M2", runId));
+            string shortKey;
+            using (var sha = SHA256.Create())
+                shortKey = BitConverter.ToString(sha.ComputeHash(Encoding.UTF8.GetBytes(runId)))
+                    .Replace("-", "").ToLowerInvariant().Substring(0, 12);
+            string expectedProject = Path.GetFullPath(Path.Combine(origin, "Builds", "M2", "P", shortKey));
+            string expectedConfig = Path.GetFullPath(Path.Combine(ownedRun, "config-201-isolated"));
+            if (!string.Equals(Path.GetFullPath(projectRoot), expectedProject, StringComparison.OrdinalIgnoreCase)
+                || !string.Equals(configDirectory, expectedConfig, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("owned-overlay-path-mismatch");
+            for (var directory = new DirectoryInfo(expectedProject); directory != null; directory = directory.Parent)
+            {
+                if ((directory.Attributes & FileAttributes.ReparsePoint) != 0)
+                    throw new InvalidDataException("owned-overlay-reparse-point");
+                if (string.Equals(directory.FullName, Path.GetFullPath(origin), StringComparison.OrdinalIgnoreCase)) break;
+            }
+            for (var directory = new DirectoryInfo(expectedConfig); directory != null; directory = directory.Parent)
+            {
+                if ((directory.Attributes & FileAttributes.ReparsePoint) != 0)
+                    throw new InvalidDataException("owned-overlay-reparse-point");
+                if (string.Equals(directory.FullName, ownedRun, StringComparison.OrdinalIgnoreCase)) break;
+            }
+        }
+
         static bool BuildYoo(string packageName, string version, string publishDir, StringBuilder report)
         {
             AssetDatabase.SaveAssets();
@@ -381,6 +525,15 @@ namespace Game.Editor.Build
         {
             string v = Arg(prefix, null);
             return int.TryParse(v, out int n) ? n : fallback;
+        }
+
+        static bool TryArgInt(string prefix, out int value)
+        {
+            string v = Arg(prefix, null);
+            if (!string.IsNullOrEmpty(v) && int.TryParse(v, out value))
+                return true;
+            value = 0;
+            return false;
         }
 
         static string Sha(string path)

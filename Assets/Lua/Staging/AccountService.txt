@@ -1,7 +1,8 @@
 -- 账号服务：register / login / restore / logout / onKick。
--- 登录成功且快照应用成功后才 CommitLoginToken；注册成功不自动授权。
+-- 登录成功且模型安装成功后才 CommitLoginToken；注册成功不自动授权。
 
 local PlayerModel = require("PlayerModel")
+local ModelStore = require("Models/ModelStore")
 local Json = require("Json")
 
 local M = {
@@ -14,8 +15,14 @@ local M = {
 local Bridge = CS.Game.Framework.Account.AccountBridge
 
 local function apply_and_commit(snapshotJson)
-  local tableSnap = Json.decode(snapshotJson or "{}")
-  PlayerModel.applySnapshot(tableSnap)
+  -- M2运行时由模型端口安装；独立M1路径经唯一 ModelStore 后再 Commit。
+  if rawget(_G, "__m2_auth_model_managed") ~= true then
+    local tableSnap = Json.decode(snapshotJson or "{}")
+    local r = ModelStore.replaceSnapshot(tableSnap, nil)
+    if r.kind ~= "Applied" and r.kind ~= "Duplicate" then
+      error("snapshot-apply-failed:" .. tostring(r.error or r.kind))
+    end
+  end
   local ok = Bridge.CommitLoginToken()
   if not ok then
     Bridge.DiscardPendingToken()

@@ -1,0 +1,113 @@
+-- U02：农场意图薄封装。只传 plotId/seedId；不改 Model；不附带 price/reward/revision。
+
+local Gameplay = require("Services/GameplayService")
+
+local M = {}
+local MAX_BATCH = 24
+
+local function as_pos_int32(v, field)
+  if type(v) == "string" then
+    if not v:match("^%d+$") or v:match("^0%d") then
+      return nil, field .. "-invalid"
+    end
+    v = tonumber(v)
+  end
+  if type(v) ~= "number" or v ~= math.floor(v) or v < 1 or v > 2147483647 then
+    return nil, field .. "-invalid"
+  end
+  return v
+end
+
+local function reject(done, err)
+  done(-12, {
+    code = -12,
+    disposition = "NotAccepted",
+    kind = "malformed_intent",
+    message = err or "参数无效",
+    retryable = false,
+  })
+  return nil
+end
+
+--- 稳定去重：保留首次出现顺序；重复丢弃。返回 list, err
+local function normalize_plot_ids(plotIds, allowEmpty)
+  if type(plotIds) ~= "table" then
+    return nil, "plotIds-must-be-table"
+  end
+  local out, seen = {}, {}
+  -- 仅数组部分
+  for i = 1, #plotIds do
+    local id, err = as_pos_int32(plotIds[i], "plotId")
+    if not id then return nil, err end
+    if not seen[id] then
+      seen[id] = true
+      out[#out + 1] = id
+    end
+  end
+  if #out == 0 and not allowEmpty then
+    return nil, "plotIds-empty"
+  end
+  if #out > MAX_BATCH then
+    return nil, "plotIds-exceed-24"
+  end
+  return out
+end
+
+--- plant(items, done)；items = { {plotId, seedId}, ... } 最多 24，plot 去重
+function M.plant(items, done)
+  assert(type(done) == "function", "plant requires done")
+  if type(items) ~= "table" then
+    return reject(done, "items-must-be-table")
+  end
+  local clean, seen = {}, {}
+  for i = 1, #items do
+    local row = items[i]
+    if type(row) ~= "table" then
+      return reject(done, "items-row-not-table")
+    end
+    local plotId, perr = as_pos_int32(row.plotId, "plotId")
+    if not plotId then return reject(done, perr) end
+    local seedId, serr = as_pos_int32(row.seedId, "seedId")
+    if not seedId then return reject(done, serr) end
+    if seen[plotId] then
+      return reject(done, "plotId-duplicate")
+    end
+    seen[plotId] = true
+    clean[#clean + 1] = { plotId = plotId, seedId = seedId }
+  end
+  if #clean == 0 then return reject(done, "items-empty") end
+  if #clean > MAX_BATCH then return reject(done, "items-exceed-24") end
+  return Gameplay.execute("Plant", { items = clean }, done)
+end
+
+--- harvest(plotIds, done)
+function M.harvest(plotIds, done)
+  assert(type(done) == "function", "harvest requires done")
+  local clean, err = normalize_plot_ids(plotIds, false)
+  if not clean then return reject(done, err) end
+  return Gameplay.execute("Harvest", { plotIds = clean }, done)
+end
+
+--- water(plotId, done) 单目标
+function M.water(plotId, done)
+  assert(type(done) == "function", "water requires done")
+  local id, err = as_pos_int32(plotId, "plotId")
+  if not id then return reject(done, err) end
+  return Gameplay.execute("Water", { plotId = id }, done)
+end
+
+--- fertilize(plotId, done) 单目标
+function M.fertilize(plotId, done)
+  assert(type(done) == "function", "fertilize requires done")
+  local id, err = as_pos_int32(plotId, "plotId")
+  if not id then return reject(done, err) end
+  return Gameplay.execute("Fertilize", { plotId = id }, done)
+end
+
+function M.isWritable()
+  return Gameplay.isWritable()
+end
+
+M.MAX_BATCH = MAX_BATCH
+
+return M

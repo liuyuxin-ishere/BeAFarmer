@@ -93,7 +93,8 @@ function M.new()
       pcall(function() self._op:Dispose() end)
       self._op = nil
     end
-    AccountService.cancelAll()
+    -- Closing this view releases its own lease only. Global cancellation also advances
+    -- authAttempt and would cancel the durable gameplay receipt query started at login.
     UIWindow.OnClose(self)
   end
 

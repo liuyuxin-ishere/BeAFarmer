@@ -1,21 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Game.Framework.Gameplay;
 using Game.Framework.Lua;
 using Game.Framework.UI;
 using UnityEngine;
+using XLua;
 
 namespace Game.Framework.Account
 {
     /// <summary>
-    /// Lua 可见的账号/网络固定桥。属 m1-bridge-0.3；不暴露 Protobuf 消息类型。
+    /// Lua 可见的账号/网络固定桥。属 m2-bridge-0.4（账号面兼容 m1）；不暴露 Protobuf 消息类型。
     /// 完成码：0=ok，&gt;0=业务码，-1=取消，-2=传输。
     /// </summary>
     public static class AccountBridge
     {
         static AccountSession _session;
+        static GameplayRuntime _gameplay;
         static LuaCallback _kickHandler;
         static LuaCallback _restoredHandler;
         static LuaCallback _expiredHandler;
@@ -48,6 +53,7 @@ namespace Game.Framework.Account
             EnsureMain();
             // 先结束旧桥操作，再更换 Session，旧成功回调不能应用到新会话。
             CancelAll();
+            DetachGameplayRuntime();
             DisposeSession();
             _session = new AccountSession
             {
@@ -62,6 +68,48 @@ namespace Game.Framework.Account
                 ? Path.Combine(Application.persistentDataPath, "m1-account")
                 : tokenDirectory;
             _session.Configure(dir);
+        }
+
+        /// <summary>
+        /// Launcher：LuaEnv 就绪且 ConfigureHost 已完成后挂载玩法运行时。
+        /// 替换时先 Dispose 旧 runtime（回调/订阅），再绑新 Session。
+        /// </summary>
+        internal static void AttachGameplayRuntime(
+            IMainThreadDispatcher dispatcher,
+            GameplaySessionContext context,
+            LuaEnv luaEnv,
+            string pendingRootDirectory)
+        {
+            EnsureMain();
+            EnsureSession();
+            DetachGameplayRuntime();
+            _gameplay = new GameplayRuntime(
+                dispatcher, context, luaEnv, pendingRootDirectory, _session);
+        }
+
+        internal static void DetachGameplayRuntime()
+        {
+            var g = _gameplay;
+            _gameplay = null;
+            try { g?.Dispose(); } catch { /* ignore */ }
+        }
+
+        /// <summary>Login/Restore 递增 attempt 后、RPC await 前。</summary>
+        internal static void NotifyGameplayAuthStarting(
+            AccountSession source, int authAttempt, long connectionGeneration, string environmentKey)
+        {
+            if (!ReferenceEquals(source, _session)) return;
+            _ = environmentKey;
+            _gameplay?.BeginAuthentication(authAttempt, connectionGeneration);
+        }
+
+        /// <summary>测试/诊断：是否已挂玩法运行时（非 Lua 导出）。</summary>
+        internal static bool HasGameplayRuntime => _gameplay != null;
+
+        internal static void NotifyGameplaySessionEnded(AccountSession source, SessionEndReason reason)
+        {
+            if (!ReferenceEquals(source, _session)) return;
+            _gameplay?.OnSessionEnded(reason);
         }
 
         /// <summary>连接 TCP。done(code, kind)。</summary>
@@ -131,10 +179,15 @@ namespace Game.Framework.Account
             return lease;
         }
 
-        /// <summary>Lua applySnapshot 成功后调用，才写入 Token 并启心跳。失败可观察（不抛）。</summary>
+        /// <summary>
+        /// 登录/恢复快照就绪后调用：有玩法运行时时经 ModelPort 安装 + Token + 观察 Recover；
+        /// 无运行时仅 Token（M1 合同，不 MarkReady 玩法）。
+        /// </summary>
         public static bool CommitLoginToken()
         {
             EnsureSession();
+            if (_gameplay != null)
+                return _gameplay.CommitLogin(_session.LastSnapshotJson);
             return _session.CommitPendingToken();
         }
 
@@ -177,6 +230,7 @@ namespace Game.Framework.Account
             {
                 try
                 {
+                    NotifyGameplaySessionEnded(session, SessionEndReason.Logout);
                     await session.LogoutAsync(ct);
                     Complete(lease, 0, "ok");
                 }
@@ -232,6 +286,125 @@ namespace Game.Framework.Account
 
         public static int PendingRequestCount() => _session?.PendingRequestCount ?? 0;
 
+        /// <summary>
+        /// T028 验收只读：GameplayCommandClient.ActiveSnapshot / 持久 store 槽位数（0|1）。
+        /// 禁止用账号传输 PendingRequestCount 冒充玩法 pending。
+        /// </summary>
+        public static int GameplayPendingCount()
+        {
+            if (_gameplay == null)
+                return 0;
+            if (_gameplay.Client.ActiveSnapshot != null)
+                return 1;
+            return _gameplay.PeekDurablePendingOrNull() != null ? 1 : 0;
+        }
+
+        /// <summary>
+        /// 写入 accept-state 玩法 pending 只读元数据（key/状态/scope/op/消息 kind/请求字节 SHA）。
+        /// 不输出 token/password；不提供写 Model / 篡改 pending 的入口。
+        /// 触及固定运行时 C# → 旧 Native 失效，须 GenAll + 新 IL2CPP 包。
+        /// </summary>
+        public static void AppendGameplayPendingAcceptanceFields(StringBuilder sb)
+        {
+            if (sb == null)
+                throw new ArgumentNullException(nameof(sb));
+
+            PendingCommand active = _gameplay?.Client?.ActiveSnapshot;
+            PendingCommand durable = null;
+            try { durable = _gameplay?.PeekDurablePendingOrNull(); }
+            catch { /* 持久锁/损坏：仍报 count，细节留空 */ }
+
+            PendingCommand src = active ?? durable;
+            int count = src != null ? 1 : 0;
+            sb.Append("pendingCount=").Append(count).Append('\n');
+            sb.Append("pendingSource=").Append(
+                active != null ? "active" : (durable != null ? "durable" : "")).Append('\n');
+
+            // 最小只读恢复诊断：busy/lockReason/recoveryPhase/异常类型；禁止 token/password/account/body。
+            bool busy = false;
+            string lockReason = "";
+            string recoveryPhase = "";
+            string recoveryError = "";
+            try
+            {
+                if (_gameplay?.Client != null)
+                {
+                    busy = _gameplay.Client.IsBusy;
+                    lockReason = _gameplay.Client.LockReason ?? "";
+                    recoveryPhase = _gameplay.Client.RecoveryPhase ?? "";
+                    recoveryError = _gameplay.Client.RecoveryError ?? "";
+                }
+            }
+            catch { /* 只读失败留空 */ }
+
+            sb.Append("pendingBusy=").Append(busy ? "true" : "false").Append('\n');
+            sb.Append("pendingLockReason=").Append(SanitizeAccept(lockReason)).Append('\n');
+            sb.Append("pendingRecoveryPhase=").Append(SanitizeAccept(recoveryPhase)).Append('\n');
+            sb.Append("pendingRecoveryError=").Append(SanitizeAccept(recoveryError)).Append('\n');
+
+            // 写锁/可写：供故障恢复后核对 pending 解除与写锁释放；不输出 token/password。
+            bool writable = false;
+            string writeReason = "";
+            try { writable = LuaGameplayFacade.IsWritable(out writeReason); }
+            catch
+            {
+                writable = false;
+                writeReason = "probe-failed";
+            }
+
+            sb.Append("gameplayWritable=").Append(writable ? "true" : "false").Append('\n');
+            sb.Append("gameplayWriteReason=").Append(SanitizeAccept(writeReason ?? "")).Append('\n');
+
+            if (src == null)
+            {
+                sb.Append("pendingState=\n");
+                sb.Append("pendingCommandKey=\n");
+                sb.Append("pendingScope=\n");
+                sb.Append("pendingOp=\n");
+                sb.Append("pendingMsgKind=\n");
+                sb.Append("pendingRequestSha256=\n");
+                sb.Append("pendingPayloadHash=\n");
+                return;
+            }
+
+            sb.Append("pendingState=").Append(src.State.ToString()).Append('\n');
+            string kind = src.Intent != null ? (src.Intent.CommandKey ?? "") : "";
+            sb.Append("pendingCommandKey=").Append(SanitizeAccept(kind)).Append('\n');
+            sb.Append("pendingScope=").Append(src.OperationScopeId.ToString()).Append('\n');
+            sb.Append("pendingOp=").Append(src.OpId.ToString()).Append('\n');
+            sb.Append("pendingMsgKind=").Append(SanitizeAccept(kind)).Append('\n');
+            sb.Append("pendingRequestSha256=").Append(Sha256Hex(src.PeekWireBytes())).Append('\n');
+            sb.Append("pendingPayloadHash=").Append(SanitizeAccept(src.PayloadHash ?? "")).Append('\n');
+        }
+
+        static string SanitizeAccept(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return "";
+            var sb = new StringBuilder(value.Length);
+            for (int i = 0; i < value.Length; i++)
+            {
+                char c = value[i];
+                if (c == '\r' || c == '\n' || c == '\0')
+                    continue;
+                sb.Append(c);
+            }
+
+            return sb.ToString();
+        }
+
+        static string Sha256Hex(byte[] bytes)
+        {
+            if (bytes == null || bytes.Length == 0)
+                return "";
+            using var sha = SHA256.Create();
+            byte[] hash = sha.ComputeHash(bytes);
+            var sb = new StringBuilder(hash.Length * 2);
+            for (int i = 0; i < hash.Length; i++)
+                sb.Append(hash[i].ToString("x2"));
+            return sb.ToString();
+        }
+
         public static void ShowDisconnectMask(string message) => _session?.ShowOverlay(message);
 
         public static void HideDisconnectMask() => _session?.HideOverlay();
@@ -266,6 +439,7 @@ namespace Game.Framework.Account
         public static void Dispose()
         {
             CancelAll();
+            DetachGameplayRuntime();
             DisposeSession();
             ReleaseHandler(ref _kickHandler, swallow: false);
             ReleaseHandler(ref _restoredHandler, swallow: false);
@@ -298,6 +472,8 @@ namespace Game.Framework.Account
         {
             int biz = code > 0 ? code : 204;
             string kind = biz == 106 ? "update-required" : "expired";
+            NotifyGameplaySessionEnded(_session,
+                biz == 106 ? SessionEndReason.VersionRejected : SessionEndReason.AuthFailed);
             Post(() =>
             {
                 var h = _expiredHandler;

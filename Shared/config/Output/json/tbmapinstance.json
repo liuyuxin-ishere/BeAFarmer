@@ -1,0 +1,371 @@
+[
+  {
+    "instanceId": 1001,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": -3.5,
+    "posY": 0.25,
+    "posZ": 2.1,
+    "label": "plot_0"
+  },
+  {
+    "instanceId": 1002,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": -2.1,
+    "posY": 0.25,
+    "posZ": 2.1,
+    "label": "plot_1"
+  },
+  {
+    "instanceId": 1003,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": -0.7,
+    "posY": 0.25,
+    "posZ": 2.1,
+    "label": "plot_2"
+  },
+  {
+    "instanceId": 1004,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": 0.7,
+    "posY": 0.25,
+    "posZ": 2.1,
+    "label": "plot_3"
+  },
+  {
+    "instanceId": 1005,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": 2.1,
+    "posY": 0.25,
+    "posZ": 2.1,
+    "label": "plot_4"
+  },
+  {
+    "instanceId": 1006,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": 3.5,
+    "posY": 0.25,
+    "posZ": 2.1,
+    "label": "plot_5"
+  },
+  {
+    "instanceId": 1007,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": -3.5,
+    "posY": 0.25,
+    "posZ": 0.7,
+    "label": "plot_6"
+  },
+  {
+    "instanceId": 1008,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": -2.1,
+    "posY": 0.25,
+    "posZ": 0.7,
+    "label": "plot_7"
+  },
+  {
+    "instanceId": 1009,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": -0.7,
+    "posY": 0.25,
+    "posZ": 0.7,
+    "label": "plot_8"
+  },
+  {
+    "instanceId": 1010,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": 0.7,
+    "posY": 0.25,
+    "posZ": 0.7,
+    "label": "plot_9"
+  },
+  {
+    "instanceId": 1011,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": 2.1,
+    "posY": 0.25,
+    "posZ": 0.7,
+    "label": "plot_10"
+  },
+  {
+    "instanceId": 1012,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": 3.5,
+    "posY": 0.25,
+    "posZ": 0.7,
+    "label": "plot_11"
+  },
+  {
+    "instanceId": 1013,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": -3.5,
+    "posY": 0.25,
+    "posZ": -0.7,
+    "label": "plot_12"
+  },
+  {
+    "instanceId": 1014,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": -2.1,
+    "posY": 0.25,
+    "posZ": -0.7,
+    "label": "plot_13"
+  },
+  {
+    "instanceId": 1015,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": -0.7,
+    "posY": 0.25,
+    "posZ": -0.7,
+    "label": "plot_14"
+  },
+  {
+    "instanceId": 1016,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": 0.7,
+    "posY": 0.25,
+    "posZ": -0.7,
+    "label": "plot_15"
+  },
+  {
+    "instanceId": 1017,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": 2.1,
+    "posY": 0.25,
+    "posZ": -0.7,
+    "label": "plot_16"
+  },
+  {
+    "instanceId": 1018,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": 3.5,
+    "posY": 0.25,
+    "posZ": -0.7,
+    "label": "plot_17"
+  },
+  {
+    "instanceId": 1019,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": -3.5,
+    "posY": 0.25,
+    "posZ": -2.1,
+    "label": "plot_18"
+  },
+  {
+    "instanceId": 1020,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": -2.1,
+    "posY": 0.25,
+    "posZ": -2.1,
+    "label": "plot_19"
+  },
+  {
+    "instanceId": 1021,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": -0.7,
+    "posY": 0.25,
+    "posZ": -2.1,
+    "label": "plot_20"
+  },
+  {
+    "instanceId": 1022,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": 0.7,
+    "posY": 0.25,
+    "posZ": -2.1,
+    "label": "plot_21"
+  },
+  {
+    "instanceId": 1023,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": 2.1,
+    "posY": 0.25,
+    "posZ": -2.1,
+    "label": "plot_22"
+  },
+  {
+    "instanceId": 1024,
+    "kind": "Plot",
+    "typeId": 0,
+    "posX": 3.5,
+    "posY": 0.25,
+    "posZ": -2.1,
+    "label": "plot_23"
+  },
+  {
+    "instanceId": 2001,
+    "kind": "Node",
+    "typeId": 1,
+    "posX": -3.5,
+    "posY": 0.3,
+    "posZ": 2,
+    "label": "tree_a"
+  },
+  {
+    "instanceId": 2002,
+    "kind": "Node",
+    "typeId": 1,
+    "posX": -3.5,
+    "posY": 0.3,
+    "posZ": 0,
+    "label": "tree_b"
+  },
+  {
+    "instanceId": 2003,
+    "kind": "Node",
+    "typeId": 2,
+    "posX": -5,
+    "posY": 0.3,
+    "posZ": 1,
+    "label": "berry_a"
+  },
+  {
+    "instanceId": 2004,
+    "kind": "Node",
+    "typeId": 3,
+    "posX": 5,
+    "posY": 0.3,
+    "posZ": -1,
+    "label": "rock_a"
+  },
+  {
+    "instanceId": 2005,
+    "kind": "Node",
+    "typeId": 1,
+    "posX": -3.5,
+    "posY": 0.3,
+    "posZ": -2,
+    "label": "tree_c"
+  },
+  {
+    "instanceId": 2006,
+    "kind": "Node",
+    "typeId": 1,
+    "posX": -2,
+    "posY": 0.3,
+    "posZ": 2,
+    "label": "tree_d"
+  },
+  {
+    "instanceId": 2007,
+    "kind": "Node",
+    "typeId": 2,
+    "posX": -5,
+    "posY": 0.3,
+    "posZ": -1,
+    "label": "berry_b"
+  },
+  {
+    "instanceId": 2008,
+    "kind": "Node",
+    "typeId": 2,
+    "posX": -5,
+    "posY": 0.3,
+    "posZ": 3,
+    "label": "berry_c"
+  },
+  {
+    "instanceId": 2009,
+    "kind": "Node",
+    "typeId": 3,
+    "posX": 5,
+    "posY": 0.3,
+    "posZ": 1,
+    "label": "rock_b"
+  },
+  {
+    "instanceId": 2010,
+    "kind": "Node",
+    "typeId": 3,
+    "posX": 5,
+    "posY": 0.3,
+    "posZ": -3,
+    "label": "rock_c"
+  },
+  {
+    "instanceId": 2011,
+    "kind": "Node",
+    "typeId": 4,
+    "posX": 0,
+    "posY": 0.3,
+    "posZ": -4,
+    "label": "flower_a"
+  },
+  {
+    "instanceId": 2012,
+    "kind": "Node",
+    "typeId": 4,
+    "posX": 2,
+    "posY": 0.3,
+    "posZ": -4,
+    "label": "flower_b"
+  },
+  {
+    "instanceId": 2013,
+    "kind": "Node",
+    "typeId": 4,
+    "posX": -2,
+    "posY": 0.3,
+    "posZ": -4,
+    "label": "flower_c"
+  },
+  {
+    "instanceId": 3001,
+    "kind": "Facility",
+    "typeId": 1,
+    "posX": 4.2,
+    "posY": 0.6,
+    "posZ": 0,
+    "label": "mill"
+  },
+  {
+    "instanceId": 3002,
+    "kind": "Facility",
+    "typeId": 2,
+    "posX": 4.2,
+    "posY": 0.6,
+    "posZ": -2,
+    "label": "workshop"
+  },
+  {
+    "instanceId": 3003,
+    "kind": "Facility",
+    "typeId": 3,
+    "posX": 6,
+    "posY": 0.6,
+    "posZ": 0,
+    "label": "oven"
+  },
+  {
+    "instanceId": 3004,
+    "kind": "Facility",
+    "typeId": 4,
+    "posX": 6,
+    "posY": 0.6,
+    "posZ": -2,
+    "label": "stove"
+  }
+]

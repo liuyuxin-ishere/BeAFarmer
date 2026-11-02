@@ -1,0 +1,190 @@
+-- C08：唯一玩法意图服务。固定允许列表；不写模型；不接收 scope/op/price/reward。
+-- 完成回调带结构化 disposition；业务拒绝不盲重试；204/106 UI 只跟 classify，终止由 C# 委托。
+
+local Json = require("Json")
+local ErrorPolicy = require("Services/GameplayErrorPolicy")
+
+local M = {}
+
+-- 与 C# GameplayCommandAllowlist 对齐的写命令子集（读命令走 sync / 查询）
+local ALLOWED = {
+  BagSell = true,
+  BagExpand = true,
+  GuideStep = true,
+  PlotUnlock = true,
+  Plant = true,
+  Harvest = true,
+  Water = true,
+  Fertilize = true,
+  Gather = true,
+  ToolUpgrade = true,
+  FacilityBuild = true,
+  FacilityUpgrade = true,
+  CraftStart = true,
+  CraftCollect = true,
+  CraftSpeedup = true,
+  OrderSubmit = true,
+  OrderReroll = true,
+  OrderMilestoneClaim = true,
+  ShopBuy = true,
+}
+
+local FORBIDDEN_KEYS = {
+  opId = true, op_id = true, operationScopeId = true, operation_scope_id = true,
+  scope = true, scopeId = true, scope_id = true,
+  expectedRevision = true, expected_revision = true, revision = true,
+  configVersion = true, config_version = true, config = true,
+  price = true, reward = true, gold = true, gem = true, ticket = true,
+  buyPrice = true, sellPrice = true,
+}
+
+local function facade()
+  return CS.Game.Framework.Gameplay.LuaGameplayFacade
+end
+
+local function parse_payload(payload)
+  if type(payload) ~= "string" or payload == "" then
+    return { disposition = "Unknown", message = tostring(payload or "") }
+  end
+  if payload:sub(1, 1) == "{" then
+    local ok, t = pcall(Json.decode, payload)
+    if ok and type(t) == "table" then
+      return t
+    end
+  end
+  return { disposition = "Unknown", message = payload }
+end
+
+local function status_table()
+  local f = facade()
+  local json = "{}"
+  if f.GetStatusJson then
+    local ok, s = pcall(function() return f.GetStatusJson() end)
+    if ok and type(s) == "string" then json = s end
+  end
+  local ok, t = pcall(Json.decode, json)
+  if ok and type(t) == "table" then return t end
+  return { authReady = false, writable = false, reason = "status-unavailable" }
+end
+
+local function strip_forbidden(intent)
+  if type(intent) ~= "table" then
+    return nil, "intent-must-be-table"
+  end
+  local clean = {}
+  for k, v in pairs(intent) do
+    local key = tostring(k)
+    if FORBIDDEN_KEYS[key] then
+      return nil, "forbidden-intent-field:" .. key
+    end
+    clean[k] = v
+  end
+  return clean, nil
+end
+
+--- isWritable() -> writable:boolean, reason:string
+function M.isWritable()
+  local st = status_table()
+  if st.writable == true then
+    return true, "ok"
+  end
+  return false, tostring(st.reason or "not-writable")
+end
+
+--- sync(done) -> observation；读路径，冻写时仍可用
+function M.sync(done)
+  assert(type(done) == "function", "sync requires done")
+  local f = facade()
+  return f.SyncState(function(code, payload)
+    local parsed = parse_payload(payload)
+    local session = status_table()
+    if parsed.cleared ~= nil then session.cleared = parsed.cleared end
+    local classified = ErrorPolicy.classify(code, parsed.disposition, session)
+    done(code, {
+      code = code,
+      disposition = parsed.disposition or "",
+      message = ErrorPolicy.message({ code = code, message = parsed.message, kind = classified.kind }),
+      kind = classified.kind,
+      action = classified.action,
+      retryable = classified.retryable,
+      preservePending = classified.preservePending,
+      raw = parsed,
+    })
+  end)
+end
+
+--- execute(commandKey, intent, done) -> observation
+-- intent 为业务表；序列化为 JSON 交桥。Busy/冻写时零发送。
+function M.execute(commandKey, intent, done)
+  assert(type(done) == "function", "execute requires done")
+  commandKey = tostring(commandKey or "")
+  if not ALLOWED[commandKey] then
+    done(-11, {
+      code = -11,
+      disposition = "NotAccepted",
+      kind = "malformed_intent",
+      action = ErrorPolicy.ACTIONS.no_auto_retry,
+      retryable = false,
+      message = ErrorPolicy.message(-11),
+    })
+    return nil
+  end
+
+  local clean, ferr = strip_forbidden(intent or {})
+  if not clean then
+    done(-12, {
+      code = -12,
+      disposition = "NotAccepted",
+      kind = "malformed_intent",
+      action = ErrorPolicy.ACTIONS.no_auto_retry,
+      retryable = false,
+      message = ferr or ErrorPolicy.message(-12),
+    })
+    return nil
+  end
+
+  local writable, reason = M.isWritable()
+  if not writable then
+    done(-10, {
+      code = -10,
+      disposition = "NotReady",
+      kind = "local_block",
+      action = ErrorPolicy.ACTIONS.block_write,
+      retryable = false,
+      message = ErrorPolicy.message({ code = -10, kind = "local_block", message = reason }),
+      reason = reason,
+    })
+    return nil
+  end
+
+  local intentJson = Json.encode(clean)
+  local f = facade()
+  return f.SendCommand(commandKey, intentJson, function(code, payload)
+    local parsed = parse_payload(payload)
+    local session = status_table()
+    -- Expired 的 preservePending 由权威 cleared 决定；Service 必须传入 parsed.cleared
+    if parsed.cleared ~= nil then session.cleared = parsed.cleared end
+    local classified = ErrorPolicy.classify(code, parsed.disposition, session)
+    -- 永不自动换 op/payload 重发；业务拒绝 retryable=false
+    done(code, {
+      code = code,
+      disposition = parsed.disposition or "",
+      message = ErrorPolicy.message({
+        code = code,
+        message = parsed.message,
+        kind = classified.kind,
+      }),
+      kind = classified.kind,
+      action = classified.action,
+      retryable = classified.retryable and false or false,
+      terminal = classified.terminal,
+      preservePending = classified.preservePending,
+      switchOpForbidden = true,
+      raw = parsed,
+    })
+  end)
+end
+
+M.ALLOWED = ALLOWED
+
+return M

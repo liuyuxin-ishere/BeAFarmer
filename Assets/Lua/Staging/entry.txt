@@ -25,6 +25,51 @@ function Entry.Start(self, phase)
     modal = false,
     canGoBack = false,
   })
+  -- Prefab 由 StageT026UiTools 烘焙供打包/Native；此处空地址走 M2U01WindowBuilder 正式 runtime 布局，
+  -- 避免未重建 Addressables 时 LoadAsync 失败。HomeHud 仍用已有 Prefab 地址（Bake 会刷新控件）。
+  UI.register({
+    windowId = "Bag",
+    prefabAddress = "",
+    -- Modal blocker belongs to Popup; keep the modal above that blocker.
+    layer = 3,
+    controllerModule = "UI/Windows/BagWindow",
+    modal = true,
+    canGoBack = true,
+  })
+  UI.register({
+    windowId = "Shop",
+    prefabAddress = "",
+    layer = 3,
+    controllerModule = "UI/Windows/ShopWindow",
+    modal = true,
+    canGoBack = true,
+  })
+  -- T035：农场控制窗（非 modal，避免挡住地块拖拽；Bag/Shop 仍为 modal 门控）
+  UI.register({
+    windowId = "Farm",
+    prefabAddress = "",
+    layer = 2,
+    controllerModule = "UI/Windows/FarmWindow",
+    modal = false,
+    canGoBack = true,
+  })
+  -- T041：采集（非 modal，可点世界节点）；工具（modal + 确认）
+  UI.register({
+    windowId = "Gather",
+    prefabAddress = "",
+    layer = 2,
+    controllerModule = "UI/Windows/GatherWindow",
+    modal = false,
+    canGoBack = true,
+  })
+  UI.register({
+    windowId = "Tool",
+    prefabAddress = "",
+    layer = 3,
+    controllerModule = "UI/Windows/ToolWindow",
+    modal = true,
+    canGoBack = true,
+  })
 
   AccountService.onKick(function(code, _)
     -- EnterLogin → 场景完成后再开 Login；禁止在此抢先 Open 造成错窗。

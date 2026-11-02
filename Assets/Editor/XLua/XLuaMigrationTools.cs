@@ -72,6 +72,96 @@ namespace Game.Editor.XLuaTools
             }
         }
 
+        /// <summary>
+        /// M2-T007：菜单 GenAll。只生成 Wrap，不写 Docs/Acceptance/xLuaMigration 旧 marker。
+        /// </summary>
+        [MenuItem("Farming/M2/Generate Bridges (GenAll)")]
+        public static void M2GenBridgesMenu()
+        {
+            ConfigurePlugin();
+            Generator.ClearAll();
+            Generator.GenAll();
+            Debug.Log("[M2] GenAll done → Assets/Framework/Lua/XLua/Gen (no M1 Accept marker)");
+        }
+
+        /// <summary>
+        /// M2 批处理 GenAll。必须带 -M2ReportRoot=（或 --m2-report-root=）指向本轮 M2 报告目录；
+        /// 禁止写入 Docs/Acceptance/xLuaMigration 旧 marker。不伪造 pass。
+        /// executeMethod: Game.Editor.XLuaTools.XLuaMigrationTools.BatchM2GenBridges
+        /// </summary>
+        public static void BatchM2GenBridges()
+        {
+            try
+            {
+                string reportRoot = ReadCliArg("-M2ReportRoot=");
+                if (string.IsNullOrEmpty(reportRoot))
+                    reportRoot = ReadCliArg("--m2-report-root=");
+                if (string.IsNullOrEmpty(reportRoot))
+                    throw new InvalidOperationException(
+                        "BatchM2GenBridges requires -M2ReportRoot= (M2 evidence dir); refusing M1 Accept marker");
+
+                string projectRoot = Path.GetDirectoryName(Application.dataPath);
+                if (!Path.IsPathRooted(reportRoot))
+                    reportRoot = Path.GetFullPath(Path.Combine(projectRoot, reportRoot));
+                else
+                    reportRoot = Path.GetFullPath(reportRoot);
+
+                string normalized = reportRoot.Replace('\\', '/');
+                if (normalized.IndexOf("Docs/Acceptance/xLuaMigration", StringComparison.OrdinalIgnoreCase) >= 0
+                    || normalized.IndexOf("Docs/Acceptance/M1/", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    throw new InvalidOperationException(
+                        "M2ReportRoot must not point at M1/xLuaMigration Accept roots: " + reportRoot);
+                }
+
+                ConfigurePlugin();
+                Generator.ClearAll();
+                Generator.GenAll();
+
+                string genDir = Path.Combine(Application.dataPath, "Framework", "Lua", "XLua", "Gen");
+                var wraps = Directory.Exists(genDir)
+                    ? Directory.GetFiles(genDir, "*Wrap*.cs", SearchOption.AllDirectories)
+                    : Array.Empty<string>();
+                bool link = File.Exists(Path.Combine(genDir, "link.xml"));
+                Directory.CreateDirectory(reportRoot);
+                var sb = new StringBuilder();
+                sb.AppendLine("tool=BatchM2GenBridges");
+                sb.AppendLine("when=" + DateTime.UtcNow.ToString("o"));
+                sb.AppendLine("genDir=" + genDir);
+                sb.AppendLine("wrapCount=" + wraps.Length);
+                sb.AppendLine("linkXml=" + link);
+                sb.AppendLine("m1AcceptMarkerWritten=false");
+                sb.AppendLine("note=wrap/link presence recorded; Unity compile of wraps is a later coordinator stage");
+                // 不写 passed=true；仅客观计数，由协调器判读。
+                File.WriteAllText(
+                    Path.Combine(reportRoot, "m2-genall-report.txt"),
+                    sb.ToString(),
+                    new UTF8Encoding(false));
+                EditorApplication.Exit(wraps.Length > 0 && link ? 0 : 3);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                EditorApplication.Exit(2);
+            }
+        }
+
+        static string ReadCliArg(string prefix)
+        {
+            string[] args = Environment.GetCommandLineArgs();
+            for (int i = 0; i < args.Length; i++)
+            {
+                string a = args[i];
+                if (a.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                    return a.Substring(prefix.Length).Trim().Trim('"');
+                if (string.Equals(a, prefix.TrimEnd('='), StringComparison.OrdinalIgnoreCase)
+                    && i + 1 < args.Length)
+                    return args[i + 1].Trim().Trim('"');
+            }
+
+            return null;
+        }
+
         /// <summary>确认 Gen 目录已有 Wrap 与 link.xml。</summary>
         public static void BatchAssertGenCompiled()
         {

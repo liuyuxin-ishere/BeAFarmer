@@ -1,5 +1,5 @@
 using CloudIsle.Net;
-using CloudIsle.Proto;
+using CloudIsle.Proto.Greybox;
 using CloudIsle.Server.Data;
 
 namespace CloudIsle.Server.Greybox;

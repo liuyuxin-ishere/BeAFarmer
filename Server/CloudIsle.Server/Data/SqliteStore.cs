@@ -9,7 +9,8 @@ namespace CloudIsle.Server.Data;
 /// </summary>
 public sealed class SqliteStore : IDisposable
 {
-    public const int CurrentVersion = 2;
+    /// <summary>当前库版本。T005=3；T009=4 Token↔scope；T016=5 日切 marker；T024=6 商店日购买计数；T029=7 已接受任务规格。</summary>
+    public const int CurrentVersion = 7;
 
     readonly object _gate = new();
     string? _databasePath;
@@ -223,6 +224,16 @@ public sealed class SqliteStore : IDisposable
             ApplyVersion1(connection, transaction);
         if (version < 2)
             ApplyVersion2(connection, transaction);
+        if (version < 3)
+            ApplyVersion3(connection, transaction);
+        if (version < 4)
+            ApplyVersion4(connection, transaction);
+        if (version < 5)
+            ApplyVersion5(connection, transaction);
+        if (version < 6)
+            ApplyVersion6(connection, transaction);
+        if (version < 7)
+            ApplyVersion7(connection, transaction);
         SetVersion(connection, transaction, CurrentVersion);
         transaction.Commit();
     }
@@ -276,6 +287,139 @@ public sealed class SqliteStore : IDisposable
             CREATE TABLE player_snapshot (
               player_id INTEGER PRIMARY KEY REFERENCES player(id),
               saved_revision INTEGER NOT NULL,
+              body BLOB NOT NULL
+            );
+            """);
+    }
+
+    /// <summary>
+    /// 建立版本 3：写命令 scope/账本、玩家 grant_version、服务端时间下界。
+    /// 不签发 scope、不发礼包、不改既有玩家货币或 snapshot 字节。
+    /// </summary>
+    /// <param name="connection">已经打开的连接。</param>
+    /// <param name="transaction">当前迁移事务。</param>
+    static void ApplyVersion3(SqliteConnection connection, SqliteTransaction transaction)
+    {
+        // grant_version=0：玩法域待初始化；迁移不得重置 gold/gem/ticket。
+        Execute(connection, transaction, """
+            ALTER TABLE player ADD COLUMN grant_version INTEGER NOT NULL DEFAULT 0
+              CHECK (grant_version >= 0);
+            """);
+
+        Execute(connection, transaction, """
+            CREATE TABLE command_scope (
+              scope_id INTEGER PRIMARY KEY,
+              player_id INTEGER NOT NULL REFERENCES player(id),
+              next_op_id INTEGER NOT NULL CHECK (next_op_id >= 1),
+              closed INTEGER NOT NULL CHECK (closed IN (0, 1)),
+              created_at_ms INTEGER NOT NULL CHECK (created_at_ms >= 0),
+              UNIQUE (scope_id, player_id)
+            );
+            """);
+
+        Execute(connection, transaction, """
+            CREATE TABLE command_receipt (
+              player_id INTEGER NOT NULL,
+              scope_id INTEGER NOT NULL,
+              op_id INTEGER NOT NULL CHECK (op_id >= 1),
+              request_hash TEXT NOT NULL,
+              code INTEGER NOT NULL,
+              committed_revision INTEGER NOT NULL CHECK (committed_revision >= 0),
+              result_blob BLOB NOT NULL,
+              config_version INTEGER NOT NULL CHECK (config_version >= 1),
+              committed_at_ms INTEGER NOT NULL CHECK (committed_at_ms >= 0),
+              PRIMARY KEY (player_id, scope_id, op_id),
+              FOREIGN KEY (scope_id, player_id) REFERENCES command_scope(scope_id, player_id)
+            );
+            """);
+
+        Execute(connection, transaction, """
+            CREATE TABLE server_clock_meta (
+              id INTEGER PRIMARY KEY CHECK (id = 1),
+              time_lower_bound_ms INTEGER NOT NULL CHECK (time_lower_bound_ms >= 0)
+            );
+            """);
+        Execute(connection, transaction, """
+            INSERT INTO server_clock_meta (id, time_lower_bound_ms) VALUES (1, 0);
+            """);
+    }
+
+    /// <summary>
+    /// schema4：TokenHash ↔ command_scope 显式关联。不改写既有 auth_token / 货币 / snapshot。
+    /// 复合 FK (token_hash,player_id)→auth_token；scope_id UNIQUE（一对一）；同玩家归属。
+    /// </summary>
+    static void ApplyVersion4(SqliteConnection connection, SqliteTransaction transaction)
+    {
+        // 供复合外键引用：token_hash 已是 PK，再声明 (token_hash,player_id) 唯一。
+        Execute(connection, transaction, """
+            CREATE UNIQUE INDEX ux_auth_token_hash_player ON auth_token(token_hash, player_id);
+            """);
+        Execute(connection, transaction, """
+            CREATE TABLE auth_token_scope (
+              token_hash TEXT NOT NULL,
+              player_id INTEGER NOT NULL,
+              scope_id INTEGER NOT NULL UNIQUE,
+              PRIMARY KEY (token_hash),
+              FOREIGN KEY (token_hash, player_id) REFERENCES auth_token(token_hash, player_id),
+              FOREIGN KEY (scope_id, player_id) REFERENCES command_scope(scope_id, player_id)
+            );
+            """);
+        Execute(connection, transaction, """
+            CREATE INDEX ix_auth_token_scope_player ON auth_token_scope(player_id);
+            """);
+    }
+
+    /// <summary>
+    /// schema5：日切模块 InitVersion/LastResetDay/Availability sidecar。
+    /// 不改写既有 player/snapshot/receipt/clock/auth；旧库无 marker 行视为未初始化。
+    /// </summary>
+    static void ApplyVersion5(SqliteConnection connection, SqliteTransaction transaction)
+    {
+        Execute(connection, transaction, """
+            CREATE TABLE player_daily_module (
+              player_id INTEGER NOT NULL REFERENCES player(id),
+              module_key TEXT NOT NULL,
+              init_version INTEGER NOT NULL CHECK (init_version >= 0),
+              last_reset_day INTEGER NOT NULL,
+              availability INTEGER NOT NULL CHECK (availability >= 0),
+              capability_hash TEXT NOT NULL,
+              PRIMARY KEY (player_id, module_key)
+            );
+            """);
+        Execute(connection, transaction, """
+            CREATE INDEX ix_player_daily_module_player ON player_daily_module(player_id);
+            """);
+    }
+
+    /// <summary>
+    /// schema6：商店当日购买计数 typed sidecar。
+    /// 不改写既有 player/snapshot/receipt/clock/auth/daily marker；旧库无行视为零计数。
+    /// </summary>
+    static void ApplyVersion6(SqliteConnection connection, SqliteTransaction transaction)
+    {
+        Execute(connection, transaction, """
+            CREATE TABLE player_shop_daily_count (
+              player_id INTEGER NOT NULL REFERENCES player(id),
+              shop_item_id INTEGER NOT NULL CHECK (shop_item_id > 0),
+              count INTEGER NOT NULL CHECK (count > 0),
+              PRIMARY KEY (player_id, shop_item_id)
+            );
+            """);
+        Execute(connection, transaction, """
+            CREATE INDEX ix_player_shop_daily_count_player ON player_shop_daily_count(player_id);
+            """);
+    }
+
+    /// <summary>
+    /// schema7：已接受任务规格 typed sidecar（AcceptedTaskState envelope）。
+    /// 不改写既有 player/snapshot/receipt/clock/auth/daily/shop；旧库无行视为空 AcceptedTaskState。
+    /// </summary>
+    static void ApplyVersion7(SqliteConnection connection, SqliteTransaction transaction)
+    {
+        Execute(connection, transaction, """
+            CREATE TABLE player_accepted_task (
+              player_id INTEGER PRIMARY KEY REFERENCES player(id),
+              format_version INTEGER NOT NULL CHECK (format_version >= 1),
               body BLOB NOT NULL
             );
             """);

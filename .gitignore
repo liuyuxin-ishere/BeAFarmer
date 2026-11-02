@@ -62,10 +62,13 @@ secrets.json
 m1-token.*
 **/tokens/
 
-# Local experiments/build archives. Portable evidence is curated in Docs/Delivery.
+# Local experiments, review workspaces, evidence and demo recordings.
 /PoC/
 /Docs/Acceptance/
 /Docs/LocalBackups/
+/Docs/CursorWorkspaces/
+/Docs/Delivery/
+/Demo Video/
 /Server/Data/
 /Server/Logs/
 /Server/PatchContent/
@@ -83,3 +86,60 @@ m1-token.*
 Thumbs.db
 desktop.ini
 ehthumbs.db
+
+# Test sources, fixtures, test-only hosts and generated results stay local.
+**/[Tt]ests/
+**/[Tt]ests.meta
+**/*.Tests/
+**/*Tests.cs
+**/*Tests.cs.meta
+/Assets/Framework/Account/AccountTestVisibility.cs
+/Assets/Framework/Account/AccountTestVisibility.cs.meta
+**/*TestVisibility.cs
+**/*TestVisibility.cs.meta
+/Assets/Editor/M2/M2TestInputRootCapture.cs
+/Assets/Editor/M2/M2TestInputRootCapture.cs.meta
+/Assets/Editor/**/*PoCTools.cs
+/Assets/Editor/**/*PoCTools.cs.meta
+/Assets/Lua/UI/Windows/TestWindow.txt
+/Assets/Lua/UI/Windows/TestWindow.txt.meta
+/Server/CloudIsle.FaultWorker/
+/Server/CloudIsle.M2AcceptanceHost/
+/Server/CloudIsle.GreyboxSmoke/
+/Server/CloudIsle.PocClient/
+/Server/CloudIsle.Bot/
+/Tools/M2/run_native_*.ps1
+/Tools/M2/send_accept_cmd.ps1
+/Tools/M2/focus_owned_native.ps1
+/Tools/*acceptance*
+/Tools/*delivery*
+/Tools/verify_greybox.ps1
+/Tools/verify_plaza_bots.ps1
+/Tools/verify_shared.ps1
+/Tools/verify_tcp.ps1
+/Tools/verify_luban.ps1
+
+# Runtime logs and log documents, including Unity metadata sidecars.
+**/[Ll]og/
+**/[Ll]og.meta
+**/[Ll]ogs/
+**/[Ll]ogs.meta
+**/*Log*.md
+**/*Log*.md.meta
+**/*log*.md
+**/*log*.md.meta
+*.trx
+*.coverage
+*.coveragexml
+
+# Private local configuration / signing material. Examples must be sanitized.
+**/secrets.*
+**/credentials.*
+*.pem
+id_rsa*
+id_ed25519*
+*.mobileprovision
+*.provisionprofile
+appsettings.*.local.json
+appsettings.Local.json
+NuGet.Config.local

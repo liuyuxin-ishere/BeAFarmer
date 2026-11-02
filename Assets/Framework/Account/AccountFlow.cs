@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Game.Framework.Home;
 using Game.Framework.Scenes;
 using Game.Framework.UI;
 using UnityEngine;
@@ -162,6 +163,10 @@ namespace Game.Framework.Account
             if (string.Equals(currentAddress, "M1_Home", StringComparison.Ordinal))
             {
                 try { UiBridge.Close("Login", (_, __) => { }); } catch { }
+                try { HomeFarmRuntime.EnsureInActiveScene(); } catch (Exception ex)
+                {
+                    Debug.LogWarning("[AccountFlow] HomeFarmRuntime: " + ex.Message);
+                }
                 try
                 {
                     UiBridge.Open("HomeHud", "", (code, _) =>

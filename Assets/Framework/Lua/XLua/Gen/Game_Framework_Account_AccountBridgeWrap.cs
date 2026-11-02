@@ -31,7 +31,7 @@ namespace XLua.CSObjectWrap
 			Utils.EndObjectRegister(type, L, translator, null, null,
 			    null, null, null);
 
-		    Utils.BeginClassRegister(type, L, __CreateInstance, 29, 3, 0);
+		    Utils.BeginClassRegister(type, L, __CreateInstance, 31, 3, 0);
 			Utils.RegisterFunc(L, Utils.CLS_IDX, "Configure", _m_Configure_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "Connect", _m_Connect_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "Register", _m_Register_xlua_st_);
@@ -50,6 +50,8 @@ namespace XLua.CSObjectWrap
             Utils.RegisterFunc(L, Utils.CLS_IDX, "LastErrorKind", _m_LastErrorKind_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "IsAuthenticated", _m_IsAuthenticated_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "PendingRequestCount", _m_PendingRequestCount_xlua_st_);
+            Utils.RegisterFunc(L, Utils.CLS_IDX, "GameplayPendingCount", _m_GameplayPendingCount_xlua_st_);
+            Utils.RegisterFunc(L, Utils.CLS_IDX, "AppendGameplayPendingAcceptanceFields", _m_AppendGameplayPendingAcceptanceFields_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "ShowDisconnectMask", _m_ShowDisconnectMask_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "HideDisconnectMask", _m_HideDisconnectMask_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "StopReconnect", _m_StopReconnect_xlua_st_);
@@ -532,6 +534,56 @@ namespace XLua.CSObjectWrap
                     
                     
                     return 1;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_GameplayPendingCount_xlua_st_(RealStatePtr L)
+        {
+		    try {
+            
+            
+            
+                
+                {
+                    
+                        var gen_ret = Game.Framework.Account.AccountBridge.GameplayPendingCount(  );
+                        LuaAPI.xlua_pushinteger(L, gen_ret);
+                    
+                    
+                    
+                    return 1;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_AppendGameplayPendingAcceptanceFields_xlua_st_(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+            
+                
+                {
+                    System.Text.StringBuilder _sb = (System.Text.StringBuilder)translator.GetObject(L, 1, typeof(System.Text.StringBuilder));
+                    
+                    Game.Framework.Account.AccountBridge.AppendGameplayPendingAcceptanceFields( _sb );
+                    
+                    
+                    
+                    return 0;
                 }
                 
             } catch(System.Exception gen_e) {

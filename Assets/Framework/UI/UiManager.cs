@@ -54,6 +54,31 @@ namespace Game.Framework.UI
 
         public int OpenCount => _open.Count;
         public int StackCount => _stack.Count;
+
+        /// <summary>
+        /// 是否存在 modal 输入占用：已打开 modal，或已 admission 进 _opening 的注册 modal
+        ///（含 OpenDelayGate 挂起的 pending 异步加载）。pending 非 modal 不挡；
+        /// Cancel/CloseAll 清 _opening 后释放门控。
+        /// </summary>
+        public bool HasModalOpen
+        {
+            get
+            {
+                foreach (KeyValuePair<string, WindowInstance> kv in _open)
+                {
+                    if (kv.Value != null && kv.Value.Modal)
+                        return true;
+                }
+
+                foreach (string openingId in _opening)
+                {
+                    if (_registry.TryGetValue(openingId, out UiWindowRegistration reg) && reg.Modal)
+                        return true;
+                }
+
+                return false;
+            }
+        }
         public int PendingOpCount => _pendingOps.Count;
         public int ToastActiveCount => _toastActive;
         public int OpeningCount => _opening.Count;
@@ -127,6 +152,7 @@ namespace Game.Framework.UI
             ILuaUiController controller = null;
             bool createHooked = false;
             bool modalPushed = false;
+            object modalIdentity = null;
             CancellationTokenSource localCts = null;
             int epoch = _epoch;
             bool claimed = false;
@@ -188,7 +214,7 @@ namespace Game.Framework.UI
                     if (IsOpenAborted(epoch, lease))
                     {
                         AbortPartial(ref go, ref view, ref controller, ref prefabLease,
-                            createHooked, modalPushed);
+                            createHooked, modalPushed, modalIdentity);
                         FinishOp(lease, -1, "cancelled");
                         return;
                     }
@@ -205,21 +231,22 @@ namespace Game.Framework.UI
                     catch
                     {
                         AbortPartial(ref go, ref view, ref controller, ref prefabLease,
-                            createHooked, modalPushed: false);
+                            createHooked, modalPushed: false, modalIdentity: null);
                         throw;
                     }
 
                     if (IsOpenAborted(epoch, lease))
                     {
                         AbortPartial(ref go, ref view, ref controller, ref prefabLease,
-                            createHooked, modalPushed);
+                            createHooked, modalPushed, modalIdentity);
                         FinishOp(lease, -1, "cancelled");
                         return;
                     }
 
                     if (reg.Modal)
                     {
-                        _root.PushModal(go.transform);
+                        modalIdentity = go.transform;
+                        _root.PushModal(go.transform, modalIdentity);
                         modalPushed = true;
                     }
 
@@ -230,14 +257,14 @@ namespace Game.Framework.UI
                     catch
                     {
                         AbortPartial(ref go, ref view, ref controller, ref prefabLease,
-                            createHooked, modalPushed);
+                            createHooked, modalPushed, modalIdentity);
                         throw;
                     }
 
                     if (IsOpenAborted(epoch, lease))
                     {
                         AbortPartial(ref go, ref view, ref controller, ref prefabLease,
-                            createHooked, modalPushed);
+                            createHooked, modalPushed, modalIdentity);
                         FinishOp(lease, -1, "cancelled");
                         return;
                     }
@@ -250,13 +277,15 @@ namespace Game.Framework.UI
                         Controller = controller,
                         PrefabLease = prefabLease,
                         Modal = reg.Modal,
-                        ModalPushed = modalPushed
+                        ModalPushed = modalPushed,
+                        ModalIdentity = modalIdentity
                     };
                     prefabLease = null;
                     go = null;
                     view = null;
                     controller = null;
                     modalPushed = false;
+                    modalIdentity = null;
 
                     _open[windowId] = created;
                     _stack.Add(windowId);
@@ -265,12 +294,14 @@ namespace Game.Framework.UI
             }
             catch (OperationCanceledException)
             {
-                AbortPartial(ref go, ref view, ref controller, ref prefabLease, createHooked, modalPushed);
+                AbortPartial(ref go, ref view, ref controller, ref prefabLease,
+                    createHooked, modalPushed, modalIdentity);
                 FinishOp(lease, -1, "cancelled");
             }
             catch (Exception ex)
             {
-                AbortPartial(ref go, ref view, ref controller, ref prefabLease, createHooked, modalPushed);
+                AbortPartial(ref go, ref view, ref controller, ref prefabLease,
+                    createHooked, modalPushed, modalIdentity);
                 FinishOp(lease, 3, "open-fail " + ex.Message);
             }
             finally
@@ -298,11 +329,19 @@ namespace Game.Framework.UI
             ref ILuaUiController controller,
             ref ResourceLease<GameObject> prefabLease,
             bool createHooked,
-            bool modalPushed)
+            bool modalPushed,
+            object modalIdentity)
         {
             if (modalPushed)
             {
-                try { _root?.PopModal(); } catch { }
+                try
+                {
+                    if (modalIdentity != null)
+                        _root?.PopModal(modalIdentity);
+                    else
+                        _root?.PopModal();
+                }
+                catch { }
             }
 
             if (createHooked && controller != null)
@@ -527,6 +566,7 @@ namespace Game.Framework.UI
                 go.name = "Win_Dialog";
 
                 var view = new ViewHost(go);
+                object modalIdentity = go.transform;
                 var inst = new WindowInstance
                 {
                     Id = dialogId,
@@ -535,9 +575,10 @@ namespace Game.Framework.UI
                     Controller = new RuntimeNopController(),
                     Modal = true,
                     ModalPushed = true,
+                    ModalIdentity = modalIdentity,
                     DialogLease = lease
                 };
-                _root.PushModal(go.transform);
+                _root.PushModal(go.transform, modalIdentity);
                 _open[dialogId] = inst;
                 _stack.Add(dialogId);
             }
@@ -677,7 +718,17 @@ namespace Game.Framework.UI
             if (inst == null)
                 return;
             if (inst.ModalPushed)
-                _root?.PopModal();
+            {
+                try
+                {
+                    if (inst.ModalIdentity != null)
+                        _root?.PopModal(inst.ModalIdentity);
+                    else
+                        _root?.PopModal();
+                }
+                catch { }
+                inst.ModalPushed = false;
+            }
             if (invokeHooks)
             {
                 try
@@ -826,8 +877,23 @@ namespace Game.Framework.UI
 
         GameObject BuildRuntimeWindow(string windowId, UILayer layer)
         {
+            Transform layerTf = _root.GetLayer(layer);
+            // T026/T035/T041：缺 Prefab 或无 ResMgr 时走正式布局 builder（非测试桩）。
+            if (string.Equals(windowId, "Bag", System.StringComparison.Ordinal))
+                return M2U01WindowBuilder.BuildBag(layerTf);
+            if (string.Equals(windowId, "Shop", System.StringComparison.Ordinal))
+                return M2U01WindowBuilder.BuildShop(layerTf);
+            if (string.Equals(windowId, "Farm", System.StringComparison.Ordinal))
+                return M2U01WindowBuilder.BuildFarm(layerTf);
+            if (string.Equals(windowId, "Gather", System.StringComparison.Ordinal))
+                return M2U01WindowBuilder.BuildGather(layerTf);
+            if (string.Equals(windowId, "Tool", System.StringComparison.Ordinal))
+                return M2U01WindowBuilder.BuildTool(layerTf);
+            if (string.Equals(windowId, "HomeHud", System.StringComparison.Ordinal))
+                return M2U01WindowBuilder.BuildHomeHud(layerTf);
+
             var go = new GameObject("RuntimeWin", typeof(RectTransform), typeof(Image));
-            go.transform.SetParent(_root.GetLayer(layer), false);
+            go.transform.SetParent(layerTf, false);
             var rt = (RectTransform)go.transform;
             rt.anchorMin = new Vector2(0.2f, 0.25f);
             rt.anchorMax = new Vector2(0.8f, 0.75f);
@@ -926,6 +992,7 @@ namespace Game.Framework.UI
             public ResourceLease<GameObject> PrefabLease;
             public bool Modal;
             public bool ModalPushed;
+            public object ModalIdentity;
             public CallbackLease DialogLease;
         }
 

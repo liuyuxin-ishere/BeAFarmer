@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -15,15 +16,21 @@ namespace Game.Framework.UI
     {
         public const string RootName = "M1_UiRoot";
 
+        sealed class ModalEntry
+        {
+            public Transform Window;
+            public object Identity;
+        }
+
         RectTransform[] _layers;
         SafeAreaAdapter _safeArea;
         CanvasScaler _scaler;
         GameObject _modalBlocker;
-        int _modalDepth;
+        readonly List<ModalEntry> _modalStack = new List<ModalEntry>();
 
         public CanvasScaler Scaler => _scaler;
         public SafeAreaAdapter SafeArea => _safeArea;
-        public int ModalDepth => _modalDepth;
+        public int ModalDepth => _modalStack.Count;
         public GameObject ModalBlocker => _modalBlocker;
 
         /// <summary>获取或创建常驻根。</summary>
@@ -104,43 +111,102 @@ namespace Game.Framework.UI
         }
 
         /// <summary>
-        /// 模态深度 +1。遮挡显示并放到 modalWindow 下方（若提供），保证当前模态窗按钮可点。
+        /// 模态入栈。遮挡显示并放到 modalWindow 下方（若提供），保证当前模态窗按钮可点。
+        /// 身份默认取 modalWindow；匿名 push（null）使用独立哨兵，仅参数化 PopModal() 可 LIFO 弹出。
         /// </summary>
         public void PushModal(Transform modalWindow = null)
         {
-            _modalDepth++;
+            PushModal(modalWindow, identity: modalWindow);
+        }
+
+        /// <summary>
+        /// 带稳定身份的模态入栈。identity 用于非 LIFO / 失败清理的精确出栈；
+        /// 迟到的下层 Pop 不会误弹上层。identity 为 null 时回退为 modalWindow（再空则匿名哨兵）。
+        /// </summary>
+        public void PushModal(Transform modalWindow, object identity)
+        {
+            object id = identity ?? (object)modalWindow ?? new object();
+            _modalStack.Add(new ModalEntry { Window = modalWindow, Identity = id });
+            ApplyBlockerToRemainingTop();
+        }
+
+        /// <summary>
+        /// 兼容旧调用：LIFO 弹出栈顶并恢复遮罩到剩余顶层窗之下；栈空则隐藏。
+        /// </summary>
+        public void PopModal()
+        {
+            if (_modalStack.Count == 0)
+                return;
+            _modalStack.RemoveAt(_modalStack.Count - 1);
+            ApplyBlockerToRemainingTop();
+        }
+
+        /// <summary>
+        /// 按身份精确出栈。未命中则空操作（不夺上层）；命中后把遮罩恢复到剩余存活顶层窗之下。
+        /// identity 为 null 时回退 LIFO <see cref="PopModal()"/>。
+        /// </summary>
+        public void PopModal(object identity)
+        {
+            if (identity == null)
+            {
+                PopModal();
+                return;
+            }
+
+            for (int i = _modalStack.Count - 1; i >= 0; i--)
+            {
+                if (ReferenceEquals(_modalStack[i].Identity, identity))
+                {
+                    _modalStack.RemoveAt(i);
+                    break;
+                }
+            }
+
+            ApplyBlockerToRemainingTop();
+        }
+
+        public void ResetModal()
+        {
+            _modalStack.Clear();
+            if (_modalBlocker != null)
+                _modalBlocker.SetActive(false);
+        }
+
+        void ApplyBlockerToRemainingTop()
+        {
             if (_modalBlocker == null)
                 return;
-            _modalBlocker.SetActive(true);
-            if (modalWindow != null && modalWindow.parent == _modalBlocker.transform.parent)
+
+            if (_modalStack.Count == 0)
             {
-                int winIndex = modalWindow.GetSiblingIndex();
-                _modalBlocker.transform.SetSiblingIndex(winIndex);
-                modalWindow.SetAsLastSibling();
-                // 再把 blocker 紧贴窗口下方：窗口最上，blocker 次之
-                int top = modalWindow.GetSiblingIndex();
+                _modalBlocker.SetActive(false);
+                return;
+            }
+
+            _modalBlocker.SetActive(true);
+
+            Transform topWindow = null;
+            for (int i = _modalStack.Count - 1; i >= 0; i--)
+            {
+                Transform w = _modalStack[i].Window;
+                // Unity 已销毁 Transform 视为假 null，跳过，不把迟到下层当顶层。
+                if (w != null)
+                {
+                    topWindow = w;
+                    break;
+                }
+            }
+
+            if (topWindow != null && topWindow.parent == _modalBlocker.transform.parent)
+            {
+                topWindow.SetAsLastSibling();
+                int top = topWindow.GetSiblingIndex();
                 _modalBlocker.transform.SetSiblingIndex(Mathf.Max(0, top - 1));
             }
             else
             {
                 _modalBlocker.transform.SetAsLastSibling();
             }
-        }
-
-        /// <summary>模态深度 -1；归零时隐藏遮挡。</summary>
-        public void PopModal()
-        {
-            if (_modalDepth > 0)
-                _modalDepth--;
-            if (_modalDepth <= 0 && _modalBlocker != null)
-                _modalBlocker.SetActive(false);
-        }
-
-        public void ResetModal()
-        {
-            _modalDepth = 0;
-            if (_modalBlocker != null)
-                _modalBlocker.SetActive(false);
         }
 
         static void EnsureEventSystem()

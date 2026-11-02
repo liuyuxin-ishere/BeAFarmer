@@ -1,140 +1,80 @@
--- 玩家模型：快照整体替换（含 info 层与全部集合），不追加。int64 保持字符串。
+-- 兼容只读门面：require("PlayerModel") 保留。唯一写入口为 Models/ModelStore。
+-- 不提供公开可变字段写与 applySnapshot 旁路。
 
-local Json = require("Json")
+local Store = require("Models/ModelStore")
 
-local M = {
-  playerId = "0",
-  nickname = "",
-  level = 0,
-  exp = 0,
-  gold = "0",
-  gem = "0",
-  ticket = "0",
-  shard = "0",
-  bagSlots = 0,
-  guideStep = 0,
-  bag = {},
-  plots = {},
-  nodes = {},
-  tools = {},
-  facilities = {},
-  orders = {},
-  orderProgress = nil,
-  home = nil,
-  avatar = nil,
-  gachaStates = {},
-  activities = {},
-}
+local M = {}
 
-local function as_string(v)
-  if v == nil then return "0" end
-  return tostring(v)
-end
-
-local function deep_copy(v)
-  if type(v) ~= "table" then
-    return v
+local function read(key, default)
+  local v = Store._compat_get(key)
+  if v == nil then
+    return default
   end
-  local out = {}
-  for k, val in pairs(v) do
-    out[k] = deep_copy(val)
-  end
-  return out
-end
-
-local function copy_array(src)
-  local out = {}
-  if type(src) ~= "table" then
-    return out
-  end
-  -- 优先数组序；否则 pairs 拷贝
-  local n = #src
-  if n > 0 then
-    for i = 1, n do
-      out[i] = deep_copy(src[i])
-    end
-    return out
-  end
-  for k, val in pairs(src) do
-    out[k] = deep_copy(val)
-  end
-  return out
-end
-
--- snapshot：ProtoJSON 对象或 JSON 字符串。两次 apply 整体覆盖，不 append。
-function M.applySnapshot(snapshot)
-  local s = snapshot
-  if type(s) == "string" then
-    s = Json.decode(s)
-  end
-  if type(s) ~= "table" then
-    error("PlayerModel.applySnapshot expects table or json string")
-  end
-
-  local info = s.info
-  if type(info) ~= "table" then
-    info = s
-  end
-
-  M.playerId = as_string(info.playerId or "0")
-  M.nickname = tostring(info.nickname or "")
-  M.level = tonumber(info.level) or 0
-  M.exp = tonumber(info.exp) or 0
-  M.gold = as_string(info.gold or "0")
-  M.gem = as_string(info.gem or "0")
-  M.ticket = as_string(info.ticket or "0")
-  M.shard = as_string(info.shard or "0")
-  M.bagSlots = tonumber(info.bagSlots) or 0
-  M.guideStep = tonumber(info.guideStep) or 0
-
-  M.bag = copy_array(s.bag)
-  M.plots = copy_array(s.plots)
-  M.nodes = copy_array(s.nodes)
-  M.tools = copy_array(s.tools)
-  M.facilities = copy_array(s.facilities)
-  M.orders = copy_array(s.orders)
-  M.gachaStates = copy_array(s.gachaStates)
-  M.activities = copy_array(s.activities)
-  M.orderProgress = s.orderProgress ~= nil and deep_copy(s.orderProgress) or nil
-  M.home = s.home ~= nil and deep_copy(s.home) or nil
-  M.avatar = s.avatar ~= nil and deep_copy(s.avatar) or nil
-  return M
-end
-
-function M.clear()
-  M.playerId = "0"
-  M.nickname = ""
-  M.level = 0
-  M.exp = 0
-  M.gold = "0"
-  M.gem = "0"
-  M.ticket = "0"
-  M.shard = "0"
-  M.bagSlots = 0
-  M.guideStep = 0
-  M.bag = {}
-  M.plots = {}
-  M.nodes = {}
-  M.tools = {}
-  M.facilities = {}
-  M.orders = {}
-  M.orderProgress = nil
-  M.home = nil
-  M.avatar = nil
-  M.gachaStates = {}
-  M.activities = {}
+  return v
 end
 
 function M.snapshot()
+  local s = Store.getSnapshot()
+  if s == nil then
+    return {
+      playerId = "0",
+      nickname = "",
+      level = 0,
+      gold = "0",
+      bagCount = 0,
+      plotCount = 0,
+      hasOrderProgress = false,
+    }
+  end
   return {
-    playerId = M.playerId,
-    nickname = M.nickname,
-    level = M.level,
-    gold = M.gold,
-    bagCount = #M.bag,
-    plotCount = #M.plots,
-    hasOrderProgress = M.orderProgress ~= nil,
+    playerId = s.playerId,
+    nickname = s.nickname,
+    level = s.level,
+    gold = s.gold,
+    bagCount = type(s.bag) == "table" and #s.bag or 0,
+    plotCount = type(s.plots) == "table" and #s.plots or 0,
+    hasOrderProgress = s.orderProgress ~= nil,
   }
 end
+
+-- 仅会话拥有者（AccountService / 模型端口）可清；Window 不应调用。
+function M.clear()
+  Store.clear("player-model-clear")
+end
+
+-- 封闭旧旁路：引导调用方迁移到 ModelStore.replaceSnapshot
+function M.applySnapshot()
+  error("PlayerModel.applySnapshot removed; use Models.ModelStore.replaceSnapshot")
+end
+
+setmetatable(M, {
+  __index = function(_, key)
+    if key == "playerId" then return read("playerId", "0") end
+    if key == "nickname" then return read("nickname", "") end
+    if key == "level" then return read("level", 0) end
+    if key == "exp" then return read("exp", 0) end
+    if key == "gold" then return read("gold", "0") end
+    if key == "gem" then return read("gem", "0") end
+    if key == "ticket" then return read("ticket", "0") end
+    if key == "shard" then return read("shard", "0") end
+    if key == "bagSlots" then return read("bagSlots", 0) end
+    if key == "guideStep" then return read("guideStep", 0) end
+    if key == "bag" then return read("bag", {}) end
+    if key == "plots" then return read("plots", {}) end
+    if key == "nodes" then return read("nodes", {}) end
+    if key == "tools" then return read("tools", {}) end
+    if key == "facilities" then return read("facilities", {}) end
+    if key == "orders" then return read("orders", {}) end
+    if key == "orderProgress" then return read("orderProgress", nil) end
+    if key == "home" then return read("home", nil) end
+    if key == "avatar" then return read("avatar", nil) end
+    if key == "gachaStates" then return read("gachaStates", {}) end
+    if key == "activities" then return read("activities", {}) end
+    return nil
+  end,
+  __newindex = function(_, key, _)
+    error("PlayerModel." .. tostring(key) .. " is read-only; use Models.ModelStore")
+  end,
+})
 
 return M

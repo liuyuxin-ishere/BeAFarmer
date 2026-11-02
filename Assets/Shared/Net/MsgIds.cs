@@ -50,11 +50,29 @@ namespace CloudIsle.Net
         public const int BadPacket = 103;
         public const int TooFast = 104;
         public const int Version = 106;
+        /// <summary>05 ERR_LEVEL_LOCKED：等级不足 / 功能未解锁。</summary>
+        public const int LevelLocked = 108;
         public const int AuthFailed = 201;
         public const int BagFull = 301;
         public const int ItemNotEnough = 302;
+        /// <summary>05 ERR_GOLD_NOT_ENOUGH。</summary>
+        public const int GoldNotEnough = 303;
+        /// <summary>05 ERR_GEM_NOT_ENOUGH。</summary>
+        public const int GemNotEnough = 304;
+        /// <summary>05 ERR_TICKET_NOT_ENOUGH。</summary>
+        public const int TicketNotEnough = 305;
+        /// <summary>05 ERR_ITEM_INVALID：物品不存在 / 不可操作（含未知新 ID、legacy 不可操作）。</summary>
+        public const int ItemInvalid = 306;
+        /// <summary>05 ERR_SHOP_ITEM_INVALID：商品不存在 / 达到限购。</summary>
+        public const int ShopItemInvalid = 703;
+        /// <summary>05 ERR_SHARD_NOT_ENOUGH。</summary>
+        public const int ShardNotEnough = 704;
         public const int PlotNotEmpty = 402;
         public const int CropNotRipe = 403;
+        /// <summary>05 ERR_NODE_COOLDOWN：采集点冷却中（now&lt;nextReady）。</summary>
+        public const int NodeCooldown = 406;
+        /// <summary>05 ERR_TOOL_MISSING：缺少所需采集工具。</summary>
+        public const int ToolMissing = 407;
         public const int SlotBusy = 409;
         public const int SlotNotDone = 411;
         public const int OrderInvalid = 501;

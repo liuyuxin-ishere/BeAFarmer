@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using Google.Protobuf;
 
-namespace CloudIsle.Proto
+namespace CloudIsle.Proto.Greybox
 {
-    /// <summary>灰盒经营消息（手写 wire，对齐 05 MsgId）。</summary>
+    /// <summary>灰盒经营消息（手写 wire，对齐历史灰盒 MsgId；与正式 Generated 消息同名但不同命名空间，非正式协议）。</summary>
     public sealed class PlantReq
     {
         public long OpId;

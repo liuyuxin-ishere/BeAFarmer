@@ -61,6 +61,74 @@ namespace XLua
 #endif
 		}
         
+		public void __Gen_Delegate_Imp2(string p0, string p1, bool p2)
+		{
+#if THREAD_SAFE || HOTFIX_ENABLE
+            lock (luaEnv.luaEnvLock)
+            {
+#endif
+                RealStatePtr L = luaEnv.L;
+                int errFunc = LuaAPI.pcall_prepare(L, errorFuncRef, luaReference);
+                
+                LuaAPI.lua_pushstring(L, p0);
+                LuaAPI.lua_pushstring(L, p1);
+                LuaAPI.lua_pushboolean(L, p2);
+                
+                PCall(L, 3, 0, errFunc);
+                
+                
+                
+                LuaAPI.lua_settop(L, errFunc - 1);
+                
+#if THREAD_SAFE || HOTFIX_ENABLE
+            }
+#endif
+		}
+        
+		public void __Gen_Delegate_Imp3(string p0)
+		{
+#if THREAD_SAFE || HOTFIX_ENABLE
+            lock (luaEnv.luaEnvLock)
+            {
+#endif
+                RealStatePtr L = luaEnv.L;
+                int errFunc = LuaAPI.pcall_prepare(L, errorFuncRef, luaReference);
+                
+                LuaAPI.lua_pushstring(L, p0);
+                
+                PCall(L, 1, 0, errFunc);
+                
+                
+                
+                LuaAPI.lua_settop(L, errFunc - 1);
+                
+#if THREAD_SAFE || HOTFIX_ENABLE
+            }
+#endif
+		}
+        
+		public void __Gen_Delegate_Imp4(int p0)
+		{
+#if THREAD_SAFE || HOTFIX_ENABLE
+            lock (luaEnv.luaEnvLock)
+            {
+#endif
+                RealStatePtr L = luaEnv.L;
+                int errFunc = LuaAPI.pcall_prepare(L, errorFuncRef, luaReference);
+                
+                LuaAPI.xlua_pushinteger(L, p0);
+                
+                PCall(L, 1, 0, errFunc);
+                
+                
+                
+                LuaAPI.lua_settop(L, errFunc - 1);
+                
+#if THREAD_SAFE || HOTFIX_ENABLE
+            }
+#endif
+		}
+        
 		
 		public override Delegate GetDelegateByType(Type type)
 		{
@@ -70,9 +138,29 @@ namespace XLua
 			    return new Game.Framework.UI.LuaClickHandler(__Gen_Delegate_Imp0);
 			}
 		
+		    if (type == typeof(Game.Framework.Home.LuaHomeFarmFacade.HomeFarmDisplayTickHandler))
+			{
+			    return new Game.Framework.Home.LuaHomeFarmFacade.HomeFarmDisplayTickHandler(__Gen_Delegate_Imp0);
+			}
+		
 		    if (type == typeof(Game.Framework.Lua.LuaCallback))
 			{
 			    return new Game.Framework.Lua.LuaCallback(__Gen_Delegate_Imp1);
+			}
+		
+		    if (type == typeof(Game.Framework.Home.LuaHomeFarmFacade.HomeFarmGestureHandler))
+			{
+			    return new Game.Framework.Home.LuaHomeFarmFacade.HomeFarmGestureHandler(__Gen_Delegate_Imp2);
+			}
+		
+		    if (type == typeof(Game.Framework.Home.LuaHomeFarmFacade.HomeFarmCancelHandler))
+			{
+			    return new Game.Framework.Home.LuaHomeFarmFacade.HomeFarmCancelHandler(__Gen_Delegate_Imp3);
+			}
+		
+		    if (type == typeof(Game.Framework.Home.LuaHomeFarmFacade.HomeFarmNodeSelectHandler))
+			{
+			    return new Game.Framework.Home.LuaHomeFarmFacade.HomeFarmNodeSelectHandler(__Gen_Delegate_Imp4);
 			}
 		
 		    return null;

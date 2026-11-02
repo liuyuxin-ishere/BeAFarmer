@@ -1,0 +1,43 @@
+-- U03：采集意图薄封装。只传 nodeId（=稳定 node_instance_id）；不改 Model；不附带奖励/概率/revision。
+
+local Gameplay = require("Services/GameplayService")
+
+local M = {}
+
+local function as_pos_int32(v, field)
+  if type(v) == "string" then
+    if not v:match("^%d+$") or v:match("^0%d") then
+      return nil, field .. "-invalid"
+    end
+    v = tonumber(v)
+  end
+  if type(v) ~= "number" or v ~= math.floor(v) or v < 1 or v > 2147483647 then
+    return nil, field .. "-invalid"
+  end
+  return v
+end
+
+local function reject(done, err)
+  done(-12, {
+    code = -12,
+    disposition = "NotAccepted",
+    kind = "malformed_intent",
+    message = err or "参数无效",
+    retryable = false,
+  })
+  return nil
+end
+
+--- gather(nodeInstanceId, done)；Proto GatherReq.node_id → nodeId
+function M.gather(nodeInstanceId, done)
+  assert(type(done) == "function", "gather requires done")
+  local id, err = as_pos_int32(nodeInstanceId, "nodeInstanceId")
+  if not id then return reject(done, err) end
+  return Gameplay.execute("Gather", { nodeId = id }, done)
+end
+
+function M.isWritable()
+  return Gameplay.isWritable()
+end
+
+return M

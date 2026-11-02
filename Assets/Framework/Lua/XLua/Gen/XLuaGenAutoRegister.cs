@@ -52,6 +52,18 @@ namespace XLua.CSObjectWrap
             translator.DelayWrapLoader(typeof(Game.Framework.Account.AccountFlow), GameFrameworkAccountAccountFlowWrap.__Register);
         
         
+            translator.DelayWrapLoader(typeof(Game.Framework.Gameplay.LuaGameplayFacade), GameFrameworkGameplayLuaGameplayFacadeWrap.__Register);
+        
+        
+            translator.DelayWrapLoader(typeof(Game.Framework.Gameplay.CommandObservation), GameFrameworkGameplayCommandObservationWrap.__Register);
+        
+        
+            translator.DelayWrapLoader(typeof(Game.Framework.Gameplay.GameplaySubscriptionLease), GameFrameworkGameplayGameplaySubscriptionLeaseWrap.__Register);
+        
+        
+            translator.DelayWrapLoader(typeof(Game.Framework.Home.LuaHomeFarmFacade), GameFrameworkHomeLuaHomeFarmFacadeWrap.__Register);
+        
+        
         
         }
         

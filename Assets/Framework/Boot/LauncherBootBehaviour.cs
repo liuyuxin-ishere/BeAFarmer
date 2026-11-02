@@ -153,6 +153,7 @@ namespace Game.Framework.Boot
         void OnDestroy()
         {
             try { _cts?.Cancel(); } catch { }
+            try { _acceptDriver?.Dispose(); } catch { }
             try { _launcher?.Dispose(); } catch (Exception ex)
             {
                 Obs("dispose-ex {0}", Sanitize(ex.GetBaseException().Message));
@@ -175,6 +176,7 @@ namespace Game.Framework.Boot
                 string cacheRoot = _acceptMode ? Path.Combine(_acceptRoot, "yoo") : null;
                 string indexRoot = _acceptMode ? Path.Combine(_acceptRoot, "index") : null;
                 string tokenDir = _acceptMode ? Path.Combine(_acceptRoot, "tokens") : null;
+                string pendingRoot = _acceptMode ? Path.Combine(_acceptRoot, "pending") : null;
                 Obs("launcher-start http={0} tcp={1}:{2}", http, tcpHost, tcpPort);
 
                 _launcher = new Launcher(
@@ -184,7 +186,8 @@ namespace Game.Framework.Boot
                     tcpHost: tcpHost,
                     tcpPort: tcpPort,
                     tokenDir: tokenDir,
-                    log: s => Obs("launcher {0}", s));
+                    log: s => Obs("launcher {0}", s),
+                    pendingRoot: pendingRoot);
                 // Boot failure can wait for Retry. The private test driver must
                 // already be consuming commands while RunAsync is suspended.
                 if (_acceptMode && !string.IsNullOrEmpty(_acceptRoot))
@@ -369,7 +372,15 @@ namespace Game.Framework.Boot
                 if (_launcher?.Lua?.Env == null)
                     return;
                 _launcher.Lua.Env.DoString(
-                    "local M=require('PlayerModel'); M.nickname='POLLUTED_LOCAL'; M.level=999",
+                    "local Store=require('Models/ModelStore')\n" +
+                    "local s=Store.getSnapshot()\n" +
+                    "if s then\n" +
+                    "  local rev=tostring(s.revision or '0')\n" +
+                    "  s.nickname='POLLUTED_LOCAL'; s.level=999\n" +
+                    "  Store.clear('pollute-prep')\n" +
+                    "  s.revision=rev\n" +
+                    "  Store.replaceSnapshot(s,nil)\n" +
+                    "end",
                     "pollute");
             }
             catch (Exception ex)

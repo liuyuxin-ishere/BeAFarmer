@@ -55,6 +55,9 @@ namespace Game.Framework.Platform
             return _tap;
         }
 
+        /// <summary>指针按键是否仍按下（只读观察；不改变既有 tap/drag 语义）。</summary>
+        public bool IsPressing => _pressing;
+
         /// <summary>最近一次 Tick 的滚轮 y。</summary>
         public float ReadZoom()
         {

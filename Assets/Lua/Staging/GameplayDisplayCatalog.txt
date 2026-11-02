@@ -1,0 +1,527 @@
+-- U01：只读展示目录。单价/可售/堆叠提示仅供 UI；权威定价与发放在服务器。
+-- 不向命令意图写入 price/reward/revision；Int64 相关字段保持十进制字符串。
+-- 全量数据来自 Services/GameplayDisplayCatalogData（Editor 从 Config200 导出）。
+
+local Json = require("Json")
+
+local M = {}
+
+local items = {}
+local shops = {}
+local unlockHints = {}
+local plotStages = {}
+local gatherNodes = {}
+local mapNodes = {}
+local toolLevels = {} -- key = toolId*1000+level
+local stackDefault = 99
+local meta = nil
+local ready = false
+
+local function as_pos_int32(v)
+  if type(v) == "number" then
+    if v ~= math.floor(v) or v < 1 or v > 2147483647 then return nil end
+    return v
+  end
+  if type(v) == "string" then
+    if not v:match("^%d+$") or v:match("^0%d") then return nil end
+    local n = tonumber(v)
+    if not n or n < 1 or n > 2147483647 then return nil end
+    return n
+  end
+  return nil
+end
+
+local function as_nonneg_int32(v)
+  if type(v) == "number" then
+    if v ~= math.floor(v) or v < 0 or v > 2147483647 then return nil end
+    return v
+  end
+  if type(v) == "string" then
+    if not v:match("^%d+$") or v:match("^0%d") then return nil end
+    local n = tonumber(v)
+    if not n or n < 0 or n > 2147483647 then return nil end
+    return n
+  end
+  return nil
+end
+
+local function copy_item(row)
+  if type(row) ~= "table" then return nil end
+  local id = as_pos_int32(row.id or row.itemId)
+  if not id then return nil end
+  local sell = row.sellPrice
+  if sell == nil then sell = 0 end
+  if type(sell) == "string" then
+    if not sell:match("^-?%d+$") then sell = 0 else sell = tonumber(sell) or 0 end
+  elseif type(sell) ~= "number" then
+    sell = 0
+  end
+  local stack = row.stackMax
+  if stack == nil then stack = 0 end
+  if type(stack) == "string" then
+    if not stack:match("^-?%d+$") then stack = 0 else stack = tonumber(stack) or 0 end
+  elseif type(stack) ~= "number" then
+    stack = 0
+  end
+  return {
+    id = id,
+    name = tostring(row.name or ("物品" .. tostring(id))),
+    type = tostring(row.type or ""),
+    sellPrice = math.floor(sell),
+    stackMax = math.floor(stack),
+    unlockLevel = as_nonneg_int32(row.unlockLevel) or 0,
+  }
+end
+
+local function copy_shop(row)
+  if type(row) ~= "table" then return nil end
+  local id = as_pos_int32(row.id or row.shopId or row.shopItemId)
+  if not id then return nil end
+  local itemId = as_pos_int32(row.itemId)
+  if not itemId then return nil end
+  local price = row.price
+  if price == nil then price = 0 end
+  if type(price) == "string" then
+    if not price:match("^-?%d+$") then price = 0 else price = tonumber(price) or 0 end
+  elseif type(price) ~= "number" then
+    price = 0
+  end
+  return {
+    id = id,
+    itemId = itemId,
+    price = math.floor(price),
+    priceCurrency = as_pos_int32(row.priceCurrency) or 9001,
+    unlockLevel = as_nonneg_int32(row.unlockLevel) or 0,
+    category = tostring(row.category or ""),
+    limitCount = as_nonneg_int32(row.limitCount) or 0,
+  }
+end
+
+local function copy_materials(raw)
+  -- nil = 缺失信息不完整；显式空表 = 合法无材料
+  if raw == nil then return nil, false end
+  if type(raw) ~= "table" then return nil, false end
+  local out = {}
+  for i = 1, #raw do
+    local m = raw[i]
+    if type(m) ~= "table" then return nil, false end
+    local itemId = as_pos_int32(m.itemId)
+    local count = as_pos_int32(m.count)
+    if not itemId or not count then return nil, false end
+    out[#out + 1] = { itemId = itemId, count = count }
+  end
+  return out, true
+end
+
+local function copy_gather_node(row)
+  if type(row) ~= "table" then return nil end
+  local id = as_pos_int32(row.id or row.nodeId or row.typeId)
+  if not id then return nil end
+  local toolId = as_pos_int32(row.toolId)
+  if not toolId then return nil end
+  return {
+    id = id,
+    code = tostring(row.code or ""),
+    name = tostring(row.name or ("采集" .. tostring(id))),
+    toolId = toolId,
+    unlockLevel = as_nonneg_int32(row.unlockLevel) or 0,
+    cooldownSec = as_nonneg_int32(row.cooldownSec) or 0,
+  }
+end
+
+local function copy_map_node(row)
+  if type(row) ~= "table" then return nil end
+  local instanceId = as_pos_int32(row.instanceId or row.nodeInstanceId)
+  if not instanceId then return nil end
+  local typeId = as_pos_int32(row.typeId or row.configNodeId)
+  if not typeId then return nil end
+  return {
+    instanceId = instanceId,
+    typeId = typeId,
+    label = tostring(row.label or ""),
+  }
+end
+
+local function copy_tool_level(row)
+  if type(row) ~= "table" then return nil end
+  local toolId = as_pos_int32(row.toolId)
+  local level = as_pos_int32(row.level)
+  if not toolId or not level then return nil end
+  local mats, matsOk = copy_materials(row.materials)
+  local complete = row.costComplete
+  if complete == nil then
+    complete = matsOk
+  else
+    complete = (complete == true) and matsOk
+  end
+  return {
+    toolId = toolId,
+    level = level,
+    needPlayerLevel = as_nonneg_int32(row.needPlayerLevel) or 0,
+    goldCost = as_nonneg_int32(row.goldCost) or 0,
+    materials = mats, -- nil 表示不完整
+    costComplete = complete and true or false,
+  }
+end
+
+local function tool_level_key(toolId, level)
+  return toolId * 1000 + level
+end
+
+--- 合并展示行（测试注入 / 运行时增量）。不改变权威模型。
+function M.merge(payload)
+  if type(payload) == "string" then
+    local ok, t = pcall(Json.decode, payload)
+    if not ok or type(t) ~= "table" then
+      return false, "catalog-json-invalid"
+    end
+    payload = t
+  end
+  if type(payload) ~= "table" then
+    return false, "catalog-not-table"
+  end
+  if type(payload.items) == "table" then
+    for _, row in pairs(payload.items) do
+      local c = copy_item(row)
+      if c then items[c.id] = c end
+    end
+  end
+  if type(payload.shops) == "table" then
+    for _, row in pairs(payload.shops) do
+      local c = copy_shop(row)
+      if c then shops[c.id] = c end
+    end
+  end
+  if type(payload.unlockHints) == "table" then
+    for k, v in pairs(payload.unlockHints) do
+      local lv = as_pos_int32(k)
+      if lv then unlockHints[lv] = tostring(v) end
+    end
+  end
+  if type(payload.plotStages) == "table" then
+    plotStages = {}
+    for _, row in pairs(payload.plotStages) do
+      if type(row) == "table" then
+        plotStages[#plotStages + 1] = {
+          stage = as_nonneg_int32(row.stage) or 0,
+          needPlayerLevel = as_pos_int32(row.needPlayerLevel) or 1,
+          totalPlots = as_pos_int32(row.totalPlots) or 0,
+          unlockGold = as_nonneg_int32(row.unlockGold) or 0,
+        }
+      end
+    end
+    table.sort(plotStages, function(a, b) return a.stage < b.stage end)
+  end
+  if type(payload.gatherNodes) == "table" then
+    for _, row in pairs(payload.gatherNodes) do
+      local c = copy_gather_node(row)
+      if c then gatherNodes[c.id] = c end
+    end
+  end
+  if type(payload.mapNodes) == "table" then
+    mapNodes = {}
+    for _, row in pairs(payload.mapNodes) do
+      local c = copy_map_node(row)
+      if c then mapNodes[c.instanceId] = c end
+    end
+  end
+  if type(payload.toolLevels) == "table" then
+    for _, row in pairs(payload.toolLevels) do
+      local c = copy_tool_level(row)
+      if c then toolLevels[tool_level_key(c.toolId, c.level)] = c end
+    end
+  end
+  if payload.stackDefault ~= nil then
+    local sd = as_pos_int32(payload.stackDefault)
+    if sd then stackDefault = sd end
+  end
+  if type(payload.meta) == "table" then
+    meta = payload.meta
+  end
+  ready = next(items) ~= nil
+  return true
+end
+
+function M.reset()
+  items = {}
+  shops = {}
+  unlockHints = {}
+  plotStages = {}
+  gatherNodes = {}
+  mapNodes = {}
+  toolLevels = {}
+  stackDefault = 99
+  meta = nil
+  ready = false
+end
+
+--- 从导出数据表安装（Root/独立测试可注入；生产默认 require Data 模块）。
+function M.installFromData(data)
+  M.reset()
+  if type(data) ~= "table" then
+    return false, "display-data-missing"
+  end
+  local ok, err = M.merge(data)
+  if not ok then return false, err end
+  ready = next(items) ~= nil
+  return ready, ready and nil or "display-items-empty"
+end
+
+--- 装载正式导出模块；失败不发明默认 Gold/价格子集。
+function M.installDefaults()
+  local ok, data = pcall(require, "Services/GameplayDisplayCatalogData")
+  if not ok or type(data) ~= "table" then
+    M.reset()
+    return false, "display-data-module-missing"
+  end
+  return M.installFromData(data)
+end
+
+function M.isReady()
+  return ready
+end
+
+function M.getMeta()
+  return meta
+end
+
+function M.getStackDefault()
+  return stackDefault
+end
+
+--- 物理 stackMax；未知旧物回落 stack_default；Currency/非正不用于占格时回落 stack_default。
+function M.getStackMax(itemId)
+  local id = as_pos_int32(itemId)
+  if not id then return stackDefault end
+  local row = items[id]
+  if not row then return stackDefault end
+  if row.type == "Currency" then return stackDefault end
+  if row.stackMax and row.stackMax > 0 then return row.stackMax end
+  return stackDefault
+end
+
+function M.stackSlotsFor(itemId, count)
+  local c = count
+  if type(c) == "string" then
+    if not c:match("^%d+$") then return 0 end
+    c = tonumber(c) or 0
+  end
+  if type(c) ~= "number" or c ~= math.floor(c) or c <= 0 then return 0 end
+  local max = M.getStackMax(itemId)
+  if not max or max <= 0 then max = stackDefault end
+  return math.floor((c + max - 1) / max)
+end
+
+function M.countOccupied(bag)
+  if type(bag) ~= "table" then return 0 end
+  local n = 0
+  for i = 1, #bag do
+    local row = bag[i]
+    if type(row) == "table" then
+      n = n + M.stackSlotsFor(row.itemId, row.count or 0)
+    end
+  end
+  return n
+end
+
+function M.getItem(itemId)
+  local id = as_pos_int32(itemId)
+  if not id then return nil end
+  local row = items[id]
+  if not row then return nil end
+  return {
+    id = row.id,
+    name = row.name,
+    type = row.type,
+    sellPrice = row.sellPrice,
+    stackMax = row.stackMax,
+    unlockLevel = row.unlockLevel,
+  }
+end
+
+function M.getShop(shopId)
+  local id = as_pos_int32(shopId)
+  if not id then return nil end
+  local row = shops[id]
+  if not row then return nil end
+  return {
+    id = row.id,
+    itemId = row.itemId,
+    price = row.price,
+    priceCurrency = row.priceCurrency,
+    unlockLevel = row.unlockLevel,
+    category = row.category,
+    limitCount = row.limitCount,
+  }
+end
+
+--- 可售：已知物理物且配置售价>0；未知/Currency/售价≤0 → 不可操作占位。
+function M.canSell(itemId)
+  local row = M.getItem(itemId)
+  if not row then
+    return false, "legacy"
+  end
+  if row.type == "Currency" then
+    return false, "currency"
+  end
+  if row.sellPrice == nil or row.sellPrice <= 0 then
+    return false, "unsellable"
+  end
+  return true, "ok"
+end
+
+function M.listShops()
+  local out = {}
+  for _, row in pairs(shops) do
+    out[#out + 1] = M.getShop(row.id)
+  end
+  table.sort(out, function(a, b) return a.id < b.id end)
+  return out
+end
+
+function M.listItems()
+  local out = {}
+  for _, row in pairs(items) do
+    out[#out + 1] = M.getItem(row.id)
+  end
+  table.sort(out, function(a, b) return a.id < b.id end)
+  return out
+end
+
+--- 只读种子列表（type=Seed）；未知/非种子不入列。选种 UI 用，不发明免费种子。
+function M.listSeeds()
+  local out = {}
+  for _, row in pairs(items) do
+    if row.type == "Seed" then
+      out[#out + 1] = M.getItem(row.id)
+    end
+  end
+  table.sort(out, function(a, b) return a.id < b.id end)
+  return out
+end
+
+function M.listPlotStages()
+  local out = {}
+  for i = 1, #plotStages do
+    local r = plotStages[i]
+    out[i] = {
+      stage = r.stage,
+      needPlayerLevel = r.needPlayerLevel,
+      totalPlots = r.totalPlots,
+      unlockGold = r.unlockGold,
+    }
+  end
+  return out
+end
+
+function M.unlockHint(level)
+  local lv = as_pos_int32(level) or 0
+  return unlockHints[lv]
+end
+
+function M.listUnlockHintsUpTo(level)
+  local lv = as_pos_int32(level) or 0
+  local out = {}
+  for k, v in pairs(unlockHints) do
+    if k <= lv then
+      out[#out + 1] = { level = k, text = v }
+    end
+  end
+  table.sort(out, function(a, b) return a.level < b.level end)
+  return out
+end
+
+--- 采集类型规则（GatherNode.id = MapInstance.typeId）；不是 instanceId。
+function M.getGatherNode(typeId)
+  local id = as_pos_int32(typeId)
+  if not id then return nil end
+  local row = gatherNodes[id]
+  if not row then return nil end
+  return {
+    id = row.id,
+    code = row.code,
+    name = row.name,
+    toolId = row.toolId,
+    unlockLevel = row.unlockLevel,
+    cooldownSec = row.cooldownSec,
+  }
+end
+
+function M.listGatherNodes()
+  local out = {}
+  for _, row in pairs(gatherNodes) do
+    out[#out + 1] = M.getGatherNode(row.id)
+  end
+  table.sort(out, function(a, b) return a.id < b.id end)
+  return out
+end
+
+--- 稳定地图 Node 实例；instanceId 不可用 typeId/序号代替。
+function M.getMapNode(instanceId)
+  local id = as_pos_int32(instanceId)
+  if not id then return nil end
+  local row = mapNodes[id]
+  if not row then return nil end
+  return {
+    instanceId = row.instanceId,
+    typeId = row.typeId,
+    label = row.label,
+  }
+end
+
+function M.listMapNodes()
+  local out = {}
+  for _, row in pairs(mapNodes) do
+    out[#out + 1] = M.getMapNode(row.instanceId)
+  end
+  table.sort(out, function(a, b) return a.instanceId < b.instanceId end)
+  return out
+end
+
+--- 工具等级只读规则；materials=nil 表示成本不完整；空表=合法无材料。
+function M.getToolLevel(toolId, level)
+  local tid = as_pos_int32(toolId)
+  local lv = as_pos_int32(level)
+  if not tid or not lv then return nil end
+  local row = toolLevels[tool_level_key(tid, lv)]
+  if not row then return nil end
+  local mats = nil
+  if row.materials ~= nil then
+    mats = {}
+    for i = 1, #row.materials do
+      mats[i] = { itemId = row.materials[i].itemId, count = row.materials[i].count }
+    end
+  end
+  return {
+    toolId = row.toolId,
+    level = row.level,
+    needPlayerLevel = row.needPlayerLevel,
+    goldCost = row.goldCost,
+    materials = mats,
+    costComplete = row.costComplete and true or false,
+  }
+end
+
+function M.listToolIds()
+  local seen, out = {}, {}
+  for _, row in pairs(toolLevels) do
+    if not seen[row.toolId] then
+      seen[row.toolId] = true
+      out[#out + 1] = row.toolId
+    end
+  end
+  table.sort(out)
+  if #out == 0 then
+    -- 回退：从物品表 Tool 类型
+    for _, row in pairs(items) do
+      if row.type == "Tool" then out[#out + 1] = row.id end
+    end
+    table.sort(out)
+  end
+  return out
+end
+
+-- 模块加载即装正式导出数据；测试可 reset/merge/installFromData。
+M.installDefaults()
+
+return M

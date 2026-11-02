@@ -86,6 +86,18 @@ public partial class Tables
     /// 全局字符串键值扩展。只增行，不改生成类型。100不含m1_patch_message。
     /// </summary>
     public TbGlobalKv TbGlobalKv {get; }
+    /// <summary>
+    /// 商店
+    /// </summary>
+    public TbShop TbShop {get; }
+    /// <summary>
+    /// M2固定灰盒地图实例
+    /// </summary>
+    public TbMapInstance TbMapInstance {get; }
+    /// <summary>
+    /// 玩法初始化（货币仍取 Global/player 默认）
+    /// </summary>
+    public TbPlayerInit TbPlayerInit {get; }
 
     public Tables(System.Func<string, JSONNode> loader)
     {
@@ -107,6 +119,9 @@ public partial class Tables
         TbGachaPoolItem = new TbGachaPoolItem(loader("tbgachapoolitem"));
         TbActivity = new TbActivity(loader("tbactivity"));
         TbGlobalKv = new TbGlobalKv(loader("tbglobalkv"));
+        TbShop = new TbShop(loader("tbshop"));
+        TbMapInstance = new TbMapInstance(loader("tbmapinstance"));
+        TbPlayerInit = new TbPlayerInit(loader("tbplayerinit"));
         ResolveRef();
     }
     
@@ -130,6 +145,9 @@ public partial class Tables
         TbGachaPoolItem.ResolveRef(this);
         TbActivity.ResolveRef(this);
         TbGlobalKv.ResolveRef(this);
+        TbShop.ResolveRef(this);
+        TbMapInstance.ResolveRef(this);
+        TbPlayerInit.ResolveRef(this);
     }
 }
 

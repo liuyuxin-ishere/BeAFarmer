@@ -30,17 +30,25 @@ namespace CloudIsle.Proto {
             "aXN0ZXJSZXESEAoIdXNlcm5hbWUYASABKAkSEAoIcGFzc3dvcmQYAiABKAkS",
             "EAoIbmlja25hbWUYAyABKAkSFQoNcHJvdG9fdmVyc2lvbhgEIAEoBRIRCglk",
             "ZXZpY2VfaWQYBSABKAkiHAoMUmVnaXN0ZXJSZXNwEgwKBGNvZGUYASABKAUi",
-            "mgEKCExvZ2luUmVxEhAKCHVzZXJuYW1lGAEgASgJEhAKCHBhc3N3b3JkGAIg",
+            "swEKCExvZ2luUmVxEhAKCHVzZXJuYW1lGAEgASgJEhAKCHBhc3N3b3JkGAIg",
             "ASgJEhMKC2FwcF92ZXJzaW9uGAMgASgJEhMKC3Jlc192ZXJzaW9uGAQgASgF",
             "EhUKDXByb3RvX3ZlcnNpb24YBSABKAUSFgoOY29uZmlnX3ZlcnNpb24YBiAB",
-            "KAUSEQoJZGV2aWNlX2lkGAcgASgJIp0BCglMb2dpblJlc3ASDAoEY29kZRgB",
-            "IAEoBRINCgV0b2tlbhgCIAEoCRITCgtzZXJ2ZXJfdGltZRgDIAEoAxIYChBu",
-            "ZWVkX3Jlc192ZXJzaW9uGAQgASgFEhsKE25lZWRfY29uZmlnX3ZlcnNpb24Y",
-            "BSABKAUSJwoEZGF0YRgGIAEoCzIZLmNsb3VkaXNsZS5QbGF5ZXJGdWxsRGF0",
-            "YSI0CgxSZWNvbm5lY3RSZXESDQoFdG9rZW4YASABKAkSFQoNcHJvdG9fdmVy",
-            "c2lvbhgCIAEoBSJbCg1SZWNvbm5lY3RSZXNwEgwKBGNvZGUYASABKAUSEwoL",
-            "c2VydmVyX3RpbWUYAiABKAMSJwoEZGF0YRgDIAEoCzIZLmNsb3VkaXNsZS5Q",
-            "bGF5ZXJGdWxsRGF0YSILCglMb2dvdXRSZXEiMAoHS2lja050ZhIlCgZyZWFz",
+            "KAUSEQoJZGV2aWNlX2lkGAcgASgJEhcKD2JyaWRnZV9jb250cmFjdBgIIAEo",
+            "CSKWAgoJTG9naW5SZXNwEgwKBGNvZGUYASABKAUSDQoFdG9rZW4YAiABKAkS",
+            "EwoLc2VydmVyX3RpbWUYAyABKAMSGAoQbmVlZF9yZXNfdmVyc2lvbhgEIAEo",
+            "BRIbChNuZWVkX2NvbmZpZ192ZXJzaW9uGAUgASgFEicKBGRhdGEYBiABKAsy",
+            "GS5jbG91ZGlzbGUuUGxheWVyRnVsbERhdGESGgoSb3BlcmF0aW9uX3Njb3Bl",
+            "X2lkGAcgASgDEhcKCm5leHRfb3BfaWQYCCABKANIAIgBARIzCgtzY29wZV9z",
+            "dGF0ZRgJIAEoDjIeLmNsb3VkaXNsZS5PcGVyYXRpb25TY29wZVN0YXRlQg0K",
+            "C19uZXh0X29wX2lkIo8BCgxSZWNvbm5lY3RSZXESDQoFdG9rZW4YASABKAkS",
+            "FQoNcHJvdG9fdmVyc2lvbhgCIAEoBRITCgthcHBfdmVyc2lvbhgDIAEoCRIT",
+            "CgtyZXNfdmVyc2lvbhgEIAEoBRIWCg5jb25maWdfdmVyc2lvbhgFIAEoBRIX",
+            "Cg9icmlkZ2VfY29udHJhY3QYBiABKAki1AEKDVJlY29ubmVjdFJlc3ASDAoE",
+            "Y29kZRgBIAEoBRITCgtzZXJ2ZXJfdGltZRgCIAEoAxInCgRkYXRhGAMgASgL",
+            "MhkuY2xvdWRpc2xlLlBsYXllckZ1bGxEYXRhEhoKEm9wZXJhdGlvbl9zY29w",
+            "ZV9pZBgEIAEoAxIXCgpuZXh0X29wX2lkGAUgASgDSACIAQESMwoLc2NvcGVf",
+            "c3RhdGUYBiABKA4yHi5jbG91ZGlzbGUuT3BlcmF0aW9uU2NvcGVTdGF0ZUIN",
+            "CgtfbmV4dF9vcF9pZCILCglMb2dvdXRSZXEiMAoHS2lja050ZhIlCgZyZWFz",
             "b24YASABKA4yFS5jbG91ZGlzbGUuS2lja1JlYXNvbipKCgpLaWNrUmVhc29u",
             "EhIKDktJQ0tfRUxTRVdIRVJFEAASFAoQS0lDS19NQUlOVEVOQU5DRRABEhIK",
             "DktJQ0tfVklPTEFUSU9OEAJCEqoCD0Nsb3VkSXNsZS5Qcm90b2IGcHJvdG8z"));
@@ -51,10 +59,10 @@ namespace CloudIsle.Proto {
             new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.HeartbeatResp), global::CloudIsle.Proto.HeartbeatResp.Parser, new[]{ "Code", "ServerTime" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.RegisterReq), global::CloudIsle.Proto.RegisterReq.Parser, new[]{ "Username", "Password", "Nickname", "ProtoVersion", "DeviceId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.RegisterResp), global::CloudIsle.Proto.RegisterResp.Parser, new[]{ "Code" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.LoginReq), global::CloudIsle.Proto.LoginReq.Parser, new[]{ "Username", "Password", "AppVersion", "ResVersion", "ProtoVersion", "ConfigVersion", "DeviceId" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.LoginResp), global::CloudIsle.Proto.LoginResp.Parser, new[]{ "Code", "Token", "ServerTime", "NeedResVersion", "NeedConfigVersion", "Data" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.ReconnectReq), global::CloudIsle.Proto.ReconnectReq.Parser, new[]{ "Token", "ProtoVersion" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.ReconnectResp), global::CloudIsle.Proto.ReconnectResp.Parser, new[]{ "Code", "ServerTime", "Data" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.LoginReq), global::CloudIsle.Proto.LoginReq.Parser, new[]{ "Username", "Password", "AppVersion", "ResVersion", "ProtoVersion", "ConfigVersion", "DeviceId", "BridgeContract" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.LoginResp), global::CloudIsle.Proto.LoginResp.Parser, new[]{ "Code", "Token", "ServerTime", "NeedResVersion", "NeedConfigVersion", "Data", "OperationScopeId", "NextOpId", "ScopeState" }, new[]{ "NextOpId" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.ReconnectReq), global::CloudIsle.Proto.ReconnectReq.Parser, new[]{ "Token", "ProtoVersion", "AppVersion", "ResVersion", "ConfigVersion", "BridgeContract" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.ReconnectResp), global::CloudIsle.Proto.ReconnectResp.Parser, new[]{ "Code", "ServerTime", "Data", "OperationScopeId", "NextOpId", "ScopeState" }, new[]{ "NextOpId" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.LogoutReq), global::CloudIsle.Proto.LogoutReq.Parser, null, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::CloudIsle.Proto.KickNtf), global::CloudIsle.Proto.KickNtf.Parser, new[]{ "Reason" }, null, null, null, null)
           }));
@@ -1030,6 +1038,7 @@ namespace CloudIsle.Proto {
 
   /// <summary>
   /// 1005 登录请求。版本字段用于判断安装包、资源和协议是否兼容。
+  /// bridge_contract 为 M2 追加字段；旧客户端可省略，服务端按门槛策略处理（运行接入见 T009）。
   /// </summary>
   public sealed partial class LoginReq : pb::IMessage<LoginReq>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -1072,6 +1081,7 @@ namespace CloudIsle.Proto {
       protoVersion_ = other.protoVersion_;
       configVersion_ = other.configVersion_;
       deviceId_ = other.deviceId_;
+      bridgeContract_ = other.bridgeContract_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1165,6 +1175,21 @@ namespace CloudIsle.Proto {
       }
     }
 
+    /// <summary>Field number for the "bridge_contract" field.</summary>
+    public const int BridgeContractFieldNumber = 8;
+    private string bridgeContract_ = "";
+    /// <summary>
+    /// 固定桥契约名，例如 m1-bridge-0.3 / m2-bridge-0.4。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string BridgeContract {
+      get { return bridgeContract_; }
+      set {
+        bridgeContract_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -1187,6 +1212,7 @@ namespace CloudIsle.Proto {
       if (ProtoVersion != other.ProtoVersion) return false;
       if (ConfigVersion != other.ConfigVersion) return false;
       if (DeviceId != other.DeviceId) return false;
+      if (BridgeContract != other.BridgeContract) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1201,6 +1227,7 @@ namespace CloudIsle.Proto {
       if (ProtoVersion != 0) hash ^= ProtoVersion.GetHashCode();
       if (ConfigVersion != 0) hash ^= ConfigVersion.GetHashCode();
       if (DeviceId.Length != 0) hash ^= DeviceId.GetHashCode();
+      if (BridgeContract.Length != 0) hash ^= BridgeContract.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1247,6 +1274,10 @@ namespace CloudIsle.Proto {
         output.WriteRawTag(58);
         output.WriteString(DeviceId);
       }
+      if (BridgeContract.Length != 0) {
+        output.WriteRawTag(66);
+        output.WriteString(BridgeContract);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1285,6 +1316,10 @@ namespace CloudIsle.Proto {
         output.WriteRawTag(58);
         output.WriteString(DeviceId);
       }
+      if (BridgeContract.Length != 0) {
+        output.WriteRawTag(66);
+        output.WriteString(BridgeContract);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -1315,6 +1350,9 @@ namespace CloudIsle.Proto {
       }
       if (DeviceId.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(DeviceId);
+      }
+      if (BridgeContract.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(BridgeContract);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -1348,6 +1386,9 @@ namespace CloudIsle.Proto {
       }
       if (other.DeviceId.Length != 0) {
         DeviceId = other.DeviceId;
+      }
+      if (other.BridgeContract.Length != 0) {
+        BridgeContract = other.BridgeContract;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -1390,6 +1431,10 @@ namespace CloudIsle.Proto {
           }
           case 58: {
             DeviceId = input.ReadString();
+            break;
+          }
+          case 66: {
+            BridgeContract = input.ReadString();
             break;
           }
         }
@@ -1435,6 +1480,10 @@ namespace CloudIsle.Proto {
             DeviceId = input.ReadString();
             break;
           }
+          case 66: {
+            BridgeContract = input.ReadString();
+            break;
+          }
         }
       }
     }
@@ -1452,6 +1501,7 @@ namespace CloudIsle.Proto {
   {
     private static readonly pb::MessageParser<LoginResp> _parser = new pb::MessageParser<LoginResp>(() => new LoginResp());
     private pb::UnknownFieldSet _unknownFields;
+    private int _hasBits0;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<LoginResp> Parser { get { return _parser; } }
@@ -1479,12 +1529,16 @@ namespace CloudIsle.Proto {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public LoginResp(LoginResp other) : this() {
+      _hasBits0 = other._hasBits0;
       code_ = other.code_;
       token_ = other.token_;
       serverTime_ = other.serverTime_;
       needResVersion_ = other.needResVersion_;
       needConfigVersion_ = other.needConfigVersion_;
       data_ = other.data_ != null ? other.data_.Clone() : null;
+      operationScopeId_ = other.operationScopeId_;
+      nextOpId_ = other.nextOpId_;
+      scopeState_ = other.scopeState_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1566,6 +1620,61 @@ namespace CloudIsle.Proto {
       }
     }
 
+    /// <summary>Field number for the "operation_scope_id" field.</summary>
+    public const int OperationScopeIdFieldNumber = 7;
+    private long operationScopeId_;
+    /// <summary>
+    /// M2：本会话写命令 scope；旧字段 1–6 语义不变。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long OperationScopeId {
+      get { return operationScopeId_; }
+      set {
+        operationScopeId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "next_op_id" field.</summary>
+    public const int NextOpIdFieldNumber = 8;
+    private long nextOpId_;
+    /// <summary>
+    /// M2-T010：新登录权威 next_op（恒为 1）；成功时 optional 给出；拒绝响应不设置。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long NextOpId {
+      get { if ((_hasBits0 & 1) != 0) { return nextOpId_; } else { return 0L; } }
+      set {
+        _hasBits0 |= 1;
+        nextOpId_ = value;
+      }
+    }
+    /// <summary>Gets whether the "next_op_id" field is set</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool HasNextOpId {
+      get { return (_hasBits0 & 1) != 0; }
+    }
+    /// <summary>Clears the value of the "next_op_id" field</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void ClearNextOpId() {
+      _hasBits0 &= ~1;
+    }
+
+    /// <summary>Field number for the "scope_state" field.</summary>
+    public const int ScopeStateFieldNumber = 9;
+    private global::CloudIsle.Proto.OperationScopeState scopeState_ = global::CloudIsle.Proto.OperationScopeState.Unknown;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::CloudIsle.Proto.OperationScopeState ScopeState {
+      get { return scopeState_; }
+      set {
+        scopeState_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -1587,6 +1696,9 @@ namespace CloudIsle.Proto {
       if (NeedResVersion != other.NeedResVersion) return false;
       if (NeedConfigVersion != other.NeedConfigVersion) return false;
       if (!object.Equals(Data, other.Data)) return false;
+      if (OperationScopeId != other.OperationScopeId) return false;
+      if (NextOpId != other.NextOpId) return false;
+      if (ScopeState != other.ScopeState) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1600,6 +1712,9 @@ namespace CloudIsle.Proto {
       if (NeedResVersion != 0) hash ^= NeedResVersion.GetHashCode();
       if (NeedConfigVersion != 0) hash ^= NeedConfigVersion.GetHashCode();
       if (data_ != null) hash ^= Data.GetHashCode();
+      if (OperationScopeId != 0L) hash ^= OperationScopeId.GetHashCode();
+      if (HasNextOpId) hash ^= NextOpId.GetHashCode();
+      if (ScopeState != global::CloudIsle.Proto.OperationScopeState.Unknown) hash ^= ScopeState.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1642,6 +1757,18 @@ namespace CloudIsle.Proto {
         output.WriteRawTag(50);
         output.WriteMessage(Data);
       }
+      if (OperationScopeId != 0L) {
+        output.WriteRawTag(56);
+        output.WriteInt64(OperationScopeId);
+      }
+      if (HasNextOpId) {
+        output.WriteRawTag(64);
+        output.WriteInt64(NextOpId);
+      }
+      if (ScopeState != global::CloudIsle.Proto.OperationScopeState.Unknown) {
+        output.WriteRawTag(72);
+        output.WriteEnum((int) ScopeState);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1676,6 +1803,18 @@ namespace CloudIsle.Proto {
         output.WriteRawTag(50);
         output.WriteMessage(Data);
       }
+      if (OperationScopeId != 0L) {
+        output.WriteRawTag(56);
+        output.WriteInt64(OperationScopeId);
+      }
+      if (HasNextOpId) {
+        output.WriteRawTag(64);
+        output.WriteInt64(NextOpId);
+      }
+      if (ScopeState != global::CloudIsle.Proto.OperationScopeState.Unknown) {
+        output.WriteRawTag(72);
+        output.WriteEnum((int) ScopeState);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -1703,6 +1842,15 @@ namespace CloudIsle.Proto {
       }
       if (data_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(Data);
+      }
+      if (OperationScopeId != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(OperationScopeId);
+      }
+      if (HasNextOpId) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(NextOpId);
+      }
+      if (ScopeState != global::CloudIsle.Proto.OperationScopeState.Unknown) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) ScopeState);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -1736,6 +1884,15 @@ namespace CloudIsle.Proto {
           Data = new global::CloudIsle.Proto.PlayerFullData();
         }
         Data.MergeFrom(other.Data);
+      }
+      if (other.OperationScopeId != 0L) {
+        OperationScopeId = other.OperationScopeId;
+      }
+      if (other.HasNextOpId) {
+        NextOpId = other.NextOpId;
+      }
+      if (other.ScopeState != global::CloudIsle.Proto.OperationScopeState.Unknown) {
+        ScopeState = other.ScopeState;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -1777,6 +1934,18 @@ namespace CloudIsle.Proto {
               Data = new global::CloudIsle.Proto.PlayerFullData();
             }
             input.ReadMessage(Data);
+            break;
+          }
+          case 56: {
+            OperationScopeId = input.ReadInt64();
+            break;
+          }
+          case 64: {
+            NextOpId = input.ReadInt64();
+            break;
+          }
+          case 72: {
+            ScopeState = (global::CloudIsle.Proto.OperationScopeState) input.ReadEnum();
             break;
           }
         }
@@ -1821,6 +1990,18 @@ namespace CloudIsle.Proto {
             input.ReadMessage(Data);
             break;
           }
+          case 56: {
+            OperationScopeId = input.ReadInt64();
+            break;
+          }
+          case 64: {
+            NextOpId = input.ReadInt64();
+            break;
+          }
+          case 72: {
+            ScopeState = (global::CloudIsle.Proto.OperationScopeState) input.ReadEnum();
+            break;
+          }
         }
       }
     }
@@ -1830,6 +2011,7 @@ namespace CloudIsle.Proto {
 
   /// <summary>
   /// 1007 重连请求。用已保存的 token 恢复会话，不再提交密码。
+  /// app/res/config/bridge 为 M2 追加，供重连同样做版本门槛（缺省或不兼容 → 106，见 T009）。
   /// </summary>
   public sealed partial class ReconnectReq : pb::IMessage<ReconnectReq>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -1867,6 +2049,10 @@ namespace CloudIsle.Proto {
     public ReconnectReq(ReconnectReq other) : this() {
       token_ = other.token_;
       protoVersion_ = other.protoVersion_;
+      appVersion_ = other.appVersion_;
+      resVersion_ = other.resVersion_;
+      configVersion_ = other.configVersion_;
+      bridgeContract_ = other.bridgeContract_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1900,6 +2086,54 @@ namespace CloudIsle.Proto {
       }
     }
 
+    /// <summary>Field number for the "app_version" field.</summary>
+    public const int AppVersionFieldNumber = 3;
+    private string appVersion_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string AppVersion {
+      get { return appVersion_; }
+      set {
+        appVersion_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "res_version" field.</summary>
+    public const int ResVersionFieldNumber = 4;
+    private int resVersion_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int ResVersion {
+      get { return resVersion_; }
+      set {
+        resVersion_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "config_version" field.</summary>
+    public const int ConfigVersionFieldNumber = 5;
+    private int configVersion_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int ConfigVersion {
+      get { return configVersion_; }
+      set {
+        configVersion_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "bridge_contract" field.</summary>
+    public const int BridgeContractFieldNumber = 6;
+    private string bridgeContract_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string BridgeContract {
+      get { return bridgeContract_; }
+      set {
+        bridgeContract_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -1917,6 +2151,10 @@ namespace CloudIsle.Proto {
       }
       if (Token != other.Token) return false;
       if (ProtoVersion != other.ProtoVersion) return false;
+      if (AppVersion != other.AppVersion) return false;
+      if (ResVersion != other.ResVersion) return false;
+      if (ConfigVersion != other.ConfigVersion) return false;
+      if (BridgeContract != other.BridgeContract) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1926,6 +2164,10 @@ namespace CloudIsle.Proto {
       int hash = 1;
       if (Token.Length != 0) hash ^= Token.GetHashCode();
       if (ProtoVersion != 0) hash ^= ProtoVersion.GetHashCode();
+      if (AppVersion.Length != 0) hash ^= AppVersion.GetHashCode();
+      if (ResVersion != 0) hash ^= ResVersion.GetHashCode();
+      if (ConfigVersion != 0) hash ^= ConfigVersion.GetHashCode();
+      if (BridgeContract.Length != 0) hash ^= BridgeContract.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1952,6 +2194,22 @@ namespace CloudIsle.Proto {
         output.WriteRawTag(16);
         output.WriteInt32(ProtoVersion);
       }
+      if (AppVersion.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(AppVersion);
+      }
+      if (ResVersion != 0) {
+        output.WriteRawTag(32);
+        output.WriteInt32(ResVersion);
+      }
+      if (ConfigVersion != 0) {
+        output.WriteRawTag(40);
+        output.WriteInt32(ConfigVersion);
+      }
+      if (BridgeContract.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(BridgeContract);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1970,6 +2228,22 @@ namespace CloudIsle.Proto {
         output.WriteRawTag(16);
         output.WriteInt32(ProtoVersion);
       }
+      if (AppVersion.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(AppVersion);
+      }
+      if (ResVersion != 0) {
+        output.WriteRawTag(32);
+        output.WriteInt32(ResVersion);
+      }
+      if (ConfigVersion != 0) {
+        output.WriteRawTag(40);
+        output.WriteInt32(ConfigVersion);
+      }
+      if (BridgeContract.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(BridgeContract);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -1985,6 +2259,18 @@ namespace CloudIsle.Proto {
       }
       if (ProtoVersion != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(ProtoVersion);
+      }
+      if (AppVersion.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(AppVersion);
+      }
+      if (ResVersion != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(ResVersion);
+      }
+      if (ConfigVersion != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(ConfigVersion);
+      }
+      if (BridgeContract.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(BridgeContract);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -2003,6 +2289,18 @@ namespace CloudIsle.Proto {
       }
       if (other.ProtoVersion != 0) {
         ProtoVersion = other.ProtoVersion;
+      }
+      if (other.AppVersion.Length != 0) {
+        AppVersion = other.AppVersion;
+      }
+      if (other.ResVersion != 0) {
+        ResVersion = other.ResVersion;
+      }
+      if (other.ConfigVersion != 0) {
+        ConfigVersion = other.ConfigVersion;
+      }
+      if (other.BridgeContract.Length != 0) {
+        BridgeContract = other.BridgeContract;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -2025,6 +2323,22 @@ namespace CloudIsle.Proto {
           }
           case 16: {
             ProtoVersion = input.ReadInt32();
+            break;
+          }
+          case 26: {
+            AppVersion = input.ReadString();
+            break;
+          }
+          case 32: {
+            ResVersion = input.ReadInt32();
+            break;
+          }
+          case 40: {
+            ConfigVersion = input.ReadInt32();
+            break;
+          }
+          case 50: {
+            BridgeContract = input.ReadString();
             break;
           }
         }
@@ -2050,6 +2364,22 @@ namespace CloudIsle.Proto {
             ProtoVersion = input.ReadInt32();
             break;
           }
+          case 26: {
+            AppVersion = input.ReadString();
+            break;
+          }
+          case 32: {
+            ResVersion = input.ReadInt32();
+            break;
+          }
+          case 40: {
+            ConfigVersion = input.ReadInt32();
+            break;
+          }
+          case 50: {
+            BridgeContract = input.ReadString();
+            break;
+          }
         }
       }
     }
@@ -2067,6 +2397,7 @@ namespace CloudIsle.Proto {
   {
     private static readonly pb::MessageParser<ReconnectResp> _parser = new pb::MessageParser<ReconnectResp>(() => new ReconnectResp());
     private pb::UnknownFieldSet _unknownFields;
+    private int _hasBits0;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<ReconnectResp> Parser { get { return _parser; } }
@@ -2094,9 +2425,13 @@ namespace CloudIsle.Proto {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ReconnectResp(ReconnectResp other) : this() {
+      _hasBits0 = other._hasBits0;
       code_ = other.code_;
       serverTime_ = other.serverTime_;
       data_ = other.data_ != null ? other.data_.Clone() : null;
+      operationScopeId_ = other.operationScopeId_;
+      nextOpId_ = other.nextOpId_;
+      scopeState_ = other.scopeState_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -2142,6 +2477,61 @@ namespace CloudIsle.Proto {
       }
     }
 
+    /// <summary>Field number for the "operation_scope_id" field.</summary>
+    public const int OperationScopeIdFieldNumber = 4;
+    private long operationScopeId_;
+    /// <summary>
+    /// M2：恢复的写命令 scope（与登录签发的同一有效 scope）。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long OperationScopeId {
+      get { return operationScopeId_; }
+      set {
+        operationScopeId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "next_op_id" field.</summary>
+    public const int NextOpIdFieldNumber = 5;
+    private long nextOpId_;
+    /// <summary>
+    /// M2-T010：持久存储的实际 next_op（非恒 1）；拒绝响应不设置。
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long NextOpId {
+      get { if ((_hasBits0 & 1) != 0) { return nextOpId_; } else { return 0L; } }
+      set {
+        _hasBits0 |= 1;
+        nextOpId_ = value;
+      }
+    }
+    /// <summary>Gets whether the "next_op_id" field is set</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool HasNextOpId {
+      get { return (_hasBits0 & 1) != 0; }
+    }
+    /// <summary>Clears the value of the "next_op_id" field</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void ClearNextOpId() {
+      _hasBits0 &= ~1;
+    }
+
+    /// <summary>Field number for the "scope_state" field.</summary>
+    public const int ScopeStateFieldNumber = 6;
+    private global::CloudIsle.Proto.OperationScopeState scopeState_ = global::CloudIsle.Proto.OperationScopeState.Unknown;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::CloudIsle.Proto.OperationScopeState ScopeState {
+      get { return scopeState_; }
+      set {
+        scopeState_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -2160,6 +2550,9 @@ namespace CloudIsle.Proto {
       if (Code != other.Code) return false;
       if (ServerTime != other.ServerTime) return false;
       if (!object.Equals(Data, other.Data)) return false;
+      if (OperationScopeId != other.OperationScopeId) return false;
+      if (NextOpId != other.NextOpId) return false;
+      if (ScopeState != other.ScopeState) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -2170,6 +2563,9 @@ namespace CloudIsle.Proto {
       if (Code != 0) hash ^= Code.GetHashCode();
       if (ServerTime != 0L) hash ^= ServerTime.GetHashCode();
       if (data_ != null) hash ^= Data.GetHashCode();
+      if (OperationScopeId != 0L) hash ^= OperationScopeId.GetHashCode();
+      if (HasNextOpId) hash ^= NextOpId.GetHashCode();
+      if (ScopeState != global::CloudIsle.Proto.OperationScopeState.Unknown) hash ^= ScopeState.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -2200,6 +2596,18 @@ namespace CloudIsle.Proto {
         output.WriteRawTag(26);
         output.WriteMessage(Data);
       }
+      if (OperationScopeId != 0L) {
+        output.WriteRawTag(32);
+        output.WriteInt64(OperationScopeId);
+      }
+      if (HasNextOpId) {
+        output.WriteRawTag(40);
+        output.WriteInt64(NextOpId);
+      }
+      if (ScopeState != global::CloudIsle.Proto.OperationScopeState.Unknown) {
+        output.WriteRawTag(48);
+        output.WriteEnum((int) ScopeState);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -2222,6 +2630,18 @@ namespace CloudIsle.Proto {
         output.WriteRawTag(26);
         output.WriteMessage(Data);
       }
+      if (OperationScopeId != 0L) {
+        output.WriteRawTag(32);
+        output.WriteInt64(OperationScopeId);
+      }
+      if (HasNextOpId) {
+        output.WriteRawTag(40);
+        output.WriteInt64(NextOpId);
+      }
+      if (ScopeState != global::CloudIsle.Proto.OperationScopeState.Unknown) {
+        output.WriteRawTag(48);
+        output.WriteEnum((int) ScopeState);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -2240,6 +2660,15 @@ namespace CloudIsle.Proto {
       }
       if (data_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(Data);
+      }
+      if (OperationScopeId != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(OperationScopeId);
+      }
+      if (HasNextOpId) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(NextOpId);
+      }
+      if (ScopeState != global::CloudIsle.Proto.OperationScopeState.Unknown) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) ScopeState);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -2264,6 +2693,15 @@ namespace CloudIsle.Proto {
           Data = new global::CloudIsle.Proto.PlayerFullData();
         }
         Data.MergeFrom(other.Data);
+      }
+      if (other.OperationScopeId != 0L) {
+        OperationScopeId = other.OperationScopeId;
+      }
+      if (other.HasNextOpId) {
+        NextOpId = other.NextOpId;
+      }
+      if (other.ScopeState != global::CloudIsle.Proto.OperationScopeState.Unknown) {
+        ScopeState = other.ScopeState;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -2295,6 +2733,18 @@ namespace CloudIsle.Proto {
             input.ReadMessage(Data);
             break;
           }
+          case 32: {
+            OperationScopeId = input.ReadInt64();
+            break;
+          }
+          case 40: {
+            NextOpId = input.ReadInt64();
+            break;
+          }
+          case 48: {
+            ScopeState = (global::CloudIsle.Proto.OperationScopeState) input.ReadEnum();
+            break;
+          }
         }
       }
     #endif
@@ -2323,6 +2773,18 @@ namespace CloudIsle.Proto {
               Data = new global::CloudIsle.Proto.PlayerFullData();
             }
             input.ReadMessage(Data);
+            break;
+          }
+          case 32: {
+            OperationScopeId = input.ReadInt64();
+            break;
+          }
+          case 40: {
+            NextOpId = input.ReadInt64();
+            break;
+          }
+          case 48: {
+            ScopeState = (global::CloudIsle.Proto.OperationScopeState) input.ReadEnum();
             break;
           }
         }

@@ -1,0 +1,448 @@
+-- U01 BagPresenter：共同生命周期 + sell/expand。关窗只释放本窗租约；已受理命令继续全局。
+-- 每条命令独立 op 令牌：同步完成、晚返回、重入 done、陈旧完成、关窗/销毁均不得误清/Dispose 新观察。
+
+local Inventory = require("Services/InventoryService")
+local Catalog = require("Services/GameplayDisplayCatalog")
+local ErrorPolicy = require("Services/GameplayErrorPolicy")
+
+local M = {}
+
+-- 列表视口行数：1280x720 下 BagListLabel 约 219px / 字号18 ≈ 10 行；留边用 8。
+local LIST_PAGE_SIZE = 8
+
+local function safe_call(fn, ...)
+  if type(fn) ~= "function" then return end
+  local ok, err = pcall(fn, ...)
+  if not ok then _ = err end
+end
+
+local function release_obs(obs)
+  if obs == nil then return end
+  local ok = pcall(function()
+    if obs.Dispose ~= nil then
+      obs:Dispose()
+    elseif obs.dispose ~= nil then
+      obs:dispose()
+    end
+  end)
+  _ = ok
+end
+
+local function feedback_text(code, result)
+  if type(result) == "table" and type(result.message) == "string" and result.message ~= "" then
+    return result.message
+  end
+  return ErrorPolicy.message({ code = code, kind = type(result) == "table" and result.kind or nil, message = type(result) == "table" and result.message or nil })
+end
+
+--- 占格：ceil(count/stackMax)；未知旧物用 stack_default。兼容仅提供 getStackMax 的注入 catalog。
+local function count_occupied(catalog, bag)
+  if type(catalog) == "table" and type(catalog.countOccupied) == "function" then
+    return catalog.countOccupied(bag)
+  end
+  if type(bag) ~= "table" then return 0 end
+  local def = 99
+  if type(catalog) == "table" and type(catalog.getStackDefault) == "function" then
+    def = catalog.getStackDefault() or 99
+  end
+  local n = 0
+  for i = 1, #bag do
+    local row = bag[i]
+    if type(row) == "table" then
+      local count = row.count or 0
+      if type(count) == "string" then count = tonumber(count) or 0 end
+      if type(count) == "number" and count > 0 then
+        local max = def
+        if type(catalog) == "table" and type(catalog.getStackMax) == "function" then
+          max = catalog.getStackMax(row.itemId) or def
+        end
+        if type(max) ~= "number" or max <= 0 then max = def end
+        n = n + math.floor((count + max - 1) / max)
+      end
+    end
+  end
+  return n
+end
+
+function M.new(service, store, clock, catalog)
+  local self = {
+    _service = service or Inventory,
+    _store = store,
+    _clock = clock,
+    _catalog = catalog or Catalog,
+    _view = nil,
+    _sub = nil,
+    _cmdObs = nil,
+    _gen = 0,
+    _opSeq = 0,
+    _uiOp = 0,
+    _pendingOp = nil,
+    _heldOp = nil,
+    _closed = true,
+    _destroyed = false,
+    _busy = false,
+    _lastFeedback = "",
+    _selIndex = 1,
+    _listPage = 1,
+    _bagRows = {},
+  }
+
+  local function bump_gen()
+    self._gen = self._gen + 1
+    return self._gen
+  end
+
+  local function alive(gen)
+    return (not self._destroyed) and (not self._closed) and self._gen == gen and self._view ~= nil
+  end
+
+  local function clear_cmd_obs()
+    local obs = self._cmdObs
+    self._cmdObs = nil
+    self._heldOp = nil
+    self._pendingOp = nil
+    release_obs(obs)
+  end
+
+  --- 开始一条本窗命令；返回 op。全局事务不由此取消。
+  local function begin_op()
+    self._opSeq = self._opSeq + 1
+    local op = self._opSeq
+    self._uiOp = op
+    self._pendingOp = op
+    return op
+  end
+
+  --- 仅当仍持有该 op 的观察时清空并 Dispose（登记交付后 Dispose 幂等）。
+  local function release_owned_op(op)
+    if self._heldOp == op then
+      local obs = self._cmdObs
+      self._cmdObs = nil
+      self._heldOp = nil
+      release_obs(obs)
+    end
+    if self._pendingOp == op then
+      self._pendingOp = nil
+    end
+  end
+
+  local function hold_cmd_obs(op, gen, lease)
+    if lease == nil then
+      if self._pendingOp == op then self._pendingOp = nil end
+      return nil
+    end
+    -- 关窗/换代，或调用方已在同步完成回调里开了更新命令：晚到的旧句柄只 Dispose 自身
+    if not alive(gen) or self._uiOp ~= op then
+      release_obs(lease)
+      if self._pendingOp == op then self._pendingOp = nil end
+      return nil
+    end
+    if self._pendingOp == op then self._pendingOp = nil end
+    if self._heldOp ~= nil and self._heldOp ~= op then
+      release_obs(lease)
+      return nil
+    end
+    if self._cmdObs ~= nil and self._cmdObs ~= lease then
+      release_obs(self._cmdObs)
+    end
+    self._cmdObs = lease
+    self._heldOp = op
+    return lease
+  end
+
+  local function set_status(text)
+    self._lastFeedback = tostring(text or "")
+    if self._view and self._view.SetText then
+      safe_call(function() self._view:SetText("StatusLabel", self._lastFeedback) end)
+    end
+  end
+
+  -- refresh_selection_label 前向声明：set_busy(false) 在任意完成/拒绝后须按选中项恢复出售资格
+  local refresh_selection_label
+
+  local function set_busy(busy)
+    self._busy = busy and true or false
+    if not self._view then return end
+    if self._view.SetInteractable then
+      safe_call(function()
+        self._view:SetInteractable("ExpandButton", not self._busy)
+        self._view:SetInteractable("PrevButton", not self._busy)
+        self._view:SetInteractable("NextButton", not self._busy)
+        if self._busy then
+          self._view:SetInteractable("SellButton", false)
+        end
+      end)
+    end
+    if not self._busy then
+      refresh_selection_label()
+    end
+  end
+
+  local function page_count(n)
+    if n <= 0 then return 1 end
+    return math.floor((n + LIST_PAGE_SIZE - 1) / LIST_PAGE_SIZE)
+  end
+
+  local function ensure_selection_visible()
+    local n = #self._bagRows
+    if n == 0 then
+      self._listPage = 1
+      return
+    end
+    if self._selIndex < 1 then self._selIndex = 1 end
+    if self._selIndex > n then self._selIndex = n end
+    self._listPage = math.floor((self._selIndex - 1) / LIST_PAGE_SIZE) + 1
+  end
+
+  refresh_selection_label = function()
+    if not self._view or not self._view.SetText then return end
+    local rows = self._bagRows
+    local n = #rows
+    if n == 0 then
+      safe_call(function()
+        self._view:SetText("SelectedLabel", "未选中物品")
+        if self._view.SetInteractable then
+          self._view:SetInteractable("SellButton", false)
+        end
+      end)
+      return
+    end
+    ensure_selection_visible()
+    local row = rows[self._selIndex]
+    local info = self._catalog.getItem(row.itemId)
+    local can = self._catalog.canSell(row.itemId)
+    local name = info and info.name or "未知旧物"
+    local mark = can and "" or "（不可出售）"
+    local pages = page_count(n)
+    safe_call(function()
+      self._view:SetText("SelectedLabel", string.format("已选 %d/%d：%s x%s%s · 第%d/%d页",
+        self._selIndex, n, name, tostring(row.count), mark, self._listPage, pages))
+      if self._view.SetInteractable then
+        self._view:SetInteractable("SellButton", (not self._busy) and can)
+      end
+    end)
+  end
+
+  function self:OnCreate(view)
+    self._view = view
+    if view and view.SetText then
+      safe_call(function()
+        view:SetText("Title", "背包")
+        view:SetText("StatusLabel", "")
+        view:SetText("SelectedLabel", "未选中物品")
+      end)
+    end
+  end
+
+  function self:OnOpen(argsJson)
+    self._closed = false
+    self._destroyed = false
+    local gen = bump_gen()
+    if self._sub then
+      safe_call(function() self._sub.dispose() end)
+      self._sub = nil
+    end
+    if self._store and self._store.subscribe then
+      self._sub = self._store.subscribe(nil, function(snap, _)
+        if not alive(gen) then return end
+        self:render(snap)
+      end)
+    end
+    local snap = self._store and self._store.getSnapshot and self._store.getSnapshot() or nil
+    self:render(snap)
+    _ = argsJson
+  end
+
+  function self:OnClose()
+    bump_gen()
+    self._closed = true
+    self._busy = false
+    clear_cmd_obs()
+    if self._sub then
+      safe_call(function() self._sub.dispose() end)
+      self._sub = nil
+    end
+  end
+
+  function self:OnDestroy()
+    self:OnClose()
+    self._destroyed = true
+    self._view = nil
+  end
+
+  function self:render(snapshot)
+    if self._destroyed or self._view == nil then return end
+    local snap = snapshot
+    local gold = "0"
+    local slots = 0
+    local bag = {}
+    if type(snap) == "table" then
+      gold = tostring(snap.gold or "0")
+      slots = snap.bagSlots or 0
+      bag = type(snap.bag) == "table" and snap.bag or {}
+    end
+    local rows = {}
+    for i = 1, #bag do
+      local row = bag[i]
+      if type(row) == "table" then
+        rows[#rows + 1] = { itemId = row.itemId, count = row.count }
+      end
+    end
+    self._bagRows = rows
+    if #rows == 0 then
+      self._selIndex = 1
+    elseif self._selIndex > #rows then
+      self._selIndex = #rows
+    elseif self._selIndex < 1 then
+      self._selIndex = 1
+    end
+    ensure_selection_visible()
+    local pages = page_count(#rows)
+    local start = (#rows == 0) and 1 or ((self._listPage - 1) * LIST_PAGE_SIZE + 1)
+    local stop = math.min(#rows, start + LIST_PAGE_SIZE - 1)
+    local lines = {}
+    if #rows > 0 then
+      lines[#lines + 1] = string.format("— 第%d/%d页 （共%d项）—", self._listPage, pages, #rows)
+    end
+    for i = start, stop do
+      local row = rows[i]
+      local id = row.itemId
+      local count = row.count
+      local info = self._catalog.getItem(id)
+      local can, reason = self._catalog.canSell(id)
+      local prefix = (i == self._selIndex) and "▶ " or "  "
+      if not info then
+        lines[#lines + 1] = prefix .. string.format("未知旧物 x%s（不可操作）", tostring(count))
+      elseif not can then
+        local why = reason == "legacy" and "未知" or (reason == "currency" and "货币" or "不可出售")
+        lines[#lines + 1] = prefix .. string.format("%s x%s [%s]", info.name, tostring(count), why)
+      else
+        lines[#lines + 1] = prefix .. string.format("%s x%s 单价%s", info.name, tostring(count), tostring(info.sellPrice))
+      end
+    end
+    local occupied = count_occupied(self._catalog, bag)
+    if #lines == 0 then lines[1] = "(空)" end
+    if self._view.SetText then
+      safe_call(function()
+        self._view:SetText("GoldLabel", "金币: " .. gold)
+        self._view:SetText("CapacityLabel", string.format("容量: %s/%s", tostring(occupied), tostring(slots)))
+        self._view:SetText("BagListLabel", table.concat(lines, "\n"))
+      end)
+    end
+    refresh_selection_label()
+  end
+
+  function self:selectPrev()
+    if self._closed or self._destroyed or #self._bagRows == 0 then return end
+    self._selIndex = self._selIndex - 1
+    if self._selIndex < 1 then self._selIndex = #self._bagRows end
+    local snap = self._store and self._store.getSnapshot and self._store.getSnapshot() or nil
+    self:render(snap)
+  end
+
+  function self:selectNext()
+    if self._closed or self._destroyed or #self._bagRows == 0 then return end
+    self._selIndex = self._selIndex + 1
+    if self._selIndex > #self._bagRows then self._selIndex = 1 end
+    local snap = self._store and self._store.getSnapshot and self._store.getSnapshot() or nil
+    self:render(snap)
+  end
+
+  function self:selectedBagRow()
+    local row = self._bagRows[self._selIndex]
+    if type(row) ~= "table" then return nil end
+    return { itemId = row.itemId, count = row.count }
+  end
+
+  --- sell(items, done)；关窗后完成不得碰已销毁视图，也不得投递退休代次/他令牌 caller done
+  function self:sell(items, done)
+    local gen = self._gen
+    if self._closed or self._destroyed then
+      safe_call(done, -10, { code = -10, kind = "local_block", message = "窗口已关闭", disposition = "NotReady" })
+      return nil
+    end
+    if self._busy then
+      set_status("操作进行中")
+      safe_call(done, -10, { code = -10, kind = "local_block", message = "操作进行中", disposition = "NotReady" })
+      return nil
+    end
+    -- UI 侧禁售校验：未知/不可售不发送；仅 Server 有权 Recorded
+    if type(items) == "table" then
+      for i = 1, #items do
+        local row = items[i]
+        if type(row) == "table" then
+          local can, reason = self._catalog.canSell(row.itemId)
+          if not can then
+            local msg = reason == "legacy" and "未知旧物不可出售" or "该物品不可出售"
+            set_status(msg)
+            safe_call(done, 306, { code = 306, kind = "business_refusal", message = msg, disposition = "Rejected" })
+            return nil
+          end
+        end
+      end
+    end
+    local op = begin_op()
+    set_busy(true)
+    set_status("出售中…")
+    local function finish(code, result)
+      release_owned_op(op)
+      if not alive(gen) or self._uiOp ~= op then
+        return
+      end
+      set_busy(false)
+      if code == 0 then
+        set_status("已提交")
+        local snap = self._store and self._store.getSnapshot and self._store.getSnapshot() or nil
+        self:render(snap)
+      else
+        set_status(feedback_text(code, result))
+      end
+      safe_call(done, code, result)
+    end
+    return hold_cmd_obs(op, gen, self._service.sell(items, finish))
+  end
+
+  function self:expand(done)
+    local gen = self._gen
+    if self._closed or self._destroyed then
+      safe_call(done, -10, { code = -10, kind = "local_block", message = "窗口已关闭", disposition = "NotReady" })
+      return nil
+    end
+    if self._busy then
+      set_status("操作进行中")
+      safe_call(done, -10, { code = -10, kind = "local_block", message = "操作进行中", disposition = "NotReady" })
+      return nil
+    end
+    local op = begin_op()
+    set_busy(true)
+    set_status("扩容中…")
+    local function finish(code, result)
+      release_owned_op(op)
+      if not alive(gen) or self._uiOp ~= op then
+        return
+      end
+      set_busy(false)
+      if code == 0 then
+        set_status("已提交")
+        local snap = self._store and self._store.getSnapshot and self._store.getSnapshot() or nil
+        self:render(snap)
+      else
+        set_status(feedback_text(code, result))
+      end
+      safe_call(done, code, result)
+    end
+    return hold_cmd_obs(op, gen, self._service.expand(finish))
+  end
+
+  function self:getFeedback()
+    return self._lastFeedback
+  end
+
+  function self:isBusy()
+    return self._busy
+  end
+
+  return self
+end
+
+return M

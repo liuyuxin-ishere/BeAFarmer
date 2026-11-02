@@ -4,6 +4,7 @@ using System.Threading;
 using CloudIsle.Net;
 using CloudIsle.Proto;
 using Cysharp.Threading.Tasks;
+using Game.Framework.Gameplay;
 using Game.Framework.Lua;
 using Game.Framework.Network;
 using Google.Protobuf;
@@ -34,7 +35,19 @@ namespace Game.Framework.Account
         CancellationTokenSource _opsCts;
         DisconnectOverlay _overlay;
         string _pendingToken = "";
+        long _pendingScopeId;
+        long _committedScopeId;
+        long _pendingNextOpId;
+        bool _pendingHasNextOp;
+        OperationScopeState _pendingScopeState;
+        long _pendingPlayerId;
+        long _pendingRevision;
+        long _committedNextOpId;
+        bool _committedHasNextOp;
+        long _committedPlayerId;
+        long _committedRevision;
         string _lastSnapshotJson = "{}";
+        long _lastAuthServerTimeMs;
         int _lastBizCode;
         string _lastErrorKind = "";
         bool _authenticated;
@@ -50,13 +63,24 @@ namespace Game.Framework.Account
         public string TcpHost { get; set; } = "127.0.0.1";
         public int TcpPort { get; set; } = 17780;
         public string AppVersion { get; set; } = Application.version;
-        public int ResVersion { get; set; } = 100;
-        public int ConfigVersion { get; set; } = 100;
+        /// <summary>M2 生产桥契约；与 BridgeApi.BridgeContractValue 对齐。</summary>
+        public string BridgeContract { get; set; } = BridgeApi.BridgeContractValue;
+        public int ResVersion { get; set; } = 200;
+        public int ConfigVersion { get; set; } = 200;
         public string DeviceId { get; set; } = "m1-editor";
 
         public string LastSnapshotJson
         {
             get { lock (_gate) return _lastSnapshotJson; }
+        }
+
+        /// <summary>
+        /// 最近一次成功 Login/Reconnect 响应的 server_time（Unix ms）。
+        /// 玩法显示时钟在模型接受后读取；与 <see cref="ServerClock"/>（墙钟偏移）分离。
+        /// </summary>
+        public long LastAuthServerTimeMs
+        {
+            get { lock (_gate) return _lastAuthServerTimeMs; }
         }
 
         public int LastBizCode
@@ -90,6 +114,120 @@ namespace Game.Framework.Account
             get { lock (_gate) return _authAttempt; }
         }
 
+        /// <summary>仅当前 attempt 的 pending scope；Commit 前可读，失败/取消不污染新 attempt。非 Lua 面。</summary>
+        internal long PendingOperationScopeId
+        {
+            get { lock (_gate) return _pendingAttempt == _authAttempt ? _pendingScopeId : 0; }
+        }
+
+        /// <summary>已 Commit 的持久 operation scope；未认证为 0。非 Lua 面。</summary>
+        internal long CommittedOperationScopeId
+        {
+            get { lock (_gate) return _authenticated ? _committedScopeId : 0; }
+        }
+
+        /// <summary>当前 attempt 的 pending next_op；无权威则 Has=false。非 Lua 面。</summary>
+        internal bool PendingHasNextOpId
+        {
+            get { lock (_gate) return _pendingAttempt == _authAttempt && _pendingHasNextOp; }
+        }
+
+        internal long PendingNextOpId
+        {
+            get { lock (_gate) return _pendingAttempt == _authAttempt && _pendingHasNextOp ? _pendingNextOpId : 0; }
+        }
+
+        internal OperationScopeState PendingScopeState
+        {
+            get
+            {
+                lock (_gate)
+                    return _pendingAttempt == _authAttempt ? _pendingScopeState : OperationScopeState.Unknown;
+            }
+        }
+
+        internal long PendingPlayerId
+        {
+            get { lock (_gate) return _pendingAttempt == _authAttempt ? _pendingPlayerId : 0; }
+        }
+
+        internal long PendingRevision
+        {
+            get { lock (_gate) return _pendingAttempt == _authAttempt ? _pendingRevision : 0; }
+        }
+
+        /// <summary>已 Commit 的权威 next_op；未设置则不可开写。非 Lua 面。</summary>
+        internal bool CommittedHasNextOpId
+        {
+            get { lock (_gate) return _authenticated && _committedHasNextOp; }
+        }
+
+        internal long CommittedNextOpId
+        {
+            get { lock (_gate) return _authenticated && _committedHasNextOp ? _committedNextOpId : 0; }
+        }
+
+        internal long CommittedPlayerId
+        {
+            get { lock (_gate) return _authenticated ? _committedPlayerId : 0; }
+        }
+
+        internal long CommittedRevision
+        {
+            get { lock (_gate) return _authenticated ? _committedRevision : 0; }
+        }
+
+        /// <summary>环境键（host:port），玩法 pending 隔离用。</summary>
+        internal string EnvironmentKey => (TcpHost ?? "127.0.0.1") + ":" + TcpPort;
+
+        /// <summary>账号键：已认证用 playerId 十进制；否则 pending。</summary>
+        internal string AccountKey
+        {
+            get
+            {
+                lock (_gate)
+                {
+                    long id = _authenticated ? _committedPlayerId : _pendingPlayerId;
+                    return id > 0 ? id.ToString(System.Globalization.CultureInfo.InvariantCulture) : "pending";
+                }
+            }
+        }
+
+        /// <summary>当前 NetClient 连接代次；无连接为 0。</summary>
+        internal long ConnectionGeneration
+        {
+            get
+            {
+                lock (_gate)
+                    return _client != null ? _client.ConnectionGeneration : 0;
+            }
+        }
+
+        /// <summary>Ack 权威推进 next（仅正数）。</summary>
+        internal void AdvanceCommittedNextOp(long nextOpId)
+        {
+            if (nextOpId <= 0) return;
+            lock (_gate)
+            {
+                if (!_authenticated) return;
+                if (_committedHasNextOp && nextOpId < _committedNextOpId) return;
+                _committedNextOpId = nextOpId;
+                _committedHasNextOp = true;
+            }
+        }
+
+        /// <summary>模型 revision 观测后同步（不降级）。</summary>
+        internal void ObserveCommittedRevision(long revision)
+        {
+            if (revision < 0) return;
+            lock (_gate)
+            {
+                if (!_authenticated) return;
+                if (revision > _committedRevision)
+                    _committedRevision = revision;
+            }
+        }
+
         public ServerClock Clock => _clock;
 
         public void Configure(string tokenDirectory)
@@ -114,7 +252,10 @@ namespace Game.Framework.Account
             {
                 _authAttempt++;
                 _pendingToken = "";
+                _pendingScopeId = 0;
                 _pendingAttempt = 0;
+                ClearPendingWriteMeta_NoLock();
+                // 取消不清除已 Commit 的 scope；仅放弃未提交 pending
                 old = _opsCts;
                 _opsCts = new CancellationTokenSource();
             }
@@ -215,13 +356,29 @@ namespace Game.Framework.Account
         {
             ThrowIfDisposed();
             int attempt;
+            long connectionGeneration;
+            string environmentKey;
             lock (_gate)
             {
                 _authAttempt++;
                 attempt = _authAttempt;
                 _pendingToken = "";
+                _pendingScopeId = 0;
                 _pendingAttempt = 0;
+                ClearPendingWriteMeta_NoLock();
+                // 新登录开始即收回已发布认证/committed，避免旧 scope 对新 attempt 可见
+                _authenticated = false;
+                _committedScopeId = 0;
+                _committedHasNextOp = false;
+                _committedNextOpId = 0;
+                _committedPlayerId = 0;
+                _committedRevision = 0;
+                connectionGeneration = _client != null ? _client.ConnectionGeneration : 0;
+                environmentKey = (TcpHost ?? "127.0.0.1") + ":" + TcpPort;
             }
+
+            // 玩法 BeginAuth 必须在任何 await Login RPC 之前
+            AccountBridge.NotifyGameplayAuthStarting(this, attempt, connectionGeneration, environmentKey);
 
             using (CancellationTokenSource linked = LinkOps(ct))
             {
@@ -236,7 +393,10 @@ namespace Game.Framework.Account
                         ResVersion = ResVersion,
                         ProtoVersion = BridgeApi.RequiredProtoVersion,
                         ConfigVersion = ConfigVersion,
-                        DeviceId = DeviceId ?? ""
+                        DeviceId = DeviceId ?? "",
+                        BridgeContract = string.IsNullOrEmpty(BridgeContract)
+                            ? BridgeApi.BridgeContractValue
+                            : BridgeContract
                     };
                     LoginResp resp = await _client.SendRequestAsync<LoginResp>(
                         req, NetClient.DefaultTimeout, linked.Token);
@@ -263,7 +423,18 @@ namespace Game.Framework.Account
                         return (107, "biz", "{}", attempt);
                     }
 
+                    // M2 认证必须携带 scope>0；否则不进入可 Commit 状态
+                    if (resp.OperationScopeId <= 0 || string.IsNullOrEmpty(resp.Token))
+                    {
+                        ClearPendingTokenIfAttempt(attempt);
+                        SetResult(107, "biz");
+                        return (107, "biz", "{}", attempt);
+                    }
+
+                    // 缺权威 next 不得开写；仍可 Commit 认证（空号），但玩法 Ready 不开写
                     string json = SnapshotCodec.ToLuaJson(resp.Data);
+                    long playerId = resp.Data.Info != null ? resp.Data.Info.PlayerId : 0;
+                    long revision = resp.Data.Revision;
                     lock (_gate)
                     {
                         if (_authAttempt != attempt || _disposed)
@@ -274,8 +445,15 @@ namespace Game.Framework.Account
                         }
 
                         _pendingToken = resp.Token ?? "";
+                        _pendingScopeId = resp.OperationScopeId;
                         _pendingAttempt = attempt;
+                        _pendingHasNextOp = resp.HasNextOpId && resp.NextOpId > 0;
+                        _pendingNextOpId = _pendingHasNextOp ? resp.NextOpId : 0;
+                        _pendingScopeState = resp.ScopeState;
+                        _pendingPlayerId = playerId;
+                        _pendingRevision = revision >= 0 ? revision : 0;
                         _lastSnapshotJson = json;
+                        _lastAuthServerTimeMs = resp.ServerTime;
                         _lastBizCode = 0;
                         _lastErrorKind = "ok";
                     }
@@ -314,36 +492,55 @@ namespace Game.Framework.Account
         {
             ThrowIfDisposed();
             EnsureTokens();
-            string token;
-            int attempt;
+            bool ok;
             lock (_gate)
             {
-                if (string.IsNullOrEmpty(_pendingToken))
+                if (string.IsNullOrEmpty(_pendingToken)
+                    || _pendingAttempt != _authAttempt
+                    || _pendingScopeId <= 0)
                     return false;
-                if (_pendingAttempt != _authAttempt)
+
+                string token = _pendingToken;
+                int attempt = _pendingAttempt;
+                long scopeId = _pendingScopeId;
+                bool hasNext = _pendingHasNextOp;
+                long nextOp = _pendingNextOpId;
+                long playerId = _pendingPlayerId;
+                long revision = _pendingRevision;
+                // Save 与代次校验同锁：避免 Save 后、发布前被 Cancel/新 attempt 插队覆写文件却仍标认证
+                if (!_tokens.Save(token))
+                {
+                    ok = false;
+                }
+                else if (_authAttempt != attempt || _pendingAttempt != attempt)
+                {
                     return false;
-                token = _pendingToken;
-                attempt = _pendingAttempt;
+                }
+                else
+                {
+                    _committedScopeId = scopeId;
+                    _committedHasNextOp = hasNext;
+                    _committedNextOpId = nextOp;
+                    _committedPlayerId = playerId;
+                    _committedRevision = revision;
+                    _pendingToken = "";
+                    _pendingScopeId = 0;
+                    _pendingAttempt = 0;
+                    ClearPendingWriteMeta_NoLock();
+                    _authenticated = true;
+                    _stopReconnect = false;
+                    ok = true;
+                }
             }
 
-            if (!_tokens.Save(token))
+            if (!ok)
             {
                 SetResult(0, "token-save-failed");
                 return false;
             }
 
-            lock (_gate)
-            {
-                if (_authAttempt != attempt || _pendingAttempt != attempt)
-                    return false;
-                _pendingToken = "";
-                _pendingAttempt = 0;
-                _authenticated = true;
-                _stopReconnect = false;
-            }
-
+            // StartHeartbeat / Hide 不得持锁
             StartHeartbeat();
-            // 登录无遮罩时 Hide 为空操作；自动重连必须在模型应用+Commit 后才解除。
             HideOverlay();
             return true;
         }
@@ -353,8 +550,19 @@ namespace Game.Framework.Account
             lock (_gate)
             {
                 _pendingToken = "";
+                _pendingScopeId = 0;
                 _pendingAttempt = 0;
+                ClearPendingWriteMeta_NoLock();
             }
+        }
+
+        void ClearPendingWriteMeta_NoLock()
+        {
+            _pendingHasNextOp = false;
+            _pendingNextOpId = 0;
+            _pendingScopeState = OperationScopeState.Unknown;
+            _pendingPlayerId = 0;
+            _pendingRevision = 0;
         }
 
         /// <summary>仅清除仍属指定登录代次的 pending（旧回调/旧租约安全）。</summary>
@@ -374,6 +582,11 @@ namespace Game.Framework.Account
             lock (_gate)
             {
                 _authenticated = false;
+                _committedScopeId = 0;
+                _committedHasNextOp = false;
+                _committedNextOpId = 0;
+                _committedPlayerId = 0;
+                _committedRevision = 0;
                 _lastSnapshotJson = "{}";
             }
         }
@@ -505,8 +718,47 @@ namespace Game.Framework.Account
             ClearPendingToken();
         }
 
+        Action<byte[]> _gameplayDeltaHandler;
+
+        /// <summary>玩法受限发送：复用本会话唯一 NetClient，不另开连接。</summary>
+        public async UniTask<IMessage> SendGameplayRequestAsync(
+            IMessage request,
+            MessageParser responseParser,
+            TimeSpan timeout,
+            CancellationToken ct)
+        {
+            ThrowIfDisposed();
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            if (responseParser == null) throw new ArgumentNullException(nameof(responseParser));
+            NetClient client;
+            lock (_gate) client = _client;
+            if (client == null)
+                throw new InvalidOperationException("not-connected");
+            using (CancellationTokenSource linked = LinkOps(ct))
+            {
+                IMessage raw = await client
+                    .SendRequestMessageAsync(request, timeout, linked.Token);
+                // 已由 NetClient 按 MsgRegistry 解析为具体类型；再经 parser 防御拷贝
+                return responseParser.ParseFrom(raw.ToByteArray());
+            }
+        }
+
+        /// <summary>订阅 PlayerDeltaBatchNtf 原始字节；Kick 仍由本类独占。</summary>
+        public IDisposable SubscribeGameplayDelta(Action<byte[]> handler)
+        {
+            _gameplayDeltaHandler = handler;
+            return new DeltaUnsub(this);
+        }
+
         void OnDispatch(Packet packet)
         {
+            if (packet.MsgId == MsgRegistry.GetId(typeof(PlayerDeltaBatchNtf)))
+            {
+                try { _gameplayDeltaHandler?.Invoke(packet.Body ?? Array.Empty<byte>()); }
+                catch { /* 隔离玩法回调 */ }
+                return;
+            }
+
             if (packet.MsgId != MsgRegistry.GetId(typeof(KickNtf)))
                 return;
             KickNtf ntf;
@@ -522,6 +774,18 @@ namespace Game.Framework.Account
             HandleKick(ntf);
         }
 
+        sealed class DeltaUnsub : IDisposable
+        {
+            AccountSession _owner;
+            public DeltaUnsub(AccountSession owner) { _owner = owner; }
+            public void Dispose()
+            {
+                AccountSession o = Interlocked.Exchange(ref _owner, null);
+                if (o != null)
+                    o._gameplayDeltaHandler = null;
+            }
+        }
+
         void HandleKick(KickNtf ntf)
         {
             StopReconnectLoop();
@@ -529,6 +793,7 @@ namespace Game.Framework.Account
             ClearToken();
             HideOverlay();
             try { _client?.Disconnect("kick"); } catch { }
+            AccountBridge.NotifyGameplaySessionEnded(this, SessionEndReason.Kick);
             AccountBridge.NotifyKick((int)(ntf?.Reason ?? KickReason.KickElsewhere));
         }
 
@@ -541,13 +806,28 @@ namespace Game.Framework.Account
             string token, CancellationToken ct)
         {
             int attempt;
+            long connectionGeneration;
+            string environmentKey;
             lock (_gate)
             {
                 _authAttempt++;
                 attempt = _authAttempt;
                 _pendingToken = "";
+                _pendingScopeId = 0;
                 _pendingAttempt = 0;
+                ClearPendingWriteMeta_NoLock();
+                // Token 重连新 attempt：收回已发布认证，旧 committed 对新 attempt 不可见
+                _authenticated = false;
+                _committedScopeId = 0;
+                _committedHasNextOp = false;
+                _committedNextOpId = 0;
+                _committedPlayerId = 0;
+                _committedRevision = 0;
+                connectionGeneration = _client != null ? _client.ConnectionGeneration : 0;
+                environmentKey = (TcpHost ?? "127.0.0.1") + ":" + TcpPort;
             }
+
+            AccountBridge.NotifyGameplayAuthStarting(this, attempt, connectionGeneration, environmentKey);
 
             using (CancellationTokenSource linked = LinkOps(ct))
             {
@@ -557,7 +837,13 @@ namespace Game.Framework.Account
                     var req = new ReconnectReq
                     {
                         Token = token,
-                        ProtoVersion = BridgeApi.RequiredProtoVersion
+                        ProtoVersion = BridgeApi.RequiredProtoVersion,
+                        AppVersion = string.IsNullOrEmpty(AppVersion) ? Application.version : AppVersion,
+                        ResVersion = ResVersion,
+                        ConfigVersion = ConfigVersion,
+                        BridgeContract = string.IsNullOrEmpty(BridgeContract)
+                            ? BridgeApi.BridgeContractValue
+                            : BridgeContract
                     };
                     ReconnectResp resp = await _client.SendRequestAsync<ReconnectResp>(
                         req, NetClient.DefaultTimeout, linked.Token);
@@ -587,7 +873,16 @@ namespace Game.Framework.Account
                         return (resp.Code == CodeOk ? 107 : resp.Code, "biz", "{}");
                     }
 
+                    if (resp.OperationScopeId <= 0)
+                    {
+                        ClearPendingTokenIfAttempt(attempt);
+                        SetResult(107, "biz");
+                        return (107, "biz", "{}");
+                    }
+
                     string json = SnapshotCodec.ToLuaJson(resp.Data);
+                    long playerId = resp.Data.Info != null ? resp.Data.Info.PlayerId : 0;
+                    long revision = resp.Data.Revision;
                     lock (_gate)
                     {
                         if (_authAttempt != attempt || _disposed)
@@ -597,13 +892,19 @@ namespace Game.Framework.Account
                             return (CodeCancel, "cancel", "{}");
                         }
 
-                        // 与 Login 相同：pending=已存同 Token；认证/心跳/遮罩等 Commit。
+                        // 与 Login 相同：pending=已存同 Token + 本 attempt 的 scope；认证/心跳/遮罩等 Commit。
                         _pendingToken = token ?? "";
+                        _pendingScopeId = resp.OperationScopeId;
                         _pendingAttempt = attempt;
+                        _pendingHasNextOp = resp.HasNextOpId && resp.NextOpId > 0;
+                        _pendingNextOpId = _pendingHasNextOp ? resp.NextOpId : 0;
+                        _pendingScopeState = resp.ScopeState;
+                        _pendingPlayerId = playerId;
+                        _pendingRevision = revision >= 0 ? revision : 0;
                         _lastSnapshotJson = json;
+                        _lastAuthServerTimeMs = resp.ServerTime;
                         _lastBizCode = 0;
                         _lastErrorKind = "ok";
-                        _authenticated = false;
                     }
 
                     if (linked.IsCancellationRequested || !IsCurrentAttempt(attempt) || _disposed)
@@ -830,7 +1131,9 @@ namespace Game.Framework.Account
                 if (_pendingAttempt != 0 && _pendingAttempt != attempt)
                     return;
                 _pendingToken = "";
+                _pendingScopeId = 0;
                 _pendingAttempt = 0;
+                ClearPendingWriteMeta_NoLock();
             }
         }
 

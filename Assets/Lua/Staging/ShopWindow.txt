@@ -1,0 +1,88 @@
+-- 生产商店窗：Presenter + View；按商品名称选择；意图仅 shopId/count。
+
+local UIWindow = require("UI/UIWindow")
+local UI = require("UI/UIManager")
+local ModelStore = require("Models/ModelStore")
+local ShopPresenter = require("UI/Presenters/ShopPresenter")
+local ShopService = require("Services/ShopService")
+local Toast = require("UI/ToastService")
+
+local M = {}
+
+local function parse_pos_int(text, field)
+  text = tostring(text or ""):gsub("%s+", "")
+  if text == "" or not text:match("^%d+$") or text:match("^0%d") then
+    return nil, field
+  end
+  local n = tonumber(text)
+  if not n or n < 1 or n > 2147483647 then return nil, field end
+  return n
+end
+
+function M.new()
+  local self = UIWindow.new()
+  self._clicks = {}
+  self._presenter = nil
+
+  function self:OnCreate(view)
+    UIWindow.OnCreate(self, view)
+    self._presenter = ShopPresenter.new(ShopService, ModelStore, nil, nil)
+    self._presenter:OnCreate(view)
+    if view.SetInputText then
+      pcall(function() view:SetInputText("CountInput", "1") end)
+    end
+
+    self._clicks[#self._clicks + 1] = view:SubscribeClick("PrevButton", function()
+      if self._presenter then self._presenter:selectPrev() end
+    end)
+    self._clicks[#self._clicks + 1] = view:SubscribeClick("NextButton", function()
+      if self._presenter then self._presenter:selectNext() end
+    end)
+
+    self._clicks[#self._clicks + 1] = view:SubscribeClick("BuyButton", function()
+      if not self._presenter or self._presenter:isBusy() then return end
+      local shopId = self._presenter:selectedShopId()
+      local count = parse_pos_int(view:GetInputText("CountInput"), "count")
+      if not shopId or not count then
+        view:SetText("StatusLabel", "请先选择商品并输入数量")
+        return
+      end
+      self._presenter:buy(shopId, count, function(code, result)
+        if code ~= 0 then
+          local msg = type(result) == "table" and result.message or ("购买失败 " .. tostring(code))
+          pcall(function() Toast.show(tostring(msg), 2.0) end)
+        end
+      end)
+    end)
+
+    self._clicks[#self._clicks + 1] = view:SubscribeClick("CloseButton", function()
+      UI.close("Shop")
+    end)
+  end
+
+  function self:OnOpen(argsJson)
+    UIWindow.OnOpen(self, argsJson)
+    if self._presenter then self._presenter:OnOpen(argsJson) end
+  end
+
+  function self:OnClose()
+    if self._presenter then self._presenter:OnClose() end
+    UIWindow.OnClose(self)
+  end
+
+  function self:OnDestroy()
+    for _, c in ipairs(self._clicks) do
+      pcall(function() c:Dispose() end)
+    end
+    self._clicks = {}
+    if self._presenter then
+      self._presenter:OnDestroy()
+      self._presenter = nil
+    end
+    UIWindow.OnDestroy(self)
+  end
+
+  return self
+end
+
+return M

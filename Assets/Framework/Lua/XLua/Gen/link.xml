@@ -13,6 +13,10 @@
 		<type fullname="Game.Framework.UI.UILayer" preserve="all"/>
 		<type fullname="Game.Framework.Account.AccountBridge" preserve="all"/>
 		<type fullname="Game.Framework.Account.AccountFlow" preserve="all"/>
+		<type fullname="Game.Framework.Gameplay.LuaGameplayFacade" preserve="all"/>
+		<type fullname="Game.Framework.Gameplay.CommandObservation" preserve="all"/>
+		<type fullname="Game.Framework.Gameplay.GameplaySubscriptionLease" preserve="all"/>
+		<type fullname="Game.Framework.Home.LuaHomeFarmFacade" preserve="all"/>
 		
 	</assembly>
 

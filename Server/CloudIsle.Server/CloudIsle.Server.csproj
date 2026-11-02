@@ -12,6 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="CloudIsle.Tests" />
+    <InternalsVisibleTo Include="CloudIsle.FaultWorker" />
+    <InternalsVisibleTo Include="CloudIsle.M2AcceptanceHost" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.11" />

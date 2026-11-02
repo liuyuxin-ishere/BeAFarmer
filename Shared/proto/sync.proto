@@ -1,0 +1,62 @@
+syntax = "proto3";
+package cloudisle;
+option csharp_namespace = "CloudIsle.Proto";
+import "common.proto";
+import "inventory.proto";
+import "farm.proto";
+import "gather.proto";
+import "craft.proto";
+import "order.proto";
+
+// 2007 请求全量家园快照（缺口/校验失败后的 full sync）。
+message SyncStateReq {}
+
+// 2008 全量快照响应。data.revision 为权威 revision；scope 为当前写权限。
+message SyncStateResp {
+  int32 code = 1;
+  int64 server_time = 2;
+  PlayerFullData data = 3;
+  int64 operation_scope_id = 4;
+  // M2-T010：权威 next_op（optional）与 scope 开闭。
+  optional int64 next_op_id = 5;
+  OperationScopeState scope_state = 6;
+}
+
+// 2009 查询已记录的旧命令结果（同 scope/op；不重新执行）。
+message CommandResultQueryReq {
+  int64 operation_scope_id = 1;
+  int64 op_id = 2;
+}
+
+// 2010 旧命令查询结果。original_code 为账本中的业务码；过期返回 ERR_COMMAND_EXPIRED(111)。
+// NotRecorded：code=0 且 result_state=NOT_RECORDED，ack.disposition=UNSPECIFIED（查询未受理命令）。
+// 外 scope：code=110，无权威 next/详情。异 payload：code=112。
+message CommandResultQueryResp {
+  int32 code = 1;
+  int32 original_code = 2;
+  int64 committed_revision = 3;
+  int32 config_version = 4;
+  // 规范化业务结果摘要（不含 Token/密码/原 seq）。
+  bytes result_blob = 5;
+  CommandResultState result_state = 6;
+  CommandAck ack = 7;
+}
+
+// 2110 单次逻辑提交的完整增量批次。客户端校验后原子应用；模块字段缺省表示本批无该模块变更。
+// 原则：数据走本 Ntf；配对 Resp 只含结果码与结果摘要，不重复发第二套资产投影。
+message PlayerDeltaBatchNtf {
+  int64 base_revision = 1;
+  int64 new_revision = 2;
+  int64 operation_scope_id = 3;
+  int64 op_id = 4;
+  int64 server_time = 5;
+  int32 config_version = 6;
+  PlayerAttrNtf attr = 7;
+  BagChangeNtf bag = 8;
+  LevelUpNtf level_up = 9;
+  PlotChangeNtf plots = 10;
+  NodeChangeNtf nodes = 11;
+  ToolChangeNtf tools = 12;
+  FacilityChangeNtf facilities = 13;
+  OrderChangeNtf orders = 14;
+}

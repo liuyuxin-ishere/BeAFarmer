@@ -1,0 +1,44 @@
+-- C08/U01：成长只读入口。不发等级赠品、不写 Model、不订 RawNtf。
+
+local Catalog = require("Services/GameplayDisplayCatalog")
+
+local M = {}
+
+--- 从权威快照与展示目录组装解锁说明（只读）。
+function M.buildUnlockView(snapshot, level)
+  local snap = snapshot
+  local lv = level
+  if type(snap) == "table" and (lv == nil or lv == "") then
+    lv = snap.level
+  end
+  if type(lv) == "string" then
+    if lv:match("^-?%d+$") then
+      lv = tonumber(lv)
+    else
+      lv = 0
+    end
+  end
+  if type(lv) ~= "number" then lv = 0 end
+  lv = math.floor(lv)
+
+  local tools = {}
+  if type(snap) == "table" and type(snap.tools) == "table" then
+    for i = 1, #snap.tools do
+      local t = snap.tools[i]
+      if type(t) == "table" and t.toolId ~= nil then
+        tools[#tools + 1] = t.toolId
+      end
+    end
+  end
+
+  local hints = Catalog.listUnlockHintsUpTo(lv)
+  return {
+    level = lv,
+    gold = type(snap) == "table" and tostring(snap.gold or "0") or "0",
+    tools = tools,
+    hints = hints,
+    grantsLocally = false,
+  }
+end
+
+return M

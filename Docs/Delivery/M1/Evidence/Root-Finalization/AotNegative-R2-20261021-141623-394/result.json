@@ -1,9 +1,0 @@
-{
-  "playerUnchanged": true,
-  "rejection": "res=101 config=101\r\noutput=E:\\Workbench\\UnityWorkBench\\Farming\\Docs\\Acceptance\\M1\\20261020-xLua\\Root-Finalization\\AotNegative-R2-20261021-141623-394\\Attempt\r\nbase=E:\\Workbench\\UnityWorkBench\\Farming\\Docs\\Acceptance\\M1\\20261020-xLua\\Root Final 100 R2\\baseline-manifest.json\r\nplayerDirUntouched=E:\\Workbench\\UnityWorkBench\\Farming\\Docs\\Acceptance\\M1\\20261020-xLua\\Root Final 100 R2\\Player\r\nplayerExeSha=29ab39aae700ec2503f7b7fe7de2d853e661c5588c5a225c540ad81474dcd0f1\r\nplayerGaSha=91b7d8f7a1fdc110e04f18b8ac6c21c1ddf390eba28a0f0dfac7456d7be5d079\r\nplayerMetaSha=cd94d993b9f329d566ccf413dac999b5c78d816d0a0588310558227ef4c409a9\r\nFAIL=aot-incompatible:fingerprint-changed:Assets/Framework/Account/AccountSession.cs",
-  "noRejectedPointer": true,
-  "publishedPointerUnchanged": true,
-  "passed": true,
-  "scriptExit": 1,
-  "sourceBeforeSha": "E06677EE237525EEF360218AC3A791E40024211BFA341ECC1A00048254E87F08"
-}

@@ -1,0 +1,75 @@
+syntax = "proto3";
+package cloudisle;
+option csharp_namespace = "CloudIsle.Proto";
+import "common.proto";
+
+// 2001 出售。operation_scope_id/expected_revision/config_version 为写命令身份与前置版本。
+message BagSellReq {
+  int64 op_id = 1;
+  repeated ItemStack items = 2;
+  int64 operation_scope_id = 3;
+  int64 expected_revision = 4;
+  int32 config_version = 5;
+}
+
+// 2002 出售结果。committed_revision 为成功提交后的新 revision；资产细节走 Ntf/Delta。
+message BagSellResp {
+  int32 code = 1;
+  int64 gold_gained = 2;
+  int64 committed_revision = 3;
+  CommandAck ack = 4;
+}
+
+// 2003 背包扩容。
+message BagExpandReq {
+  int64 op_id = 1;
+  int64 operation_scope_id = 2;
+  int64 expected_revision = 3;
+  int32 config_version = 4;
+}
+
+// 2004 扩容结果。
+message BagExpandResp {
+  int32 code = 1;
+  int32 bag_slots = 2;
+  int64 committed_revision = 3;
+  CommandAck ack = 4;
+}
+
+// 2005 新手引导步进。
+message GuideStepReq {
+  int64 op_id = 1;
+  int32 step = 2;
+  int64 operation_scope_id = 3;
+  int64 expected_revision = 4;
+  int32 config_version = 5;
+}
+
+// 2006 引导步进结果。
+message GuideStepResp {
+  int32 code = 1;
+  int64 committed_revision = 2;
+  CommandAck ack = 3;
+}
+
+// 2101 属性推送（亦作为 Delta 批内模块载荷）。值为变化后的权威快照字段。
+message PlayerAttrNtf {
+  int32 level = 1;
+  int32 exp = 2;
+  int64 gold = 3;
+  int64 gem = 4;
+  int64 ticket = 5;
+  int64 shard = 6;
+  int32 bag_slots = 7;
+}
+
+// 2102 背包增量。changes 为变化后最终数量；count=0 表示移除。
+message BagChangeNtf {
+  repeated ItemStack changes = 1;
+}
+
+// 2103 升级解锁推送。
+message LevelUpNtf {
+  int32 new_level = 1;
+  repeated int32 unlock_ids = 2;
+}

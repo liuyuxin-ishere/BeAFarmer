@@ -31,7 +31,7 @@ namespace XLua.CSObjectWrap
 			Utils.EndObjectRegister(type, L, translator, null, null,
 			    null, null, null);
 
-		    Utils.BeginClassRegister(type, L, __CreateInstance, 16, 6, 0);
+		    Utils.BeginClassRegister(type, L, __CreateInstance, 16, 7, 0);
 			Utils.RegisterFunc(L, Utils.CLS_IDX, "EnsureManager", _m_EnsureManager_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "ClearManager", _m_ClearManager_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "BindSceneService", _m_BindSceneService_xlua_st_);
@@ -54,6 +54,7 @@ namespace XLua.CSObjectWrap
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "Scenes", _g_get_Scenes);
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "OpenCount", _g_get_OpenCount);
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "StackCount", _g_get_StackCount);
+            Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "HasModalOpen", _g_get_HasModalOpen);
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "LiveClicks", _g_get_LiveClicks);
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "LiveCallbackLeases", _g_get_LiveCallbackLeases);
             
@@ -515,6 +516,18 @@ namespace XLua.CSObjectWrap
 		    try {
             
 			    LuaAPI.xlua_pushinteger(L, Game.Framework.UI.UiBridge.StackCount);
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 1;
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _g_get_HasModalOpen(RealStatePtr L)
+        {
+		    try {
+            
+			    LuaAPI.lua_pushboolean(L, Game.Framework.UI.UiBridge.HasModalOpen);
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
             }

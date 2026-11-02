@@ -30,15 +30,16 @@ internal static class M1ServerCommand
             {
                 DatabasePath = PathArg("--db", "Server/Data/M1/m1.db"),
                 ConfigDirectory = PathArg("--config-dir", "Server/ConfigLuban"),
-                ConfigVersion = Positive(values, "--config-version", 100),
+                ConfigVersion = Positive(values, "--config-version", 200),
                 ContentRoot = PathArg("--content-root", "Server/PatchContent/M1"),
                 LogDirectory = PathArg("--log-dir", "Server/Logs/M1"),
                 TcpEndpoint = new IPEndPoint(address, tcpPort),
                 HttpPrefix = $"http://localhost:{httpPort}/",
-                MinAppVersion = Value(values, "--min-app-version", "0.3.0"),
+                MinAppVersion = Value(values, "--min-app-version", "0.4.0"),
+                RequiredBridgeContract = Value(values, "--bridge-contract", "m2-bridge-0.4"),
                 ProtoVersion = Positive(values, "--proto-version", 1),
-                RequiredResVersion = Positive(values, "--res-version", 100),
-                RequiredConfigVersion = Positive(values, "--required-config-version", 100)
+                RequiredResVersion = Positive(values, "--res-version", 200),
+                RequiredConfigVersion = Positive(values, "--required-config-version", 200)
             };
             using var stop = new CancellationTokenSource();
             ConsoleCancelEventHandler onCancel = (_, e) => { e.Cancel = true; stop.Cancel(); };
@@ -87,8 +88,8 @@ internal static class M1ServerCommand
         var allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "--repo-root", "--db", "--config-dir", "--config-version", "--content-root", "--log-dir",
-            "--tcp-host", "--tcp-port", "--http-port", "--min-app-version", "--proto-version",
-            "--res-version", "--required-config-version", "--stop-file"
+            "--tcp-host", "--tcp-port", "--http-port", "--min-app-version", "--bridge-contract",
+            "--proto-version", "--res-version", "--required-config-version", "--stop-file"
         };
         var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         bool seenM1 = false;

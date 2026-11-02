@@ -1,0 +1,957 @@
+-- U02 FarmPresenter：选种/种植/水肥/收获 + 状态倒计时显示。
+-- 资产只认 Batch/Sync；倒计时到 0 不自动收获；关窗后异步完成不写旧 view。
+
+local Farm = require("Services/FarmService")
+local Catalog = require("Services/GameplayDisplayCatalog")
+local ErrorPolicy = require("Services/GameplayErrorPolicy")
+local Json = require("Json")
+
+local M = {}
+local MAX_BATCH = 24
+local INT32_MAX = 2147483647
+local MODE_LABELS = { plant="播种", water="浇水", fertilize="施肥", harvest="收获" }
+-- Compact player-facing outcomes keep all24 items readable;wire codes stay in the service result.
+local RESULT_LABELS = { [0]="成功",[101]="无效",[108]="等级低",[301]="满包",[302]="缺物品",
+  [303]="缺金币",[304]="缺钻石",[305]="缺券",[306]="不可用",[401]="未解锁",
+  [402]="非空",[403]="未成熟",[404]="未解锁",[405]="已护理" }
+-- C# CancelActive 仍发内部 token；玩家可见文案映射为中文，未知用通用兜底（不改取消/去重/挡写语义）。
+local CANCEL_LABELS = {
+  ["ui-obstruction"]="界面遮挡", ["modal"]="界面占用", ["focus-lost"]="窗口失焦",
+  ["input-disabled"]="输入已关闭", ["not-writable"]="暂不可操作", ["tool-change"]="已切换工具",
+  ["window-close"]="已关闭窗口", ["ui-or-gate-on-press"]="按下时受阻", ["gate-on-release"]="松开时受阻",
+  ["dispose"]="已结束", ["scene-destroy"]="场景已关闭", ["lua-cancel"]="已取消", ["cancel"]="已取消"
+}
+local function format_cancel_reason(reason)
+  local key = tostring(reason or "")
+  if key == "" then return "操作已取消" end
+  return CANCEL_LABELS[key] or "操作已取消"
+end
+
+local function safe_call(fn, ...)
+  if type(fn) ~= "function" then return end
+  local ok, err = pcall(fn, ...)
+  if not ok then _ = err end
+end
+
+local function release_obs(obs)
+  if obs == nil then return end
+  pcall(function()
+    if obs.Dispose ~= nil then obs:Dispose()
+    elseif obs.dispose ~= nil then obs:dispose() end
+  end)
+end
+
+local function facade_clock_remaining(deadline)
+  local f = CS.Game.Framework.Gameplay.LuaGameplayFacade
+  if f == nil or f.RemainingMs == nil then return "0" end
+  local ok, s = pcall(function() return f.RemainingMs(tostring(deadline or "0")) end)
+  if ok and type(s) == "string" then return s end
+  return "0"
+end
+
+local function facade_clock_synced()
+  local f = CS.Game.Framework.Gameplay.LuaGameplayFacade
+  if f == nil or f.IsClockSynchronized == nil then return false end
+  local ok, v = pcall(function() return f.IsClockSynchronized() end)
+  return ok and v == true
+end
+
+local function home_facade()
+  return CS.Game.Framework.Home.LuaHomeFarmFacade
+end
+
+local function normalize_plot_ids(plotIds)
+  if type(plotIds) ~= "table" then return nil, "plotIds-must-be-table" end
+  local out, seen = {}, {}
+  for i = 1, #plotIds do
+    local v = plotIds[i]
+    if type(v) == "string" then
+      if not v:match("^%d+$") or v:match("^0%d") then return nil, "plotId-invalid" end
+      v = tonumber(v)
+    end
+    if type(v) ~= "number" or v ~= math.floor(v) or v < 1 or v > INT32_MAX then
+      return nil, "plotId-invalid"
+    end
+    if not seen[v] then
+      seen[v] = true
+      out[#out + 1] = v
+    end
+  end
+  if #out == 0 then return nil, "plotIds-empty" end
+  if #out > MAX_BATCH then return nil, "plotIds-exceed-24" end
+  return out
+end
+
+--- 严格 world JSON：必须是数组；正 int32；拒绝对象/负数/小数/杂键 digit 抽取
+local function parse_plot_ids_json(plotIdsJson)
+  if type(plotIdsJson) ~= "string" or plotIdsJson == "" then
+    return nil, "plotIds-json-empty"
+  end
+  local ok, decoded = pcall(Json.decode, plotIdsJson)
+  if not ok or type(decoded) ~= "table" then
+    return nil, "plotIds-json-invalid"
+  end
+  for k, _ in pairs(decoded) do
+    if type(k) ~= "number" or k ~= math.floor(k) or k < 1 then
+      return nil, "plotIds-json-not-array"
+    end
+  end
+  return normalize_plot_ids(decoded)
+end
+
+local function bag_count(bag, itemId)
+  if type(bag) ~= "table" then return 0 end
+  local n = 0
+  for i = 1, #bag do
+    local row = bag[i]
+    if type(row) == "table" and row.itemId == itemId then
+      local c = row.count or 0
+      if type(c) == "string" then c = tonumber(c) or 0 end
+      if type(c) == "number" then n = n + c end
+    end
+  end
+  return n
+end
+
+-- ProtoJSON PlotState：省略 = proto3 default0 Locked。
+-- 仅精确映射 0/1/2/3、PLOT_* 与友好名 Locked/Empty/Growing/Ripe；禁子串猜测。
+-- 畸形类型/字符串/数字 → Unknown。缺 state（哪怕有元数据）→ Locked。不改模型/不自动收。
+local function normalize_plot_state(st)
+  if st == nil then
+    return 0
+  end
+  if type(st) == "number" then
+    if st == 0 or st == 1 or st == 2 or st == 3 then
+      return st
+    end
+    return nil
+  end
+  if type(st) == "string" then
+    if st == "PLOT_LOCKED" or st == "Locked" then return 0 end
+    if st == "PLOT_EMPTY" or st == "Empty" then return 1 end
+    if st == "PLOT_GROWING" or st == "Growing" then return 2 end
+    if st == "PLOT_RIPE" or st == "Ripe" then return 3 end
+    return nil
+  end
+  return nil
+end
+
+-- 权威模型 → 显示态；ready 到期仅标 Ripe，不收获
+local function present_plot(row, nowSynced)
+  if type(row) ~= "table" or type(row.plotId) ~= "number" then
+    return "Unknown", 7, ""
+  end
+  local kind = normalize_plot_state(row.state)
+  if kind == nil then
+    return "Unknown", 7, ""
+  end
+  if kind == 0 then return "Locked", 0, "" end
+  if kind == 1 then return "Empty", 1, "" end
+  -- Growing(2)/Ripe(3)：用 readyTime 投影；无 readyTime 时用规范化数值判定 Ripe
+  local ready = row.readyTime
+  if ready == nil then
+    if kind == 3 then
+      return "Ripe", 3, "0"
+    end
+    return "Growing", 2, ""
+  end
+  if not nowSynced then
+    return "Growing", 2, "…"
+  end
+  local rem = facade_clock_remaining(ready)
+  if rem == "0" or rem == "" then
+    return "Ripe", 3, "0"
+  end
+  return "Growing", 2, rem
+end
+
+-- 与 ErrorPolicy 同源：code0+Unknown 的「未确认」文案；可写后仅中性可继续，不发明原命令成功。
+local UNKNOWN_WAIT = ErrorPolicy.message({ code = 0, kind = "unknown" })
+local RECOVERY_READY = "状态已同步，可继续操作"
+
+local function feedback_text(code, result)
+  if type(result) == "table" and type(result.message) == "string" and result.message ~= "" then
+    return result.message
+  end
+  return ErrorPolicy.message({
+    code = code,
+    kind = type(result) == "table" and result.kind or nil,
+    message = type(result) == "table" and result.message or nil,
+  })
+end
+
+--- 一次性观察已结束的 Unknown/wait_recover：仅驱动 view-local 反馈跟踪，不延长 CommandObservation。
+local function is_unknown_recovery_outcome(result)
+  if type(result) ~= "table" then return false end
+  if result.kind == "unknown" then return true end
+  if result.action == "wait_recover" then return true end
+  local d = result.disposition
+  return d == "Unknown"
+end
+
+--- 顶层 code==0 只表示已处理；须看权威 results 区分全成功/部分/全业务失败。
+--- resultsStatus=error → 可观察不可用；unavailable/缺 results → 已提交（不发明逐项成功）。
+local function format_batch_feedback(code, result)
+  if code ~= 0 then
+    return feedback_text(code, result)
+  end
+  local disposition = type(result) == "table" and result.disposition or nil
+  if disposition ~= "Recorded" and disposition ~= "SyncApplied" then
+    return feedback_text(code, result)
+  end
+  local raw = type(result) == "table" and result.raw or result
+  if type(raw) ~= "table" then
+    raw = type(result) == "table" and result or nil
+  end
+  local status = type(raw) == "table" and (raw.resultsStatus or raw.results_status) or nil
+  if status == "error" then
+    return "结果不可用"
+  end
+  -- 正式完成信封：顶层 results；假服务仍可注入 raw.results
+  local results = nil
+  if type(result) == "table" and type(result.results) == "table" then
+    results = result.results
+  elseif type(raw) == "table" then
+    results = raw.results or raw.Results
+  end
+  if type(results) ~= "table" or #results == 0 then
+    return "已提交"
+  end
+  local okN, failN, lines = 0, 0, {}
+  for i = 1, #results do
+    local r = results[i]
+    if type(r) == "table" then
+      local pid = r.plotId or r.plot_id or "?"
+      local rc = r.code
+      if rc == nil then rc = -1 end
+      if rc == 0 then okN = okN + 1 else failN = failN + 1 end
+      lines[#lines + 1] = string.format("%s:%s", tostring(pid), RESULT_LABELS[rc] or "失败")
+    end
+  end
+  local detail = table.concat(lines, " ")
+  if failN == 0 then
+    return "全部成功 " .. detail
+  end
+  if okN == 0 then
+    return "全部失败（已处理） " .. detail
+  end
+  return "部分成功 " .. detail
+end
+
+function M.new(service, store, clock, catalog)
+  local self = {
+    _service = service or Farm,
+    _store = store,
+    _clock = clock,
+    _catalog = catalog or Catalog,
+    _view = nil,
+    _sub = nil,
+    _cmdObs = nil,
+    _gen = 0,
+    _opSeq = 0,
+    _uiOp = 0,
+    _pendingOp = nil,
+    _heldOp = nil,
+    _closed = true,
+    _destroyed = false,
+    _busy = false,
+    _lastFeedback = "",
+    _selectedSeedId = nil,
+    _toolMode = "plant",
+    _seedRows = {},
+    _seedIndex = 1,
+    _attachEpoch = 0,
+    _previewIds = {},
+    _countdownLines = {},
+    _countdownPage = 1,
+    _countdownPageSize = 5,
+    -- view-local：Unknown 观察结束后，等 service.isWritable 再把未确认改为中性可继续
+    _recoveryArmed = false,
+    _recoveryGen = 0,
+    _recoveryOp = 0,
+  }
+
+  local function bump_gen()
+    self._gen = self._gen + 1
+    return self._gen
+  end
+
+  local function alive(gen)
+    return (not self._destroyed) and (not self._closed) and self._gen == gen and self._view ~= nil
+  end
+
+  local function clear_recovery_track()
+    self._recoveryArmed = false
+    self._recoveryGen = 0
+    self._recoveryOp = 0
+  end
+
+  local function clear_cmd_obs()
+    local obs = self._cmdObs
+    self._cmdObs = nil
+    self._heldOp = nil
+    self._pendingOp = nil
+    release_obs(obs)
+  end
+
+  local function begin_op()
+    clear_recovery_track()
+    self._opSeq = self._opSeq + 1
+    local op = self._opSeq
+    self._uiOp = op
+    self._pendingOp = op
+    return op
+  end
+
+  local function release_owned_op(op)
+    if self._heldOp == op then
+      local obs = self._cmdObs
+      self._cmdObs = nil
+      self._heldOp = nil
+      release_obs(obs)
+    end
+    if self._pendingOp == op then self._pendingOp = nil end
+  end
+
+  local function hold_cmd_obs(op, gen, lease)
+    if lease == nil then
+      if self._pendingOp == op then self._pendingOp = nil end
+      return nil
+    end
+    -- 同步 callback-before-return：finish 已清 pending → 立即释放返回租约
+    if self._pendingOp ~= op then
+      release_obs(lease)
+      return nil
+    end
+    if not alive(gen) or self._uiOp ~= op then
+      release_obs(lease)
+      if self._pendingOp == op then self._pendingOp = nil end
+      return nil
+    end
+    self._pendingOp = nil
+    if self._heldOp ~= nil and self._heldOp ~= op then
+      release_obs(lease)
+      return nil
+    end
+    if self._cmdObs ~= nil and self._cmdObs ~= lease then
+      release_obs(self._cmdObs)
+    end
+    self._cmdObs = lease
+    self._heldOp = op
+    return lease
+  end
+
+  local function set_status(text)
+    text = tostring(text or "")
+    -- 非「未确认」文案（新操作/业务错/取消等）作废旧恢复旗，避免解锁后覆盖
+    if text ~= UNKNOWN_WAIT then
+      clear_recovery_track()
+    end
+    self._lastFeedback = text
+    if self._view and self._view.SetText then
+      safe_call(function() self._view:SetText("StatusLabel", self._lastFeedback) end)
+    end
+  end
+
+  local function arm_recovery_track(gen, op)
+    self._recoveryArmed = true
+    self._recoveryGen = gen
+    self._recoveryOp = op
+  end
+
+  --- 权威 isWritable + tick/render：冻写保持未确认；可写后仅中性同步提示，不发明成功/301。
+  local function try_resolve_recovery_feedback()
+    if not self._recoveryArmed then return end
+    if self._destroyed or self._closed then return end
+    if self._gen ~= self._recoveryGen then
+      clear_recovery_track()
+      return
+    end
+    -- 新 op 已推进时 begin_op 应已清旗；防御性丢弃跨 op 残旗
+    if self._recoveryOp ~= 0 and self._uiOp ~= self._recoveryOp then
+      clear_recovery_track()
+      return
+    end
+    if self._lastFeedback ~= UNKNOWN_WAIT then
+      clear_recovery_track()
+      return
+    end
+    local svc = self._service
+    if type(svc) ~= "table" or type(svc.isWritable) ~= "function" then return end
+    local ok, writable = pcall(function() return svc.isWritable() end)
+    if not ok or writable ~= true then
+      return
+    end
+    clear_recovery_track()
+    set_status(RECOVERY_READY)
+  end
+
+  --- 门控 service.isWritable；假 writable=false 不得派发写
+  local function ensure_writable(done)
+    local svc = self._service
+    if type(svc) ~= "table" or type(svc.isWritable) ~= "function" then
+      set_status("服务不可写")
+      safe_call(done, -10, {
+        code = -10, kind = "local_block", message = "service-not-writable", disposition = "NotReady",
+      })
+      return false
+    end
+    local ok, writable, reason = pcall(function() return svc.isWritable() end)
+    if not ok or writable ~= true then
+      local msg = (ok and reason) and tostring(reason) or "不可写"
+      set_status(msg)
+      safe_call(done, -10, {
+        code = -10, kind = "local_block", message = msg, disposition = "NotReady",
+      })
+      return false
+    end
+    return true
+  end
+
+  local function set_busy(busy)
+    self._busy = busy and true or false
+    if self._view and self._view.SetInteractable then
+      safe_call(function()
+        self._view:SetInteractable("PlantModeButton", not self._busy)
+        self._view:SetInteractable("WaterModeButton", not self._busy)
+        self._view:SetInteractable("FertilizeModeButton", not self._busy)
+        self._view:SetInteractable("HarvestModeButton", not self._busy)
+        self._view:SetInteractable("PrevSeedButton", not self._busy)
+        self._view:SetInteractable("NextSeedButton", not self._busy)
+      end)
+    end
+  end
+
+  local function push_tool_mode()
+    local hf = home_facade()
+    if hf and hf.SetToolMode then
+      pcall(function() hf.SetToolMode(self._toolMode) end)
+    end
+  end
+
+  local function apply_displays(snapshot, previewSet)
+    local hf = home_facade()
+    if hf == nil or hf.ApplyPlotDisplays == nil then return end
+    local synced = facade_clock_synced()
+    local byId = {}
+    if type(snapshot) == "table" and type(snapshot.plots) == "table" then
+      for i = 1, #snapshot.plots do
+        local row = snapshot.plots[i]
+        if type(row) == "table" and type(row.plotId) == "number" then
+          byId[row.plotId] = row
+        end
+      end
+    end
+    local parts = {}
+    -- 冻结 24 地：缺模型行视为 Locked 显示
+    for id = 1001, 1024 do
+      local kindInt = 0
+      local row = byId[id]
+      if row then
+        local _, ki = present_plot(row, synced)
+        kindInt = ki
+      end
+      if self._busy then kindInt = 5 end
+      if previewSet and previewSet[id] then kindInt = 4 end
+      parts[#parts + 1] = string.format("%d:%d", id, kindInt)
+    end
+    pcall(function() hf.ApplyPlotDisplays(table.concat(parts, ";")) end)
+  end
+
+  local function collect_countdown_lines(snapshot)
+    local synced = facade_clock_synced()
+    local lines = {}
+    if type(snapshot) ~= "table" or type(snapshot.plots) ~= "table" then
+      return { "(无地块快照)" }
+    end
+    for i = 1, #snapshot.plots do
+      local row = snapshot.plots[i]
+      if type(row) == "table" then
+        local name, _, rem = present_plot(row, synced)
+        if name == "Growing" then
+          lines[#lines + 1] = string.format("地%d 生长 剩余%s ms", row.plotId, tostring(rem))
+        elseif name == "Ripe" then
+          lines[#lines + 1] = string.format("地%d 成熟", row.plotId)
+        elseif name == "Empty" then
+          lines[#lines + 1] = string.format("地%d 空地", row.plotId)
+        elseif name == "Locked" then
+          lines[#lines + 1] = string.format("地%d 锁定", row.plotId)
+        end
+      end
+    end
+    if #lines == 0 then return { "(无可显示地块)" } end
+    return lines
+  end
+
+  local function countdown_page_count()
+    local n = #self._countdownLines
+    if n <= 0 then return 1 end
+    local ps = self._countdownPageSize
+    if type(ps) ~= "number" or ps < 1 then ps = 5 end
+    return math.max(1, math.ceil(n / ps))
+  end
+
+  local function apply_countdown_page()
+    if not self._view or not self._view.SetText then return end
+    local lines = self._countdownLines or {}
+    local ps = self._countdownPageSize
+    if type(ps) ~= "number" or ps < 1 then ps = 5 end
+    local pages = countdown_page_count()
+    if self._countdownPage < 1 then self._countdownPage = 1 end
+    if self._countdownPage > pages then self._countdownPage = pages end
+    local from = (self._countdownPage - 1) * ps + 1
+    local to = math.min(#lines, from + ps - 1)
+    local slice = {}
+    for i = from, to do slice[#slice + 1] = lines[i] end
+    local body = #slice > 0 and table.concat(slice, "\n") or ""
+    local header = string.format("倒计时 %d/%d页", self._countdownPage, pages)
+    safe_call(function()
+      self._view:SetText("CountdownLabel", header .. "\n" .. body)
+    end)
+    if self._view.SetInteractable then
+      safe_call(function()
+        self._view:SetInteractable("CountdownPrevButton", self._countdownPage > 1)
+        self._view:SetInteractable("CountdownNextButton", self._countdownPage < pages)
+      end)
+    end
+  end
+
+  local function refresh_countdown(snapshot)
+    self._countdownLines = collect_countdown_lines(snapshot)
+    apply_countdown_page()
+  end
+
+  local function refresh_seed_label(snap)
+    if not self._view or not self._view.SetText then return end
+    local level = 0
+    local bag = {}
+    if type(snap) == "table" then
+      level = snap.level or 0
+      bag = type(snap.bag) == "table" and snap.bag or {}
+    end
+    local rows = {}
+    if self._catalog.listSeeds then
+      rows = self._catalog.listSeeds() or {}
+    else
+      local items = self._catalog.listItems and self._catalog.listItems() or {}
+      for i = 1, #items do
+        if items[i] and items[i].type == "Seed" then rows[#rows + 1] = items[i] end
+      end
+    end
+    self._seedRows = rows
+    if #rows == 0 then
+      self._selectedSeedId = nil
+      safe_call(function()
+        self._view:SetText("SeedLabel", "无种子配置")
+        if self._view.SetInteractable then
+          self._view:SetInteractable("PlantModeButton", false)
+        end
+      end)
+      return
+    end
+    if self._seedIndex < 1 then self._seedIndex = 1 end
+    if self._seedIndex > #rows then self._seedIndex = #rows end
+    local s = rows[self._seedIndex]
+    local have = bag_count(bag, s.id)
+    local unlocked = level >= (s.unlockLevel or 0)
+    local ok = unlocked and have > 0
+    if self._selectedSeedId == nil or self._selectedSeedId ~= s.id then
+      -- 保持显式 selectSeed 优先；浏览时同步候选
+      if self._selectedSeedId == nil then self._selectedSeedId = s.id end
+    end
+    local mark = ok and "" or (not unlocked and "（未解锁）" or "（库存不足）")
+    safe_call(function()
+      self._view:SetText("SeedLabel", string.format("种子 %s x%d%s", s.name or tostring(s.id), have, mark))
+    end)
+  end
+
+  function self:OnCreate(view)
+    self._view = view
+    if view and view.SetText then
+      safe_call(function()
+        view:SetText("Title", "农场")
+        view:SetText("StatusLabel", "")
+        view:SetText("SeedLabel", "未选种")
+        view:SetText("ModeLabel", "模式: 播种")
+        view:SetText("CountdownLabel", "")
+      end)
+    end
+  end
+
+  function self:OnOpen(argsJson)
+    self._closed = false
+    self._destroyed = false
+    self._countdownPage = 1
+    local gen = bump_gen()
+    if self._sub then
+      safe_call(function() self._sub.dispose() end)
+      self._sub = nil
+    end
+    if self._store and self._store.subscribe then
+      self._sub = self._store.subscribe(nil, function(snap, _)
+        if not alive(gen) then return end
+        self:render(snap)
+      end)
+    end
+
+    local hf = home_facade()
+    if hf and hf.AttachHandlers then
+      local function on_gesture(mode, plotIdsJson, previewOnly)
+        if not alive(gen) then return end
+        self:onWorldGesture(mode, plotIdsJson, previewOnly)
+      end
+      local function on_cancel(reason)
+        if not alive(gen) then return end
+        self._previewIds = {}
+        set_status("手势取消: " .. format_cancel_reason(reason))
+        local snap = self._store and self._store.getSnapshot and self._store.getSnapshot() or nil
+        apply_displays(snap, nil)
+      end
+      local function on_tick()
+        if not alive(gen) then return end
+        -- 只刷新倒计时显示，绝不自动收获；快照可先于写解锁，tick 须处理稍后解锁
+        local snap = self._store and self._store.getSnapshot and self._store.getSnapshot() or nil
+        refresh_countdown(snap)
+        local previewSet = nil
+        if #self._previewIds > 0 then
+          previewSet = {}
+          for i = 1, #self._previewIds do previewSet[self._previewIds[i]] = true end
+        end
+        apply_displays(snap, previewSet)
+        try_resolve_recovery_feedback()
+      end
+      local ok, epoch = pcall(function()
+        return hf.AttachHandlers(on_gesture, on_cancel, on_tick)
+      end)
+      if ok then self._attachEpoch = epoch or 0 end
+      pcall(function() hf.SetInputEnabled(true) end)
+      push_tool_mode()
+    end
+
+    self:render(self._store and self._store.getSnapshot and self._store.getSnapshot() or nil)
+    _ = argsJson
+  end
+
+  function self:OnClose()
+    bump_gen()
+    self._closed = true
+    self._busy = false
+    -- 关窗作废恢复跟踪；未确认文案不得带到无 scoped 跟踪的重开界面
+    if self._recoveryArmed and self._lastFeedback == UNKNOWN_WAIT then
+      self._lastFeedback = ""
+      if self._view and self._view.SetText then
+        safe_call(function() self._view:SetText("StatusLabel", "") end)
+      end
+    end
+    clear_recovery_track()
+    clear_cmd_obs()
+    local hf = home_facade()
+    if hf then
+      pcall(function() hf.CancelActiveGesture("window-close") end)
+      -- 共享 Adapter：输入所有权由 Attach/Detach 按模块 epoch 持有；关窗只 Detach 本窗，
+      -- 不得 SetInputEnabled(false) 夺 Gather 等其它消费者（两者全关时 Facade 门闸禁用）。
+      if hf.DetachHandlers then
+        pcall(function() hf.DetachHandlers(self._attachEpoch) end)
+      end
+    end
+    self._attachEpoch = 0
+    self._previewIds = {}
+    if self._sub then
+      safe_call(function() self._sub.dispose() end)
+      self._sub = nil
+    end
+  end
+
+  function self:OnDestroy()
+    self:OnClose()
+    self._destroyed = true
+    self._view = nil
+  end
+
+  function self:render(snapshot)
+    if self._destroyed or self._view == nil then return end
+    refresh_seed_label(snapshot)
+    refresh_countdown(snapshot)
+    if self._view.SetText then
+      safe_call(function()
+        self._view:SetText("ModeLabel", "模式: " .. (MODE_LABELS[self._toolMode] or "未知"))
+        local gold = type(snapshot) == "table" and tostring(snapshot.gold or "0") or "0"
+        local level = type(snapshot) == "table" and tostring(snapshot.level or 0) or "0"
+        self._view:SetText("GoldLabel", "金币: " .. gold)
+        self._view:SetText("LevelLabel", "Lv." .. level)
+      end)
+    end
+    local previewSet = nil
+    if #self._previewIds > 0 then
+      previewSet = {}
+      for i = 1, #self._previewIds do previewSet[self._previewIds[i]] = true end
+    end
+    apply_displays(snapshot, previewSet)
+    -- 模型修订可先于写解锁到达；可写后无新 delta 时仍靠本路径/tick 解除未确认
+    try_resolve_recovery_feedback()
+  end
+
+  function self:selectSeed(seedId)
+    if self._closed or self._destroyed then return false end
+    local id = seedId
+    if type(id) == "string" then id = tonumber(id) end
+    if type(id) ~= "number" or id ~= math.floor(id) or id < 1 then
+      set_status("无效种子")
+      return false
+    end
+    local info = self._catalog.getItem(id)
+    if not info or info.type ~= "Seed" then
+      set_status("未知种子，已禁用")
+      self._selectedSeedId = nil
+      return false
+    end
+    self._selectedSeedId = id
+    for i = 1, #self._seedRows do
+      if self._seedRows[i].id == id then self._seedIndex = i break end
+    end
+    set_status("已选种: " .. tostring(info.name))
+    self:render(self._store and self._store.getSnapshot and self._store.getSnapshot() or nil)
+    return true
+  end
+
+  function self:setToolMode(mode)
+    if self._closed or self._destroyed then return end
+    mode = tostring(mode or "")
+    if mode ~= "plant" and mode ~= "water" and mode ~= "fertilize" and mode ~= "harvest" then
+      set_status("未知模式")
+      return
+    end
+    self._toolMode = mode
+    push_tool_mode()
+    set_status("模式: " .. MODE_LABELS[mode])
+    if self._view and self._view.SetText then
+      safe_call(function() self._view:SetText("ModeLabel", "模式: " .. MODE_LABELS[mode]) end)
+    end
+  end
+
+  function self:selectPrevSeed()
+    if self._closed or self._destroyed or #self._seedRows == 0 then return end
+    self._seedIndex = self._seedIndex - 1
+    if self._seedIndex < 1 then self._seedIndex = #self._seedRows end
+    self:selectSeed(self._seedRows[self._seedIndex].id)
+  end
+
+  function self:selectNextSeed()
+    if self._closed or self._destroyed or #self._seedRows == 0 then return end
+    self._seedIndex = self._seedIndex + 1
+    if self._seedIndex > #self._seedRows then self._seedIndex = 1 end
+    self:selectSeed(self._seedRows[self._seedIndex].id)
+  end
+
+  function self:countdownPrevPage()
+    if self._closed or self._destroyed then return end
+    if self._countdownPage > 1 then
+      self._countdownPage = self._countdownPage - 1
+      apply_countdown_page()
+    end
+  end
+
+  function self:countdownNextPage()
+    if self._closed or self._destroyed then return end
+    if self._countdownPage < countdown_page_count() then
+      self._countdownPage = self._countdownPage + 1
+      apply_countdown_page()
+    end
+  end
+
+  function self:onWorldGesture(mode, plotIdsJson, previewOnly)
+    local clean, err = parse_plot_ids_json(plotIdsJson)
+    if not clean then
+      if not previewOnly then set_status(err or "选择无效") end
+      return
+    end
+    if previewOnly then
+      self._previewIds = clean
+      local snap = self._store and self._store.getSnapshot and self._store.getSnapshot() or nil
+      local previewSet = {}
+      for i = 1, #clean do previewSet[clean[i]] = true end
+      apply_displays(snap, previewSet)
+      return
+    end
+    self._previewIds = {}
+    mode = tostring(mode or "")
+    if mode == "plant" then
+      self:plant(clean)
+    elseif mode == "water" then
+      if #clean ~= 1 then set_status("浇水仅单块"); return end
+      self:water(clean[1])
+    elseif mode == "fertilize" then
+      if #clean ~= 1 then set_status("施肥仅单块"); return end
+      self:fertilize(clean[1])
+    elseif mode == "harvest" then
+      self:harvest(clean)
+    else
+      set_status("未知模式")
+    end
+  end
+
+  function self:plant(plotIds, done)
+    local gen = self._gen
+    if self._closed or self._destroyed then
+      safe_call(done, -10, { code = -10, kind = "local_block", message = "窗口已关闭", disposition = "NotReady" })
+      return nil
+    end
+    if self._busy then
+      set_status("操作进行中")
+      safe_call(done, -10, { code = -10, kind = "local_block", message = "操作进行中", disposition = "NotReady" })
+      return nil
+    end
+    if not ensure_writable(done) then return nil end
+    local clean, err = normalize_plot_ids(plotIds)
+    if not clean then
+      set_status(err or "选择无效")
+      safe_call(done, -12, { code = -12, kind = "malformed_intent", message = err or "选择无效", disposition = "NotAccepted" })
+      return nil
+    end
+    -- 25 项：normalize 已拒；再防调用方塞入超长
+    if #clean > MAX_BATCH then
+      set_status("最多24块")
+      safe_call(done, -12, { code = -12, kind = "malformed_intent", message = "plotIds-exceed-24", disposition = "NotAccepted" })
+      return nil
+    end
+    local seedId = self._selectedSeedId
+    if seedId == nil then
+      set_status("请先选种")
+      safe_call(done, -12, { code = -12, kind = "malformed_intent", message = "seed-required", disposition = "NotAccepted" })
+      return nil
+    end
+    local info = self._catalog.getItem(seedId)
+    if not info or info.type ~= "Seed" then
+      set_status("未知种子")
+      safe_call(done, -12, { code = -12, kind = "malformed_intent", message = "seed-unknown", disposition = "NotAccepted" })
+      return nil
+    end
+    local items = {}
+    for i = 1, #clean do
+      items[i] = { plotId = clean[i], seedId = seedId }
+    end
+    local op = begin_op()
+    set_busy(true)
+    set_status("播种中…")
+    local function finish(code, result)
+      release_owned_op(op)
+      -- 旧代次/旧 op 不得清新 busy/lease；也不得改新 view 的恢复跟踪
+      if not alive(gen) or self._uiOp ~= op then return end
+      set_busy(false)
+      local fb = format_batch_feedback(code, result)
+      set_status(fb)
+      if is_unknown_recovery_outcome(result) and self._lastFeedback == UNKNOWN_WAIT then
+        arm_recovery_track(gen, op)
+        try_resolve_recovery_feedback()
+      end
+      if code == 0 then
+        self:render(self._store and self._store.getSnapshot and self._store.getSnapshot() or nil)
+      end
+      safe_call(done, code, result)
+    end
+    return hold_cmd_obs(op, gen, self._service.plant(items, finish))
+  end
+
+  function self:water(plotId, done)
+    local gen = self._gen
+    if self._closed or self._destroyed then
+      safe_call(done, -10, { code = -10, kind = "local_block", message = "窗口已关闭", disposition = "NotReady" })
+      return nil
+    end
+    if self._busy then
+      safe_call(done, -10, { code = -10, kind = "local_block", message = "操作进行中", disposition = "NotReady" })
+      return nil
+    end
+    if not ensure_writable(done) then return nil end
+    local op = begin_op()
+    set_busy(true)
+    set_status("浇水中…")
+    local function finish(code, result)
+      release_owned_op(op)
+      if not alive(gen) or self._uiOp ~= op then return end
+      set_busy(false)
+      set_status(feedback_text(code, result))
+      if is_unknown_recovery_outcome(result) and self._lastFeedback == UNKNOWN_WAIT then
+        arm_recovery_track(gen, op)
+        try_resolve_recovery_feedback()
+      end
+      if code == 0 then self:render(self._store and self._store.getSnapshot and self._store.getSnapshot() or nil) end
+      safe_call(done, code, result)
+    end
+    return hold_cmd_obs(op, gen, self._service.water(plotId, finish))
+  end
+
+  function self:fertilize(plotId, done)
+    local gen = self._gen
+    if self._closed or self._destroyed then
+      safe_call(done, -10, { code = -10, kind = "local_block", message = "窗口已关闭", disposition = "NotReady" })
+      return nil
+    end
+    if self._busy then
+      safe_call(done, -10, { code = -10, kind = "local_block", message = "操作进行中", disposition = "NotReady" })
+      return nil
+    end
+    if not ensure_writable(done) then return nil end
+    local op = begin_op()
+    set_busy(true)
+    set_status("施肥中…")
+    local function finish(code, result)
+      release_owned_op(op)
+      if not alive(gen) or self._uiOp ~= op then return end
+      set_busy(false)
+      set_status(feedback_text(code, result))
+      if is_unknown_recovery_outcome(result) and self._lastFeedback == UNKNOWN_WAIT then
+        arm_recovery_track(gen, op)
+        try_resolve_recovery_feedback()
+      end
+      if code == 0 then self:render(self._store and self._store.getSnapshot and self._store.getSnapshot() or nil) end
+      safe_call(done, code, result)
+    end
+    return hold_cmd_obs(op, gen, self._service.fertilize(plotId, finish))
+  end
+
+  function self:harvest(plotIds, done)
+    local gen = self._gen
+    if self._closed or self._destroyed then
+      safe_call(done, -10, { code = -10, kind = "local_block", message = "窗口已关闭", disposition = "NotReady" })
+      return nil
+    end
+    if self._busy then
+      safe_call(done, -10, { code = -10, kind = "local_block", message = "操作进行中", disposition = "NotReady" })
+      return nil
+    end
+    if not ensure_writable(done) then return nil end
+    local clean, err = normalize_plot_ids(plotIds)
+    if not clean then
+      set_status(err or "选择无效")
+      safe_call(done, -12, { code = -12, kind = "malformed_intent", message = err or "选择无效", disposition = "NotAccepted" })
+      return nil
+    end
+    local op = begin_op()
+    set_busy(true)
+    set_status("收获中…")
+    local function finish(code, result)
+      release_owned_op(op)
+      if not alive(gen) or self._uiOp ~= op then return end
+      set_busy(false)
+      local fb = format_batch_feedback(code, result)
+      set_status(fb)
+      if is_unknown_recovery_outcome(result) and self._lastFeedback == UNKNOWN_WAIT then
+        arm_recovery_track(gen, op)
+        try_resolve_recovery_feedback()
+      end
+      if code == 0 then self:render(self._store and self._store.getSnapshot and self._store.getSnapshot() or nil) end
+      safe_call(done, code, result)
+    end
+    return hold_cmd_obs(op, gen, self._service.harvest(clean, finish))
+  end
+
+  function self:getFeedback() return self._lastFeedback end
+  function self:isBusy() return self._busy end
+  function self:selectedSeedId() return self._selectedSeedId end
+  function self:toolMode() return self._toolMode end
+
+  return self
+end
+
+return M

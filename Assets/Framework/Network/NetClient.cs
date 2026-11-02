@@ -178,6 +178,20 @@ namespace Game.Framework.Network
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
+            ushort requestId = MsgRegistry.GetId(request.GetType());
+            if (!MsgRegistry.TryGetResponseId(requestId, out ushort responseId))
+                throw new InvalidOperationException("该请求没有配对响应");
+            if (MsgRegistry.GetId(typeof(TResponse)) != responseId)
+                throw new InvalidOperationException("响应类型与请求不配对");
+            IMessage message = await SendRequestMessageAsync(request, timeout, ct);
+            return (TResponse)message;
+        }
+
+        /// <summary>玩法适配：按 MsgRegistry 配对发送，返回已解析的响应消息（非泛型）。</summary>
+        public async UniTask<IMessage> SendRequestMessageAsync(IMessage request, TimeSpan timeout, CancellationToken ct)
+        {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
             if (timeout < TimeSpan.Zero)
                 throw new ArgumentOutOfRangeException(nameof(timeout));
             EnsureOwner();
@@ -188,8 +202,6 @@ namespace Game.Framework.Network
             ushort requestId = MsgRegistry.GetId(request.GetType());
             if (!MsgRegistry.TryGetResponseId(requestId, out ushort responseId))
                 throw new InvalidOperationException("该请求没有配对响应");
-            if (MsgRegistry.GetId(typeof(TResponse)) != responseId)
-                throw new InvalidOperationException("响应类型与请求不配对");
 
             byte[] body = request.ToByteArray();
             CancellationTokenSource abort = new CancellationTokenSource();
@@ -220,14 +232,13 @@ namespace Game.Framework.Network
                 catch (Exception)
                 {
                     if (waiting.Finished)
-                        return (TResponse)await waiting.Done.Task;
+                        return await waiting.Done.Task;
                     if (Detach(waiting))
                         Release(waiting);
                     throw;
                 }
 
-                IMessage message = await waiting.Done.Task;
-                return (TResponse)message;
+                return await waiting.Done.Task;
             }
             finally
             {
@@ -582,12 +593,18 @@ namespace Game.Framework.Network
             }
         }
 
-        /// <summary>返回当前连接代次。</summary>
-        int CurrentGeneration()
+        /// <summary>返回当前连接代次（玩法 stamp / 门控用）。</summary>
+        public int ConnectionGeneration
         {
-            lock (gate)
-                return generation;
+            get
+            {
+                lock (gate)
+                    return generation;
+            }
         }
+
+        /// <summary>返回当前连接代次。</summary>
+        int CurrentGeneration() => ConnectionGeneration;
 
         /// <summary>分配下一个请求序号。0 留给系统，用完后从 1 继续。</summary>
         uint NextSeq()

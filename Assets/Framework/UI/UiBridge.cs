@@ -76,6 +76,9 @@ namespace Game.Framework.UI
 
         public static int OpenCount => _manager?.OpenCount ?? 0;
         public static int StackCount => _manager?.StackCount ?? 0;
+
+        /// <summary>家园世界输入门控：任一 modal 打开时禁止透传点击/拖拽写。</summary>
+        public static bool HasModalOpen => _manager != null && _manager.HasModalOpen;
         public static int LiveClicks => ClickSubscription.LiveCount;
         public static int LiveCallbackLeases => CallbackLease.LiveCount;
 

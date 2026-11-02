@@ -71,6 +71,21 @@ namespace CloudIsle.Config
                 return double.Parse(Convert.ToString(v, CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
             }
 
+            /// <summary>
+            /// 必须存在且为 JSON 数值（解析为 long 或 double）。
+            /// 拒绝缺失、null、字符串、boolean 及其他非数值；不走 <see cref="GetDouble"/> 的兼容转换。
+            /// </summary>
+            public double RequireJsonNumber(string key)
+            {
+                if (!_map.TryGetValue(key, out var v) || v == null)
+                    throw new FormatException("expected json number " + key);
+                if (v is double d)
+                    return d;
+                if (v is long l)
+                    return l;
+                throw new FormatException("expected json number " + key);
+            }
+
             public bool GetBool(string key)
             {
                 if (!_map.TryGetValue(key, out var v) || v == null)

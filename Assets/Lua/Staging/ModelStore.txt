@@ -1,0 +1,860 @@
+-- C07：唯一玩法模型写入口。按 proto 校验/clone 后单次 root swap；int64 规范十进制字符串，无 tonumber 回退。
+
+local Json = require("Json")
+
+local ApplyKind = {
+  Applied = "Applied",
+  Duplicate = "Duplicate",
+  Gap = "Gap",
+  Invalid = "Invalid",
+}
+
+local INT64_MAX = "9223372036854775807"
+local INT64_MIN = "-9223372036854775808"
+local INT32_MAX = 2147483647
+local INT32_MIN = -2147483648
+
+local root = nil
+local appliedRevision = "0"
+local subscribers = {}
+local nextSubId = 1
+local notifyDepth = 0
+local pendingNotify = {}
+
+local function result(kind, rev, err)
+  return {
+    kind = kind,
+    appliedRevision = tostring(rev or appliedRevision or "0"),
+    error = err or "",
+  }
+end
+
+local function deep_copy(v)
+  if type(v) ~= "table" then
+    return v
+  end
+  local out = {}
+  for k, val in pairs(v) do
+    out[k] = deep_copy(val)
+  end
+  return out
+end
+
+-- 纯十进制字符串比较；禁止 tonumber（大数精度丢失）。
+local function compare_decimal(a, b)
+  a = tostring(a or "0")
+  b = tostring(b or "0")
+  -- 校验范围前也需要比较；不能调用仅接受有效 Int64 的桥导致越界值直接抛异常。
+  local function split(s)
+    local neg = false
+    if s:sub(1, 1) == "-" then
+      neg = true
+      s = s:sub(2)
+    end
+    s = s:gsub("^0+", "")
+    if s == "" then s = "0" end
+    return neg, s
+  end
+  local an, ab = split(a)
+  local bn, bb = split(b)
+  if an ~= bn then
+    if ab == "0" and bb == "0" then return 0 end
+    return an and -1 or 1
+  end
+  if #ab ~= #bb then
+    local cmp = (#ab < #bb) and -1 or 1
+    return an and -cmp or cmp
+  end
+  if ab == bb then return 0 end
+  local cmp = (ab < bb) and -1 or 1
+  return an and -cmp or cmp
+end
+
+local function as_int64_string(v, field)
+  if v == nil then
+    return nil, field .. "-int64-nil"
+  end
+  local s
+  if type(v) == "string" then
+    if v == "" then
+      return nil, field .. "-int64-empty"
+    end
+    if not v:match("^-?%d+$") then
+      return nil, field .. "-int64-non-decimal"
+    end
+    if v ~= "0" and v:match("^-?0%d") then
+      return nil, field .. "-int64-leading-zero"
+    end
+    if v == "-0" then
+      return nil, field .. "-int64-neg-zero"
+    end
+    s = v
+  elseif type(v) == "number" then
+    -- ProtoJSON 的 int64 必须是字符串；拒绝 number，避免静默精度损失
+    return nil, field .. "-int64-must-be-string"
+  else
+    return nil, field .. "-int64-type"
+  end
+  if compare_decimal(s, INT64_MAX) > 0 or compare_decimal(s, INT64_MIN) < 0 then
+    return nil, field .. "-int64-out-of-range"
+  end
+  return s, nil
+end
+
+-- int32：允许 JSON number 或规范十进制字符串；范围严格。
+local function as_int32(v, field)
+  if v == nil then
+    return nil, field .. "-int32-nil"
+  end
+  local n
+  if type(v) == "number" then
+    if v ~= math.floor(v) then
+      return nil, field .. "-int32-non-integer"
+    end
+    n = v
+  elseif type(v) == "string" then
+    if not v:match("^-?%d+$") then
+      return nil, field .. "-int32-non-decimal"
+    end
+    if v ~= "0" and v:match("^-?0%d") then
+      return nil, field .. "-int32-leading-zero"
+    end
+    n = tonumber(v)
+    if not n then
+      return nil, field .. "-int32-parse"
+    end
+  else
+    return nil, field .. "-int32-type"
+  end
+  if n > INT32_MAX or n < INT32_MIN then
+    return nil, field .. "-int32-out-of-range"
+  end
+  return n, nil
+end
+
+local function is_dense_array(t)
+  if type(t) ~= "table" then
+    return false
+  end
+  local n = #t
+  local count = 0
+  for k, _ in pairs(t) do
+    if type(k) ~= "number" or k ~= math.floor(k) or k < 1 or k > n then
+      return false
+    end
+    count = count + 1
+  end
+  return count == n
+end
+
+local function validate_item_stack(row, path, requirePositiveCount)
+  if type(row) ~= "table" then
+    return false, path .. "-not-table"
+  end
+  local itemId, ierr = as_int32(row.itemId, path .. ".itemId")
+  if not itemId or itemId <= 0 then
+    return false, ierr or (path .. "-itemId-invalid")
+  end
+  local count, cerr
+  if row.count == nil then
+    count = 0
+  else
+    count, cerr = as_int32(row.count, path .. ".count")
+    if count == nil then
+      return false, cerr or (path .. "-count-invalid")
+    end
+  end
+  if count < 0 then
+    return false, path .. "-count-negative"
+  end
+  if requirePositiveCount and count <= 0 then
+    return false, path .. "-count-non-positive"
+  end
+  row.itemId = itemId
+  row.count = count
+  return true
+end
+
+local function validate_unique_dense(list, idKey, path, rowValidator)
+  if list == nil then
+    return true
+  end
+  if type(list) ~= "table" then
+    return false, path .. "-not-table"
+  end
+  if not is_dense_array(list) then
+    return false, path .. "-not-dense"
+  end
+  local seen = {}
+  for i = 1, #list do
+    local row = list[i]
+    if type(row) ~= "table" then
+      return false, path .. "[" .. i .. "]-not-table"
+    end
+    if rowValidator then
+      local ok, err = rowValidator(row, path .. "[" .. i .. "]")
+      if not ok then return false, err end
+    end
+    local id = row[idKey]
+    if id == nil then
+      return false, path .. "[" .. i .. "]-missing-" .. idKey
+    end
+    local idNum, idErr = as_int32(id, path .. "[" .. i .. "]." .. idKey)
+    if not idNum or idNum <= 0 then
+      return false, idErr or (path .. "-id-invalid")
+    end
+    row[idKey] = idNum
+    local key = tostring(idNum)
+    if seen[key] then
+      return false, path .. "-duplicate-" .. idKey
+    end
+    seen[key] = true
+  end
+  return true
+end
+
+local function validate_plot_row(row, path)
+  local plotId, err = as_int32(row.plotId, path .. ".plotId")
+  if not plotId or plotId <= 0 then
+    return false, err or (path .. "-plotId-missing")
+  end
+  row.plotId = plotId
+  if row.cropId ~= nil then
+    local c, cerr = as_int32(row.cropId, path .. ".cropId")
+    if c == nil then return false, cerr end
+    row.cropId = c
+  end
+  if row.plantTime ~= nil then
+    local t, terr = as_int64_string(row.plantTime, path .. ".plantTime")
+    if not t then return false, terr end
+    row.plantTime = t
+  end
+  if row.readyTime ~= nil then
+    local t, terr = as_int64_string(row.readyTime, path .. ".readyTime")
+    if not t then return false, terr end
+    row.readyTime = t
+  end
+  return true
+end
+
+local function validate_node_row(row, path)
+  local nodeId, err = as_int32(row.nodeId, path .. ".nodeId")
+  if not nodeId or nodeId <= 0 then
+    return false, err or (path .. "-nodeId-missing")
+  end
+  row.nodeId = nodeId
+  if row.nextReadyTime ~= nil then
+    local t, terr = as_int64_string(row.nextReadyTime, path .. ".nextReadyTime")
+    if not t then return false, terr end
+    row.nextReadyTime = t
+  end
+  return true
+end
+
+local function validate_tool_row(row, path)
+  local toolId, err = as_int32(row.toolId, path .. ".toolId")
+  if not toolId or toolId <= 0 then
+    return false, err or (path .. "-toolId-missing")
+  end
+  row.toolId = toolId
+  return true
+end
+
+local function validate_facility_row(row, path)
+  local facilityId, err = as_int32(row.facilityId, path .. ".facilityId")
+  if not facilityId or facilityId <= 0 then
+    return false, err or (path .. "-facilityId-missing")
+  end
+  row.facilityId = facilityId
+  if row.slots ~= nil then
+    local ok, serr = validate_unique_dense(row.slots, "slotId", path .. ".slots", function(slot, sp)
+      local sid, e = as_int32(slot.slotId, sp .. ".slotId")
+      if not sid or sid <= 0 then return false, e or (sp .. "-slotId") end
+      slot.slotId = sid
+      if slot.finishTime ~= nil then
+        local t, terr = as_int64_string(slot.finishTime, sp .. ".finishTime")
+        if not t then return false, terr end
+        slot.finishTime = t
+      end
+      return true
+    end)
+    if not ok then return false, serr end
+  end
+  return true
+end
+
+local function validate_order_row(row, path)
+  local orderId, err = as_int32(row.orderId, path .. ".orderId")
+  if not orderId or orderId <= 0 then
+    return false, err or (path .. "-orderId-missing")
+  end
+  row.orderId = orderId
+  return true
+end
+
+local function validate_snapshot(s)
+  if type(s) ~= "table" then
+    return false, "snapshot-not-table"
+  end
+  local info = s.info
+  if type(info) ~= "table" then
+    info = s
+  end
+  local playerId, err = as_int64_string(info.playerId or s.playerId, "playerId")
+  if not playerId or playerId == "0" then
+    return false, err or "player-id-missing"
+  end
+  info.playerId = playerId
+
+  local rev, rerr = as_int64_string(s.revision ~= nil and s.revision or "0", "revision")
+  if not rev then return false, rerr end
+  if compare_decimal(rev, "0") < 0 then
+    return false, "snapshot-negative-revision"
+  end
+  s.revision = rev
+
+  -- grantVersion 是 int32，不是 int64 资产
+  if s.grantVersion ~= nil then
+    local g, gerr = as_int32(s.grantVersion, "grantVersion")
+    if g == nil then return false, gerr end
+    if g < 0 then return false, "snapshot-negative-grant" end
+    s.grantVersion = g
+  end
+
+  for _, key in ipairs({ "gold", "gem", "ticket", "shard" }) do
+    if info[key] ~= nil then
+      local v, verr = as_int64_string(info[key], "info." .. key)
+      if not v then return false, verr end
+      info[key] = v
+    end
+  end
+
+  for _, key in ipairs({ "level", "exp", "bagSlots", "guideStep" }) do
+    if info[key] ~= nil then
+      local v, verr = as_int32(info[key], "info." .. key)
+      if v == nil then return false, verr end
+      info[key] = v
+    end
+  end
+
+  if s.bag ~= nil then
+    local ok, berr = validate_unique_dense(s.bag, "itemId", "bag", function(row, path)
+      return validate_item_stack(row, path, true)
+    end)
+    if not ok then return false, berr end
+  end
+  if s.plots ~= nil then
+    local ok, perr = validate_unique_dense(s.plots, "plotId", "plots", validate_plot_row)
+    if not ok then return false, perr end
+  end
+  if s.nodes ~= nil then
+    local ok, nerr = validate_unique_dense(s.nodes, "nodeId", "nodes", validate_node_row)
+    if not ok then return false, nerr end
+  end
+  if s.tools ~= nil then
+    local ok, terr = validate_unique_dense(s.tools, "toolId", "tools", validate_tool_row)
+    if not ok then return false, terr end
+  end
+  if s.facilities ~= nil then
+    local ok, ferr = validate_unique_dense(s.facilities, "facilityId", "facilities", validate_facility_row)
+    if not ok then return false, ferr end
+  end
+  if s.orders ~= nil then
+    local ok, oerr = validate_unique_dense(s.orders, "orderId", "orders", validate_order_row)
+    if not ok then return false, oerr end
+  end
+  if s.orderProgress ~= nil then
+    local op = s.orderProgress
+    if type(op) ~= "table" then
+      return false, "orderProgress-not-table"
+    end
+    if op.dayIndex ~= nil then
+      local d, derr = as_int32(op.dayIndex, "orderProgress.dayIndex")
+      if d == nil then return false, derr end
+      op.dayIndex = d
+    end
+    if op.nextRefreshTime ~= nil then
+      local t, terr = as_int64_string(op.nextRefreshTime, "orderProgress.nextRefreshTime")
+      if not t then return false, terr end
+      op.nextRefreshTime = t
+    end
+  end
+  return true
+end
+
+local function build_root_from_snapshot(s)
+  local info = s.info
+  if type(info) ~= "table" then
+    info = s
+  end
+  local function i64(v, d)
+    if v == nil then return d end
+    local x = as_int64_string(v, "field")
+    return x or d
+  end
+  local function i32(v, d)
+    if v == nil then return d end
+    local x = as_int32(v, "field")
+    if x == nil then return d end
+    return x
+  end
+  return {
+    playerId = i64(info.playerId, "0"),
+    nickname = tostring(info.nickname or ""),
+    level = i32(info.level, 0),
+    exp = i32(info.exp, 0),
+    gold = i64(info.gold, "0"),
+    gem = i64(info.gem, "0"),
+    ticket = i64(info.ticket, "0"),
+    shard = i64(info.shard, "0"),
+    bagSlots = i32(info.bagSlots, 0),
+    guideStep = i32(info.guideStep, 0),
+    revision = i64(s.revision, "0"),
+    grantVersion = i32(s.grantVersion, 0),
+    bag = deep_copy(s.bag or {}),
+    plots = deep_copy(s.plots or {}),
+    nodes = deep_copy(s.nodes or {}),
+    tools = deep_copy(s.tools or {}),
+    facilities = deep_copy(s.facilities or {}),
+    orders = deep_copy(s.orders or {}),
+    gachaStates = deep_copy(s.gachaStates or {}),
+    activities = deep_copy(s.activities or {}),
+    orderProgress = s.orderProgress ~= nil and deep_copy(s.orderProgress) or nil,
+    home = s.home ~= nil and deep_copy(s.home) or nil,
+    avatar = s.avatar ~= nil and deep_copy(s.avatar) or nil,
+  }
+end
+
+local function index_by_id(list, idKey)
+  local map = {}
+  if type(list) ~= "table" then
+    return map
+  end
+  for i = 1, #list do
+    local row = list[i]
+    if type(row) == "table" and row[idKey] ~= nil then
+      map[tostring(row[idKey])] = deep_copy(row)
+    end
+  end
+  return map
+end
+
+local function map_to_array(map)
+  local out = {}
+  for _, v in pairs(map) do
+    out[#out + 1] = v
+  end
+  table.sort(out, function(a, b)
+    local ai = tonumber(a.itemId or a.plotId or a.nodeId or a.toolId or a.facilityId or a.orderId or 0) or 0
+    local bi = tonumber(b.itemId or b.plotId or b.nodeId or b.toolId or b.facilityId or b.orderId or 0) or 0
+    return ai < bi
+  end)
+  return out
+end
+
+local function apply_bag_changes(bagList, changes)
+  local map = index_by_id(bagList, "itemId")
+  if type(changes) ~= "table" then
+    return nil, "bag-changes-not-table"
+  end
+  local arr = changes
+  if changes.changes then
+    arr = changes.changes
+  end
+  if not is_dense_array(arr) then
+    return nil, "bag-changes-not-dense"
+  end
+  local seen = {}
+  for i = 1, #arr do
+    local c = arr[i]
+    local ok, err = validate_item_stack(c, "bag.changes[" .. i .. "]", false)
+    if not ok then return nil, err end
+    local id = tostring(c.itemId)
+    if seen[id] then
+      return nil, "bag-changes-duplicate-itemId"
+    end
+    seen[id] = true
+    if c.count == 0 then
+      map[id] = nil
+    else
+      map[id] = { itemId = c.itemId, count = c.count }
+    end
+  end
+  return map_to_array(map)
+end
+
+local function merge_entity_list(existing, patch, idKey, rowValidator)
+  local map = index_by_id(existing, idKey)
+  if type(patch) ~= "table" then
+    return nil, "patch-not-table"
+  end
+  local arr = patch
+  if patch[idKey] == nil and #patch == 0 then
+    for _, v in pairs(patch) do
+      if type(v) == "table" and #v > 0 then
+        arr = v
+        break
+      end
+    end
+  end
+  if not is_dense_array(arr) then
+    return nil, idKey .. "-patch-not-dense"
+  end
+  local seen = {}
+  for i = 1, #arr do
+    local row = arr[i]
+    if type(row) ~= "table" then
+      return nil, idKey .. "-row-not-table"
+    end
+    if rowValidator then
+      local ok, err = rowValidator(row, idKey .. "[" .. i .. "]")
+      if not ok then return nil, err end
+    end
+    if row[idKey] == nil then
+      return nil, idKey .. "-missing"
+    end
+    local key = tostring(row[idKey])
+    if seen[key] then
+      return nil, idKey .. "-duplicate"
+    end
+    seen[key] = true
+    map[key] = deep_copy(row)
+  end
+  return map_to_array(map)
+end
+
+local function validate_batch(batch)
+  if type(batch) ~= "table" then
+    return false, "batch-not-table"
+  end
+  -- ProtoJSON 省略默认 baseRevision=0
+  local baseRaw = batch.baseRevision
+  if baseRaw == nil then
+    baseRaw = "0"
+  end
+  local base, berr = as_int64_string(baseRaw, "baseRevision")
+  if not base then return false, berr end
+  local neu, nerr = as_int64_string(batch.newRevision, "newRevision")
+  if not neu then return false, nerr end
+  batch.baseRevision = base
+  batch.newRevision = neu
+
+  if batch.operationScopeId ~= nil then
+    local v, e = as_int64_string(batch.operationScopeId, "operationScopeId")
+    if not v then return false, e end
+    batch.operationScopeId = v
+  end
+  if batch.opId ~= nil then
+    local v, e = as_int64_string(batch.opId, "opId")
+    if not v then return false, e end
+    batch.opId = v
+  end
+  if batch.serverTime ~= nil then
+    local v, e = as_int64_string(batch.serverTime, "serverTime")
+    if not v then return false, e end
+    batch.serverTime = v
+  end
+  if batch.configVersion ~= nil then
+    local v, e = as_int32(batch.configVersion, "configVersion")
+    if v == nil then return false, e end
+    batch.configVersion = v
+  end
+
+  if batch.attr ~= nil and type(batch.attr) ~= "table" then
+    return false, "attr-not-table"
+  end
+  if batch.bag ~= nil then
+    local changes = batch.bag.changes or batch.bag
+    if type(changes) ~= "table" then
+      return false, "bag-not-table"
+    end
+  end
+  return true, nil, base, neu
+end
+
+local function finish_notify()
+  while #pendingNotify > 0 do
+    local job = table.remove(pendingNotify, 1)
+    local snap = job.nextRoot and deep_copy(job.nextRoot) or nil
+    local prevCopy = job.prev and deep_copy(job.prev) or nil
+    local list = {}
+    for id, sub in pairs(subscribers) do
+      list[#list + 1] = { id = id, handler = sub.handler, selector = sub.selector }
+    end
+    for i = 1, #list do
+      local sub = list[i]
+      local ok, err = pcall(function()
+        -- 每个订阅者独立拷贝，互不污染
+        local view = snap ~= nil and deep_copy(snap) or nil
+        if view ~= nil and sub.selector then
+          view = sub.selector(view)
+        end
+        sub.handler(view, prevCopy ~= nil and deep_copy(prevCopy) or nil)
+      end)
+      if not ok then
+        _ = err
+      end
+    end
+  end
+end
+
+local function notify_once(prev, nextRoot)
+  pendingNotify[#pendingNotify + 1] = { prev = prev, nextRoot = nextRoot }
+  if notifyDepth > 0 then
+    -- 每次提交都保留事件；当前通知完成后按提交顺序排队投递。
+    return
+  end
+  notifyDepth = notifyDepth + 1
+  local ok, err = pcall(finish_notify)
+  notifyDepth = notifyDepth - 1
+  if not ok then
+    _ = err
+  end
+  if #pendingNotify > 0 and notifyDepth == 0 then
+    notifyDepth = notifyDepth + 1
+    pcall(finish_notify)
+    notifyDepth = notifyDepth - 1
+  end
+end
+
+local M = {}
+
+function M.replaceSnapshot(snapshot, stamp)
+  _ = stamp
+  local s = snapshot
+  if type(s) == "string" then
+    local ok, decoded = pcall(Json.decode, s)
+    if not ok or type(decoded) ~= "table" then
+      return result(ApplyKind.Invalid, appliedRevision, "snapshot-json-invalid")
+    end
+    s = decoded
+  end
+  local candidate = deep_copy(s)
+  local ok, err = validate_snapshot(candidate)
+  if not ok then
+    return result(ApplyKind.Invalid, appliedRevision, err)
+  end
+  local nextRoot = build_root_from_snapshot(candidate)
+  local nextRev = nextRoot.revision
+  -- 仅更旧 revision 为 Duplicate；同 revision 全量仍 Apply（M1 二次安装可换内容）
+  if root ~= nil and compare_decimal(nextRev, appliedRevision) < 0 then
+    return result(ApplyKind.Duplicate, appliedRevision, "stale-snapshot")
+  end
+  local prev = root
+  root = nextRoot
+  appliedRevision = nextRev
+  notify_once(prev, root)
+  return result(ApplyKind.Applied, nextRev)
+end
+
+function M.applyBatch(batch, stamp)
+  _ = stamp
+  if root == nil then
+    return result(ApplyKind.Gap, "0", "no-root")
+  end
+  local b = batch
+  if type(b) == "string" then
+    local ok, decoded = pcall(Json.decode, b)
+    if not ok or type(decoded) ~= "table" then
+      return result(ApplyKind.Invalid, appliedRevision, "batch-json-invalid")
+    end
+    b = decoded
+  end
+  local candidate = deep_copy(b)
+  local ok, err, base, neu = validate_batch(candidate)
+  if not ok then
+    return result(ApplyKind.Invalid, appliedRevision, err)
+  end
+
+  -- 非前进相对当前：Duplicate（含 base==neu==current）
+  if compare_decimal(neu, appliedRevision) <= 0 then
+    return result(ApplyKind.Duplicate, appliedRevision, "duplicate-or-old")
+  end
+  if compare_decimal(base, appliedRevision) > 0 then
+    return result(ApplyKind.Gap, appliedRevision, "gap")
+  end
+  if compare_decimal(base, appliedRevision) < 0 then
+    return result(ApplyKind.Duplicate, appliedRevision, "old-base")
+  end
+  if compare_decimal(neu, base) <= 0 then
+    return result(ApplyKind.Duplicate, appliedRevision, "non-advancing")
+  end
+
+  local nextRoot = deep_copy(root)
+
+  -- 出现 attr = 全量属性投影（省略的标量按 proto 默认 0）；缺省 attr = 不变
+  if candidate.attr then
+    local a = candidate.attr
+    local function currency(field)
+      if a[field] == nil then
+        return "0"
+      end
+      local g, gerr = as_int64_string(a[field], "attr." .. field)
+      if not g then return nil, gerr end
+      return g
+    end
+    local g, ge = currency("gold")
+    if not g then return result(ApplyKind.Invalid, appliedRevision, ge) end
+    nextRoot.gold = g
+    g, ge = currency("gem")
+    if not g then return result(ApplyKind.Invalid, appliedRevision, ge) end
+    nextRoot.gem = g
+    g, ge = currency("ticket")
+    if not g then return result(ApplyKind.Invalid, appliedRevision, ge) end
+    nextRoot.ticket = g
+    g, ge = currency("shard")
+    if not g then return result(ApplyKind.Invalid, appliedRevision, ge) end
+    nextRoot.shard = g
+
+    local function i32field(field, dest)
+      local raw = a[field]
+      if raw == nil then
+        nextRoot[dest] = 0
+        return true
+      end
+      local v, e = as_int32(raw, "attr." .. field)
+      if v == nil then
+        return false, e
+      end
+      nextRoot[dest] = v
+      return true
+    end
+    local iok, ierr = i32field("level", "level")
+    if not iok then return result(ApplyKind.Invalid, appliedRevision, ierr) end
+    iok, ierr = i32field("exp", "exp")
+    if not iok then return result(ApplyKind.Invalid, appliedRevision, ierr) end
+    iok, ierr = i32field("bagSlots", "bagSlots")
+    if not iok then return result(ApplyKind.Invalid, appliedRevision, ierr) end
+    if a.nickname ~= nil then
+      nextRoot.nickname = tostring(a.nickname)
+    end
+  end
+
+  if candidate.levelUp then
+    local lu = candidate.levelUp
+    if lu.newLevel ~= nil then
+      local v, e = as_int32(lu.newLevel, "levelUp.newLevel")
+      if v == nil then return result(ApplyKind.Invalid, appliedRevision, e) end
+      nextRoot.level = v
+    elseif lu.level ~= nil then
+      local v, e = as_int32(lu.level, "levelUp.level")
+      if v == nil then return result(ApplyKind.Invalid, appliedRevision, e) end
+      nextRoot.level = v
+    end
+  end
+
+  if candidate.bag then
+    local bag, berr = apply_bag_changes(nextRoot.bag, candidate.bag)
+    if not bag then
+      return result(ApplyKind.Invalid, appliedRevision, berr or "bag-invalid")
+    end
+    nextRoot.bag = bag
+  end
+  if candidate.plots then
+    local plots, perr = merge_entity_list(
+      nextRoot.plots, candidate.plots.plots or candidate.plots, "plotId", validate_plot_row)
+    if not plots then return result(ApplyKind.Invalid, appliedRevision, perr) end
+    nextRoot.plots = plots
+  end
+  if candidate.nodes then
+    local nodes, nerr = merge_entity_list(
+      nextRoot.nodes, candidate.nodes.nodes or candidate.nodes, "nodeId", validate_node_row)
+    if not nodes then return result(ApplyKind.Invalid, appliedRevision, nerr) end
+    nextRoot.nodes = nodes
+  end
+  if candidate.tools then
+    local tools, terr = merge_entity_list(
+      nextRoot.tools, candidate.tools.tools or candidate.tools, "toolId", validate_tool_row)
+    if not tools then return result(ApplyKind.Invalid, appliedRevision, terr) end
+    nextRoot.tools = tools
+  end
+  if candidate.facilities then
+    local facilities, ferr = merge_entity_list(
+      nextRoot.facilities, candidate.facilities.facilities or candidate.facilities, "facilityId", validate_facility_row)
+    if not facilities then return result(ApplyKind.Invalid, appliedRevision, ferr) end
+    nextRoot.facilities = facilities
+  end
+  if candidate.orders then
+    local o = candidate.orders
+    if o.orders then
+      local orders, oerr = merge_entity_list(nextRoot.orders, o.orders, "orderId", validate_order_row)
+      if not orders then return result(ApplyKind.Invalid, appliedRevision, oerr) end
+      nextRoot.orders = orders
+    end
+    if o.progress ~= nil then
+      local progress = deep_copy(o.progress)
+      if type(progress) ~= "table" then
+        return result(ApplyKind.Invalid, appliedRevision, "orderProgress-not-table")
+      end
+      if progress.dayIndex ~= nil then
+        local d, derr = as_int32(progress.dayIndex, "orderProgress.dayIndex")
+        if d == nil then return result(ApplyKind.Invalid, appliedRevision, derr) end
+        progress.dayIndex = d
+      end
+      if progress.nextRefreshTime ~= nil then
+        local t, terr = as_int64_string(progress.nextRefreshTime, "orderProgress.nextRefreshTime")
+        if not t then return result(ApplyKind.Invalid, appliedRevision, terr) end
+        progress.nextRefreshTime = t
+      end
+      nextRoot.orderProgress = progress
+    end
+  end
+
+  nextRoot.revision = neu
+  local prev = root
+  root = nextRoot
+  appliedRevision = neu
+  notify_once(prev, root)
+  return result(ApplyKind.Applied, neu)
+end
+
+function M.getSnapshot()
+  if root == nil then
+    return nil
+  end
+  return deep_copy(root)
+end
+
+function M.getRevision()
+  return tostring(appliedRevision or "0")
+end
+
+function M.subscribe(selector, handler)
+  if type(handler) ~= "function" then
+    error("subscribe handler required")
+  end
+  local id = nextSubId
+  nextSubId = nextSubId + 1
+  subscribers[id] = { selector = selector, handler = handler }
+  local lease = {
+    id = id,
+    disposed = false,
+  }
+  function lease.dispose()
+    if lease.disposed then return end
+    lease.disposed = true
+    subscribers[id] = nil
+  end
+  return lease
+end
+
+function M.clear(reason)
+  _ = reason
+  local prev = root
+  root = nil
+  appliedRevision = "0"
+  notify_once(prev, nil)
+end
+
+function M._compat_get(key)
+  if root == nil then
+    return nil
+  end
+  local v = root[key]
+  if type(v) == "table" then
+    return deep_copy(v)
+  end
+  return v
+end
+
+return M
