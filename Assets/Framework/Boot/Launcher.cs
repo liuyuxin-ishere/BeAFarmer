@@ -155,6 +155,7 @@ namespace Game.Framework.Boot
                 if (_lua != null)
                     throw new InvalidOperationException("lua-env-already");
                 _lua = new LuaLoader();
+                // 这一阶段只把源码读进内存并交给 PrepareAsync 校验、编译。Lua 虚拟机要到 StartEntryAsync 才创建。
 #if UNITY_EDITOR
                 // 编辑器：CDN GameLua 可能仍为旧 bridge；从 Assets/Lua 装载（CustomLoader 回落补全 UI/*）。
                 // Player 正式包仍走 Yoo GameLua（T58 冻结 m1-bridge-0.3）。
@@ -162,6 +163,7 @@ namespace Game.Framework.Boot
 #else
                 if (!YooAssets.TryGetPackage(HotfixLoader.LuaPackageName, out ResourcePackage luaPackage) || luaPackage == null)
                     luaPackage = YooAssets.GetPackage(HotfixLoader.LuaPackageName);
+                // 正式包：按 catalog 从 YooAsset 的 GameLua 包取出每个模块的字节，再做同一套 Prepare。
                 var preload = await LuaModulePreloader.LoadFromPackageAsync(luaPackage, linked);
                 await _lua.PrepareAsync(preload.Index, preload.Modules, preload.ConfigBytes, linked);
 #endif
@@ -195,6 +197,7 @@ namespace Game.Framework.Boot
                     Events = new EventBus(),
                     Versions = manifest
                 };
+                // 创建 LuaEnv、注册 require 加载器，并调用入口 Entry.Start("boot")。
                 await _lua.StartEntryAsync(boot, "boot", linked);
                 if (!BridgeApi.EntryExecuted || _lua.Env == null)
                     throw new InvalidOperationException("entry-not-ready");

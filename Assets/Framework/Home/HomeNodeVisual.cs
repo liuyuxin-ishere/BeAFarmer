@@ -66,7 +66,9 @@ namespace Game.Framework.Home
         public void SetDisplay(HomeNodeDisplayKind kind)
         {
             _kind = kind;
-            ApplyColor();
+            var art = GetComponent<HomeArtInstance>();
+            if (art != null) art.SetNodeDisplay(kind);
+            else ApplyColor();
         }
 
         void OnDestroy()

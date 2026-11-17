@@ -151,36 +151,14 @@ namespace Game.Editor.M1
 
         static void CreateLoginPrefab(string path)
         {
-            var root = new GameObject("LoginWindow", typeof(RectTransform), typeof(Image));
-            var rt = (RectTransform)root.transform;
-            rt.sizeDelta = new Vector2(900, 640);
-            root.GetComponent<Image>().color = new Color(0.12f, 0.14f, 0.18f, 0.98f);
-
-            CreateText(root.transform, "Title", "登录", new Vector2(0.1f, 0.82f), new Vector2(0.9f, 0.95f), 36);
-            CreateInput(root.transform, "Username", "用户名", new Vector2(0.15f, 0.68f), new Vector2(0.85f, 0.78f), false);
-            CreateInput(root.transform, "Password", "密码", new Vector2(0.15f, 0.54f), new Vector2(0.85f, 0.64f), true);
-            CreateInput(root.transform, "Nickname", "昵称(注册)", new Vector2(0.15f, 0.40f), new Vector2(0.85f, 0.50f), false);
-            CreateText(root.transform, "ErrorLabel", "", new Vector2(0.1f, 0.28f), new Vector2(0.9f, 0.38f), 24);
-            CreateButton(root.transform, "RegisterButton", "注册", new Vector2(0.12f, 0.08f), new Vector2(0.45f, 0.22f));
-            CreateButton(root.transform, "LoginButton", "登录", new Vector2(0.55f, 0.08f), new Vector2(0.88f, 0.22f));
-
+            var root = Game.Framework.UI.ArtLoginBuilder.Build(null);
             PrefabUtility.SaveAsPrefabAsset(root, path);
             UnityEngine.Object.DestroyImmediate(root);
         }
 
         static void CreateHomeHudPrefab(string path)
         {
-            var root = new GameObject("HomeHudWindow", typeof(RectTransform), typeof(Image));
-            var rt = (RectTransform)root.transform;
-            rt.sizeDelta = new Vector2(720, 280);
-            root.GetComponent<Image>().color = new Color(0.10f, 0.16f, 0.12f, 0.95f);
-
-            CreateText(root.transform, "Title", "家园", new Vector2(0.05f, 0.70f), new Vector2(0.95f, 0.95f), 34);
-            CreateText(root.transform, "PlayerId", "ID:", new Vector2(0.08f, 0.45f), new Vector2(0.92f, 0.68f), 26);
-            CreateText(root.transform, "Nickname", "昵称", new Vector2(0.08f, 0.28f), new Vector2(0.55f, 0.48f), 26);
-            CreateText(root.transform, "Level", "Lv.0", new Vector2(0.55f, 0.28f), new Vector2(0.92f, 0.48f), 26);
-            CreateButton(root.transform, "LogoutButton", "登出", new Vector2(0.30f, 0.05f), new Vector2(0.70f, 0.22f));
-
+            var root = Game.Framework.UI.M2U01WindowBuilder.BuildHomeHud(null);
             PrefabUtility.SaveAsPrefabAsset(root, path);
             UnityEngine.Object.DestroyImmediate(root);
         }

@@ -39,6 +39,8 @@ function M.new()
       bagSlots = snap.bagSlots or 0
       bag = type(snap.bag) == "table" and snap.bag or {}
     end
+    pcall(function() require("UI/Presenters/FarmPresenter").PushArtSnapshot(snap) end)
+    pcall(function() require("UI/Presenters/GatherPresenter").PushArtSnapshot(snap) end)
     local occupied = Catalog.countOccupied(bag)
     self.view:SetText("PlayerId", "ID: " .. playerId)
     self.view:SetText("Nickname", nickname)

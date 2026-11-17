@@ -1,0 +1,208 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 874d283f9a7db854094f4192109a2c6b, type: 3}
+  m_Name: ArtUiSkin_v03
+  m_EditorClassIdentifier: Game.Framework::Game.Framework.UI.ArtUiSkin
+  chineseFont: {fileID: 12800000, guid: f5f32d6b45d2a3b4da772a9752e02b7f, type: 3}
+  sprites:
+  - key: 1001
+    sprite: {fileID: -4075235737344341704, guid: e87af92e8b38d0b4d82ed56d343da3fa, type: 3}
+  - key: 1002
+    sprite: {fileID: -3964279975754055409, guid: a98bdba586ad09f44b2a1911e075841b, type: 3}
+  - key: 1003
+    sprite: {fileID: -4395257300294322916, guid: a024690b212dcfd47a5972627876852e, type: 3}
+  - key: 1004
+    sprite: {fileID: 2580156386608770290, guid: 0f2ee022a19733a479aad06593bedd9c, type: 3}
+  - key: 1005
+    sprite: {fileID: 2894590196641941711, guid: 4e8a81b6bf60bc0488cfe9b12d22bce7, type: 3}
+  - key: 1006
+    sprite: {fileID: -4850483442238985600, guid: 29beb6278eb680743b6ca346d57d59db, type: 3}
+  - key: 1007
+    sprite: {fileID: -2094003563809191008, guid: 13d0472ad30ca1c49977c3591186e56d, type: 3}
+  - key: 2001
+    sprite: {fileID: -7747560439346512834, guid: 07634ea6e599934429c2ba00ef1d4efd, type: 3}
+  - key: 2002
+    sprite: {fileID: -3802377726198042592, guid: 37396fb2a8b4fd2499893aafe86e9b5e, type: 3}
+  - key: 2003
+    sprite: {fileID: -5468759986172396227, guid: 2d2bbe49dddfb414585439d0f0363f47, type: 3}
+  - key: 2004
+    sprite: {fileID: -975250947973818357, guid: a59551d2be31206489c5c7b6ab8f739e, type: 3}
+  - key: 2005
+    sprite: {fileID: -4936521629143998787, guid: 82ab86fa2c9781f49a7c87a21dc40d07, type: 3}
+  - key: 2006
+    sprite: {fileID: 6090503619559557021, guid: fe6fd6f8d9b8ada4d97904f73e8a59c9, type: 3}
+  - key: 2007
+    sprite: {fileID: 7273407538145959361, guid: 6bc6b0ca324213e4a8ac06cbde98e30b, type: 3}
+  - key: 4001
+    sprite: {fileID: -3443764531484618344, guid: 001073e66233a0146bc151337aa46013, type: 3}
+  - key: 4002
+    sprite: {fileID: -2296692909944865680, guid: 445f61ea1e5d9094bb9ec02d7d30cde9, type: 3}
+  - key: 4003
+    sprite: {fileID: 8971500189182259226, guid: 8ecb1f15c4205004690eeb850c3cc3ba, type: 3}
+  - key: 4004
+    sprite: {fileID: -3695936053751067674, guid: 6f495a6b326013242b16abcfb38156ca, type: 3}
+  - key: 4101
+    sprite: {fileID: 2914333753653662419, guid: 3470967e62fdd0f4d970df59d7f16a9c, type: 3}
+  - key: 4102
+    sprite: {fileID: -5756890948177474411, guid: c26e83a014090984b96378a02eaceac0, type: 3}
+  - key: 4103
+    sprite: {fileID: -6093270054280964302, guid: d6d54dbc8a497a741a242547f909daa8, type: 3}
+  - key: 4104
+    sprite: {fileID: 5479449632504550832, guid: 0ddca197ae1d63545807a0d7e81251ce, type: 3}
+  - key: 5001
+    sprite: {fileID: 2795918431134353439, guid: f5acfdbd7af6b024bbd0aa42b6380c08, type: 3}
+  - key: 9001
+    sprite: {fileID: -4518371735284073708, guid: 91bda6aa71386f74db385f551170cf95, type: 3}
+  - key: 9002
+    sprite: {fileID: -4513365578972484050, guid: d6c6b20003b137047b546ccf3de90678, type: 3}
+  - key: 9003
+    sprite: {fileID: 9043031081780518162, guid: 6422c74967342224cbce289d2bb342bb, type: 3}
+  - key: 9101
+    sprite: {fileID: -9091599527451566506, guid: a43248f1d63a3eb439f576d86a7558ab, type: 3}
+  - key: bag
+    sprite: {fileID: 894945321173968318, guid: 44368f14a9d024546b57b49af105745c, type: 3}
+  - key: craft
+    sprite: {fileID: 878092848032162094, guid: 13b081a3f9f070e47a1da8d3ff789205, type: 3}
+  - key: farm
+    sprite: {fileID: 2801041811580861665, guid: 6e5e675aade1eaf4f9da4438ef0289c2, type: 3}
+  - key: furniture
+    sprite: {fileID: 1931869909136235770, guid: fcc4f8f5cb74c7244b1a6c1b8e197eca, type: 3}
+  - key: gacha
+    sprite: {fileID: -6174310644261184646, guid: a5afd271fccae2842ba97b4c74c69f90, type: 3}
+  - key: gather
+    sprite: {fileID: -7929878248464250960, guid: 9aca0a16754ee3545ab403dee1fe2185, type: 3}
+  - key: home
+    sprite: {fileID: 6785726884737435188, guid: fdd66751fa92e1d4f81d17af7ffc465b, type: 3}
+  - key: orders
+    sprite: {fileID: -1867289037339428756, guid: 00a7c99120a920e43ad00b72803263fb, type: 3}
+  - key: plaza
+    sprite: {fileID: -8053224210644050481, guid: 04c3d1501601faf40ada3bdcdeb09db2, type: 3}
+  - key: settings
+    sprite: {fileID: 4230216764240656230, guid: a8e2d88d2211b024fb7bf5a049cc7b47, type: 3}
+  - key: shop
+    sprite: {fileID: -6135087980750483045, guid: 4ed3e8d281c51194cb6f51fa0bbd95f1, type: 3}
+  - key: wardrobe
+    sprite: {fileID: -7794821024713497039, guid: a2f9820bbeac9b34387d67709b2c5daa, type: 3}
+  - key: back
+    sprite: {fileID: 1187961194834725857, guid: 74a5876dffa40a44181e7559c91f7b98, type: 3}
+  - key: close
+    sprite: {fileID: 4671213621800289002, guid: 979c6ab3c417b7546afc6ac972044732, type: 3}
+  - key: confirm
+    sprite: {fileID: 7422569216845771908, guid: bf55c4cda5fa3fe418e68214f82dec24, type: 3}
+  - key: info
+    sprite: {fileID: 3164007730830291572, guid: c4b3d737051aa07479ac6626e3ed4d6d, type: 3}
+  - key: lock
+    sprite: {fileID: 8464627282614862601, guid: 942881c84d7b20b42bddc7fac1bf9515, type: 3}
+  - key: minus
+    sprite: {fileID: 4283866062461104401, guid: af3d2e45f859ebb47b2e6d1142bbd3e7, type: 3}
+  - key: plus
+    sprite: {fileID: 1558698868822982226, guid: d6a2f22ecf008c34bba561fa87c028c9, type: 3}
+  - key: refresh
+    sprite: {fileID: -1004202255716699100, guid: 898f23a9cc44c6f4e8b906d11e0236c0, type: 3}
+  - key: rotate
+    sprite: {fileID: -3223379498465821752, guid: 64c06cfd042dde248a45a08fd12222d7, type: 3}
+  - key: sell
+    sprite: {fileID: 1846394787505406181, guid: 8da32038ad7bca047a1fd20e7b2250ba, type: 3}
+  - key: store
+    sprite: {fileID: -4353016054876007489, guid: 854698cd9419e67459cc3a05ef51eeec, type: 3}
+  - key: timer
+    sprite: {fileID: 1436445749492888080, guid: e45b1de7f6437b848a2307abde91bae5, type: 3}
+  - key: done
+    sprite: {fileID: 3449518171935125709, guid: d0bfde3cd5dfd5d478b742e454684702, type: 3}
+  - key: empty
+    sprite: {fileID: -4730573424505813790, guid: 08b878bccf49a3349b48691dd75fa2d3, type: 3}
+  - key: exp
+    sprite: {fileID: -3938203369652739983, guid: bd55edd11e7f9224aafbad489fccaa8a, type: 3}
+  - key: fertilized
+    sprite: {fileID: 7938006409746794147, guid: b854f34d1c8a3944c8af000ef0977b7c, type: 3}
+  - key: level
+    sprite: {fileID: -4069579855878342933, guid: 740bc93e5f2b19347a639c22281980d3, type: 3}
+  - key: ripe
+    sprite: {fileID: 6298121136330467894, guid: 85dc765d00f0ebb49b5697cfda371a9d, type: 3}
+  - key: watered
+    sprite: {fileID: 2000123943649201917, guid: bc9a10a90f9121b48a23ed93c00b24ba, type: 3}
+  - key: working
+    sprite: {fileID: 6683773902346908361, guid: a19129b7e0a4a8b488912976e277eec8, type: 3}
+  - key: account
+    sprite: {fileID: -6299202328695847901, guid: c02d1b0bf465d85499ba2d25dbfc5824, type: 3}
+  - key: help
+    sprite: {fileID: 582448398262224985, guid: da70b5758a2a81d45bd0bea7d12ca4b2, type: 3}
+  - key: password
+    sprite: {fileID: -7196667306411628022, guid: fe5e1992b02944c458a99a703afcbc96, type: 3}
+  - key: sound
+    sprite: {fileID: 6493222095853719535, guid: 2e52c2a53468029479f58825a1f94184, type: 3}
+  - key: U01_LoginBackground
+    sprite: {fileID: -1388024601507356472, guid: 3e42a44e4bd398647bfeec60b5acf7e7, type: 3}
+  - key: panel_bubble
+    sprite: {fileID: -2295621962958059330, guid: 5093a4eedc94d0d41b3ed65ef27a56ac, type: 3}
+  - key: panel_card
+    sprite: {fileID: 534972133301649366, guid: c04574f97345ec242b140d58f1258414, type: 3}
+  - key: panel_toast
+    sprite: {fileID: -6946666266210899802, guid: 8259576420be99b4f9ef1f314c5e6030, type: 3}
+  - key: panel_window
+    sprite: {fileID: -3961198791822510105, guid: 4b747b3393420f24e93c0271e09ae692, type: 3}
+  - key: border_epic
+    sprite: {fileID: -3180614571695643032, guid: 123e32eefaf97f942bc4ee392cb2c9b5, type: 3}
+  - key: border_legendary
+    sprite: {fileID: 566852738700518652, guid: 7868160dcd4f815448953f346eaf2abd, type: 3}
+  - key: border_locked
+    sprite: {fileID: 2223827077802182731, guid: 07cc06f4a4c04ea48b981338559e35f6, type: 3}
+  - key: border_normal
+    sprite: {fileID: -6045523154458536587, guid: 253a317a1a5201c46b19498fbb881563, type: 3}
+  - key: border_rare
+    sprite: {fileID: 1446539993228979514, guid: 85fb1eaa0710a244fbd75a8f83f11c38, type: 3}
+  - key: border_selected
+    sprite: {fileID: 7159931548948214591, guid: 40f88cc8b4092da43b403a875d2b10b9, type: 3}
+  - key: button_disabled
+    sprite: {fileID: -5730984250091439851, guid: 64ab0a04e45a8cc4b8e4ab083fd9b557, type: 3}
+  - key: button_hover
+    sprite: {fileID: 425597936212420307, guid: 1b1376a5dd5921d4f9a1a114303cdf08, type: 3}
+  - key: button_pressed
+    sprite: {fileID: 5123317806511552220, guid: a4bbe960f35d81c4f81eb88dcfa70291, type: 3}
+  - key: button_primary
+    sprite: {fileID: 1621712137103933385, guid: ddf5278f98dfad440b1f946647d68170, type: 3}
+  - key: button_secondary
+    sprite: {fileID: -2402611074831390270, guid: 6cc418bd78ce5b74b908b513390ba6b7, type: 3}
+  - key: tab_selected
+    sprite: {fileID: -6319994123133223118, guid: 82052163d6bc71f418d5cb63bafce1e3, type: 3}
+  - key: check_off
+    sprite: {fileID: -2023704097513889659, guid: a93319d5e3d709a47bedc7327e2765d8, type: 3}
+  - key: check_on
+    sprite: {fileID: -7605773900757613391, guid: add51a8a36d34a74a87fd002e8590bfc, type: 3}
+  - key: input_focus
+    sprite: {fileID: 4669450854827676980, guid: bc3bc8a6b33882849b9da916d999fab2, type: 3}
+  - key: input_normal
+    sprite: {fileID: 7426786179994069278, guid: b60d04da3bcdbf64a86c7445e96a1cc7, type: 3}
+  - key: toggle_off
+    sprite: {fileID: 3757395874008749525, guid: a429d8eacabe2464fa03f7a38ca29e24, type: 3}
+  - key: toggle_on
+    sprite: {fileID: -4335964015908331526, guid: 238d2ac6e766e1c49949e66d5264ecfc, type: 3}
+  - key: bar_exp
+    sprite: {fileID: 6865849736047213393, guid: c934a61439fb8c442adce08ff0c2e15c, type: 3}
+  - key: bar_fill
+    sprite: {fileID: -2467368898455330562, guid: c485149ca91dee846bd93286dccce6f6, type: 3}
+  - key: bar_timer
+    sprite: {fileID: -7732968419927470067, guid: 67455cae72fcc6c47ad5b35c9099bdd8, type: 3}
+  - key: bar_track
+    sprite: {fileID: -974349662149935683, guid: d8f2cfba33cf488429ea9786cd9d87e3, type: 3}
+  - key: guide_arrow
+    sprite: {fileID: -7188635334984079463, guid: c524dfd436a68574189aaf7490377ba5, type: 3}
+  - key: guide_ring
+    sprite: {fileID: 4855582029524956217, guid: 8c8c48e955dd62d47bb454dc68c3255d, type: 3}
+  - key: notification
+    sprite: {fileID: -2214990725042146602, guid: 17b41c93c395d2c48996895861b9ad15, type: 3}
+  - key: placement_bad
+    sprite: {fileID: 3738255876205842103, guid: 1b3a93388ec35d841809e68283f8994b, type: 3}
+  - key: placement_ok
+    sprite: {fileID: -8012836933158896376, guid: faa9cbfeab6db344da24a2955a6db3f2, type: 3}
+  - key: spinner
+    sprite: {fileID: -4178185926463856189, guid: dfaac887ce056c64d80eea8c6ae5d3fe, type: 3}

@@ -430,6 +430,7 @@ function M.new(service, store, clock, catalog)
   end
 
   local function apply_displays(snapshot, previewSet)
+    M.PushArtSnapshot(snapshot)
     local hf = home_facade()
     if hf == nil or hf.ApplyPlotDisplays == nil then return end
     local synced = facade_clock_synced()
@@ -562,6 +563,7 @@ function M.new(service, store, clock, catalog)
     local mark = ok and "" or (not unlocked and "（未解锁）" or "（库存不足）")
     safe_call(function()
       self._view:SetText("SeedLabel", string.format("种子 %s x%d%s", s.name or tostring(s.id), have, mark))
+      if self._view.SetIcon then self._view:SetIcon("SeedIcon", tostring(s.id)) end
     end)
   end
 
@@ -952,6 +954,27 @@ function M.new(service, store, clock, catalog)
   function self:toolMode() return self._toolMode end
 
   return self
+end
+
+-- Shared read-only world art refresh, including when the farm window is closed.
+function M.PushArtSnapshot(snapshot)
+  local hf = home_facade()
+  if not hf or not hf.ApplyPlotArt then return end
+  local byId, parts = {}, {}
+  if type(snapshot) == "table" and type(snapshot.plots) == "table" then
+    for _, row in ipairs(snapshot.plots) do byId[row.plotId] = row end
+  end
+  local synced = facade_clock_synced()
+  for id = 1001, 1024 do
+    local row = byId[id]
+    local kind = 0
+    if row then local _, value = present_plot(row, synced); kind = value end
+    row = row or {}
+    parts[#parts + 1] = table.concat({ tostring(id), tostring(kind), tostring(row.cropId or 0),
+      tostring(row.plantTime or "0"), tostring(row.readyTime or "0"), row.watered == true and "1" or "0",
+      row.fertilized == true and "1" or "0" }, ":")
+  end
+  hf.ApplyPlotArt(table.concat(parts, ";"))
 end
 
 return M

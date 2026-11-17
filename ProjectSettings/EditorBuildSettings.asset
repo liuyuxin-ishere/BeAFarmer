@@ -9,9 +9,6 @@ EditorBuildSettings:
     path: Assets/Scenes/M1/M1_Boot.unity
     guid: ad796098ae9a01f498b3f6ee0665da4f
   - enabled: 0
-    path: Assets/Scenes/xLua_PoC.unity
-    guid: 5010700a5136bdb4981d75b47633300d
-  - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   m_configObjects:

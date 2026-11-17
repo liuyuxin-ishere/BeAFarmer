@@ -73,6 +73,13 @@ namespace Game.Framework.UI
             selectable.interactable = interactable;
         }
 
+        /// <summary>Shared, synchronous Sprite catalog; no late async writes after window disposal.</summary>
+        public void SetIcon(string path, string key)
+        {
+            ThrowIfDisposed();
+            _root.GetComponent<ArtUiBindings>()?.SetIcon(path, key);
+        }
+
         /// <summary>读取 InputField 文本。无组件时抛错。</summary>
         public string GetInputText(string path)
         {

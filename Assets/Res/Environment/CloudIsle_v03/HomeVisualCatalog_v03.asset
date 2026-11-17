@@ -1,0 +1,106 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68b8a2db04f3530458a43b7079fdca55, type: 3}
+  m_Name: HomeVisualCatalog_v03
+  m_EditorClassIdentifier: Game.Framework::Game.Framework.Home.HomeVisualCatalog
+  entries:
+  - key: house
+    prefab: {fileID: 3862959201668599650, guid: b40c9de297f812448840fe761b3dfc7e, type: 3}
+  - key: mill
+    prefab: {fileID: 2788081190291376759, guid: 944afb4197a261646a562a511534c1b1, type: 3}
+  - key: oven
+    prefab: {fileID: 3731355555390249872, guid: cc30f0af98467834e84068b48d642a2a, type: 3}
+  - key: stove
+    prefab: {fileID: 3624888766618227932, guid: 1a0d9ed7ccd1c88498042622e37af19a, type: 3}
+  - key: workshop
+    prefab: {fileID: 8390164523313790174, guid: a71dac20cbcc52b419a00717b6c0e201, type: 3}
+  - key: crop_1_stage_0
+    prefab: {fileID: 3414247162304377396, guid: 55e5015d00eefc940b51198b62baada4, type: 3}
+  - key: crop_1_stage_1
+    prefab: {fileID: 8049311915779019157, guid: 37cad617c1646514394501a92cf00686, type: 3}
+  - key: crop_1_stage_2
+    prefab: {fileID: 4379693471820339639, guid: 864aab94146248148bc037ff0616f8c0, type: 3}
+  - key: crop_1_stage_3
+    prefab: {fileID: 8847248385148736992, guid: e648ec630cc8af3418147a765497066a, type: 3}
+  - key: crop_2_stage_0
+    prefab: {fileID: 2802257054167659163, guid: a4d85121979032540b4d4a8c310a6ec7, type: 3}
+  - key: crop_2_stage_1
+    prefab: {fileID: 5053063957073725848, guid: d322cf791769bea4e8c6d595bddb4377, type: 3}
+  - key: crop_2_stage_2
+    prefab: {fileID: 40618783749246344, guid: 149e6827388f976489f36cc0343ad824, type: 3}
+  - key: crop_2_stage_3
+    prefab: {fileID: 2586910232505712357, guid: ce34a3ec1ce84ee408f5a8f646e8d959, type: 3}
+  - key: crop_3_stage_0
+    prefab: {fileID: 1947585175445687921, guid: 8d408b369be2afb4a8d3d1f945404bfe, type: 3}
+  - key: crop_3_stage_1
+    prefab: {fileID: 2350226260679365786, guid: 7d310a3b2927ee44cb3657ab34965fed, type: 3}
+  - key: crop_3_stage_2
+    prefab: {fileID: 5367400257416722601, guid: 78100cfe9c90d7b48b2ca0ce59da018c, type: 3}
+  - key: crop_3_stage_3
+    prefab: {fileID: 3717139996848231582, guid: 4c8f67a8587e12c4cb7eb1fb1b969f82, type: 3}
+  - key: crop_4_stage_0
+    prefab: {fileID: 4770111900024866096, guid: b33eeaae132107c4b8a12dbcd6dcd333, type: 3}
+  - key: crop_4_stage_1
+    prefab: {fileID: 7016794114875623187, guid: f907a2b12495d00418806a2cd1d21737, type: 3}
+  - key: crop_4_stage_2
+    prefab: {fileID: 6892435016594557363, guid: 728bd84aafe0e3240b2f45e46164a12b, type: 3}
+  - key: crop_4_stage_3
+    prefab: {fileID: 8465270179788798760, guid: b7fdafd0983b39d4d87f1e0213dd866a, type: 3}
+  - key: crop_5_stage_0
+    prefab: {fileID: 3158369945004594643, guid: 71cc930a323374d4ab6a29ab487abc46, type: 3}
+  - key: crop_5_stage_1
+    prefab: {fileID: 4026635735061167521, guid: 0f80349b21766724fb4d576ea680c662, type: 3}
+  - key: crop_5_stage_2
+    prefab: {fileID: 4027966877944041323, guid: 4624bf5ae45324248adb1049667d0dcc, type: 3}
+  - key: crop_5_stage_3
+    prefab: {fileID: 5939929891679100131, guid: 39b58dbdb01692444b542d2510581824, type: 3}
+  - key: crop_6_stage_0
+    prefab: {fileID: 306562956902810458, guid: a6035a4908faa4d4b9301cd5a35fdcb6, type: 3}
+  - key: crop_6_stage_1
+    prefab: {fileID: 845612799588283505, guid: fc6a9bd298fff7541ae0921c74c21052, type: 3}
+  - key: crop_6_stage_2
+    prefab: {fileID: 8730160591447555652, guid: 412bc080f6bdf264b84fc92d00545a13, type: 3}
+  - key: crop_6_stage_3
+    prefab: {fileID: 2097886171388306646, guid: 72b54b08fc24ad242bcc147614546c50, type: 3}
+  - key: crop_7_stage_0
+    prefab: {fileID: 2314598257148633832, guid: 7ffabc2ab0750dc478e271c8bfeb1c02, type: 3}
+  - key: crop_7_stage_1
+    prefab: {fileID: 6019654230307288003, guid: ec8cc1f2d5fcd974da0c212490b6dffe, type: 3}
+  - key: crop_7_stage_2
+    prefab: {fileID: 4501366784757001971, guid: e4f65f247f36b924c8c0d3884f02299e, type: 3}
+  - key: crop_7_stage_3
+    prefab: {fileID: 2103916101701800635, guid: acd66a52f1114f2449b399d0dcb4e0ac, type: 3}
+  - key: berry_cooldown
+    prefab: {fileID: 8169302811833723128, guid: 4b5fb640b9c833c4a919028f25736f05, type: 3}
+  - key: berry_ready
+    prefab: {fileID: 9028838079153179972, guid: f69a2aea418747346b5f5ee4e7f483c6, type: 3}
+  - key: flower_cooldown
+    prefab: {fileID: 6276536749083746568, guid: 0f939fba6d9ac8e47a5ed52dd3f74df5, type: 3}
+  - key: flower_ready
+    prefab: {fileID: 3485353735087190956, guid: 0e37a80f0f74a66458879cde78088d8f, type: 3}
+  - key: ore_cooldown
+    prefab: {fileID: 1079986300569223846, guid: 33be4cb03cfbdc4489d6f8f58a8052bb, type: 3}
+  - key: ore_ready
+    prefab: {fileID: 404127930538375785, guid: 8628b7905506e474f8c62238421d4e53, type: 3}
+  - key: tree_cooldown
+    prefab: {fileID: 2296291526046956852, guid: fb428e08bb86c1448bd78f9f2e70ec0c, type: 3}
+  - key: tree_ready
+    prefab: {fileID: 3825914623810126924, guid: fbc707aa040022e4fb06c43496dab3cf, type: 3}
+  - key: fertilized_marker
+    prefab: {fileID: 5375334032375081141, guid: 7433fee89062c384eb0111f206cd491f, type: 3}
+  - key: soil_empty
+    prefab: {fileID: 6665400148877801924, guid: 67d56d5c3c9be1a4e8af14df66c04856, type: 3}
+  - key: wood_lock_sign
+    prefab: {fileID: 4103027459630140518, guid: a107616b2c4760347bbef9db63522a06, type: 3}
+  plotRoot: {fileID: 4567268975956525665, guid: aa73f2bb81c478a4885ec9b99cabbd3d, type: 3}
+  nodeRoot: {fileID: 722106995989203760, guid: 5d34c81ee50de0d4ebb2f8ef87ff08f4, type: 3}
+  indicatorMaterial: {fileID: 2100000, guid: 59e8fbebbb4a5ea47abd74359ca20615, type: 2}

@@ -14,7 +14,7 @@ namespace Game.Framework.Home
 
         public const string NodesRootName = "HomeGreyboxNodes";
 
-        public static Transform SpawnPlots(Transform parent, int layer = 0)
+        public static Transform SpawnPlots(Transform parent, int layer = 0, HomeVisualCatalog catalog = null)
         {
             HomePlotLayout.ValidateOrThrow();
             var rootGo = new GameObject(RootName);
@@ -26,13 +26,14 @@ namespace Game.Framework.Home
             for (int i = 0; i < rows.Count; i++)
             {
                 HomePlotLayout.PlotRow row = rows[i];
-                var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                var cube = catalog != null ? Object.Instantiate(catalog.plotRoot) : GameObject.CreatePrimitive(PrimitiveType.Cube);
                 cube.name = "Plot_" + row.InstanceId;
                 cube.layer = layer;
                 cube.transform.SetParent(rootGo.transform, false);
                 Vector3 display = HomeDisplayLayout.ToDisplayWorld(row);
                 cube.transform.localPosition = display;
-                cube.transform.localScale = new Vector3(1.1f, 0.2f, 1.1f);
+                cube.transform.localScale = catalog != null ? Vector3.one : new Vector3(1.1f, 0.2f, 1.1f);
+                if (catalog != null) cube.AddComponent<HomeArtInstance>().Initialize(catalog, 0);
 
                 var binder = cube.AddComponent<HomeTargetBinder>();
                 binder.BindExplicit(row.InstanceId, HomeInstanceKinds.Plot);
@@ -53,7 +54,7 @@ namespace Game.Framework.Home
         /// 生成 13 个可视灰盒 Node；每块显式 Bind instanceId/kind=Node。
         /// 同类不同实例独立 collider，不共享倒计时状态对象。
         /// </summary>
-        public static Transform SpawnNodes(Transform parent, int layer = 0)
+        public static Transform SpawnNodes(Transform parent, int layer = 0, HomeVisualCatalog catalog = null)
         {
             HomeNodeLayout.ValidateOrThrow();
             var rootGo = new GameObject(NodesRootName);
@@ -66,15 +67,23 @@ namespace Game.Framework.Home
             {
                 HomeNodeLayout.NodeRow row = rows[i];
                 PrimitiveType prim = PrimitiveForType(row.TypeId);
-                var go = GameObject.CreatePrimitive(prim);
+                var go = catalog != null ? Object.Instantiate(catalog.nodeRoot) : GameObject.CreatePrimitive(prim);
                 go.name = "Node_" + row.InstanceId + "_" + row.Label;
                 go.layer = layer;
                 go.transform.SetParent(rootGo.transform, false);
                 // 稳定锚点仍在 HomeNodeLayout；显示坐标经 HomeDisplayLayout 分区，避免遮挡地块
-                Vector3 display = HomeDisplayLayout.ToDisplayWorld(row);
+                Vector3 display = catalog != null ? HomeDisplayLayout.ToArtDisplayWorld(row) : HomeDisplayLayout.ToDisplayWorld(row);
                 go.transform.localPosition = new Vector3(
-                    display.x, display.y + HeightForType(row.TypeId) * 0.5f, display.z);
-                go.transform.localScale = ScaleForType(row.TypeId);
+                    display.x, display.y + (catalog != null ? 0 : HeightForType(row.TypeId) * 0.5f), display.z);
+                go.transform.localScale = catalog != null ? Vector3.one : ScaleForType(row.TypeId);
+                if (catalog != null)
+                {
+                    go.AddComponent<HomeArtInstance>().Initialize(catalog, row.TypeId);
+                    var collider = go.GetComponent<BoxCollider>();
+                    float width = row.TypeId == 1 ? 1.8f : row.TypeId == 3 ? 1.5f : 1f;
+                    collider.size = new Vector3(width, .8f, width);
+                    collider.center = new Vector3(0, .4f, 0);
+                }
 
                 var binder = go.AddComponent<HomeTargetBinder>();
                 binder.BindExplicit(row.InstanceId, HomeInstanceKinds.Node);
@@ -135,6 +144,7 @@ namespace Game.Framework.Home
             if (owned != null)
             {
                 ConfigureOwnedCamera(owned);
+                ConfigureArtCamera(owned, parent);
                 return owned;
             }
 
@@ -150,6 +160,7 @@ namespace Game.Framework.Home
 
             var cam = go.AddComponent<Camera>();
             ConfigureOwnedCamera(cam);
+            ConfigureArtCamera(cam, parent);
             return cam;
         }
 
@@ -243,6 +254,18 @@ namespace Game.Framework.Home
             cam.fieldOfView = 48f;
             cam.nearClipPlane = 0.1f;
             cam.farClipPlane = 100f;
+        }
+
+        static void ConfigureArtCamera(Camera cam, Transform parent)
+        {
+            var runtime = parent != null ? parent.GetComponent<HomeFarmRuntime>() : null;
+            if (runtime != null && runtime.VisualCatalog != null)
+            {
+                cam.transform.position = new Vector3(-1.5f, 16f, -19f);
+                cam.transform.LookAt(new Vector3(.5f, 0, 2.5f));
+                cam.backgroundColor = new Color(.48f, .62f, .53f);
+                cam.clearFlags = CameraClearFlags.SolidColor;
+            }
         }
     }
 }

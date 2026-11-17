@@ -15,6 +15,9 @@ namespace Game.Framework.Home
     {
         public const string HostObjectName = "HomeFarmRuntime";
 
+        [SerializeField] HomeVisualCatalog visualCatalog;
+        public HomeVisualCatalog VisualCatalog { get => visualCatalog; set => visualCatalog = value; }
+
         HomeInputAdapter _adapter;
         HomeFarmGestureController _gestures;
         MouseKeyboardInput _input;
@@ -80,8 +83,8 @@ namespace Game.Framework.Home
             HomePlotLayout.ValidateOrThrow();
             HomeNodeLayout.ValidateOrThrow();
             _camera = HomeGreyboxSpawner.EnsureHomeCamera(transform);
-            _plotsRoot = HomeGreyboxSpawner.SpawnPlots(transform);
-            _nodesRoot = HomeGreyboxSpawner.SpawnNodes(transform);
+            _plotsRoot = HomeGreyboxSpawner.SpawnPlots(transform, 0, visualCatalog);
+            _nodesRoot = HomeGreyboxSpawner.SpawnNodes(transform, 0, visualCatalog);
             CacheVisuals();
             CacheNodeVisuals();
 
@@ -116,6 +119,18 @@ namespace Game.Framework.Home
         {
             if (_nodeVisuals.TryGetValue(instanceId, out HomeNodeVisual v))
                 v.SetDisplay(kind);
+        }
+
+        public void SetPlotArt(int id, int kind, int crop, long planted, long ready, bool watered, bool fertilized)
+        {
+            if (_visuals.TryGetValue(id, out var visual))
+                visual.GetComponent<HomeArtInstance>()?.SetPlotTimeline(kind, crop, planted, ready, watered, fertilized);
+        }
+
+        public void SetNodeArt(int id, int kind, long deadline)
+        {
+            if (_nodeVisuals.TryGetValue(id, out var visual))
+                visual.GetComponent<HomeArtInstance>()?.SetNodeTimeline(kind, deadline);
         }
 
         public void ApplyNodeDisplays(IReadOnlyDictionary<int, HomeNodeDisplayKind> map)

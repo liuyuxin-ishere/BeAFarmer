@@ -274,6 +274,32 @@ namespace Game.Framework.Home
             }
         }
 
+        /// <summary>Read-only art payload: instance:baseState:crop:plantTime:readyTime:watered:fertilized.</summary>
+        public static void ApplyPlotArt(string payload)
+        {
+            if (_runtime == null || string.IsNullOrEmpty(payload)) return;
+            foreach (string row in payload.Split(';'))
+            {
+                string[] p = row.Split(':');
+                if (p.Length != 7 || !int.TryParse(p[0], out int id) || !int.TryParse(p[1], out int kind)
+                    || !int.TryParse(p[2], out int crop) || !long.TryParse(p[3], out long planted)
+                    || !long.TryParse(p[4], out long ready) || kind < 0 || kind > 7) continue;
+                _runtime.SetPlotArt(id, kind, crop, planted, ready, p[5] == "1", p[6] == "1");
+            }
+        }
+
+        public static void ApplyNodeArt(string payload)
+        {
+            if (_runtime == null || string.IsNullOrEmpty(payload)) return;
+            foreach (string row in payload.Split(';'))
+            {
+                var p = row.Split(':');
+                if (p.Length == 3 && int.TryParse(p[0], out int id) && int.TryParse(p[1], out int kind)
+                    && long.TryParse(p[2], out long deadline) && kind >= 0 && kind <= 6)
+                    _runtime.SetNodeArt(id, kind, deadline);
+            }
+        }
+
         /// <summary>
         /// 推送采集点显示。payload "2001:1;2002:2"（instanceId:kindInt）。
         /// 冷却到 0 只反映 Ready，不自动采集/发奖。

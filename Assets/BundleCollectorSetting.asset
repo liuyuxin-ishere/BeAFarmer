@@ -25,19 +25,6 @@ MonoBehaviour:
     AutoCollectShaders: 1
     IgnoreRuleName: NormalIgnoreRule
     Groups:
-    - GroupName: PoC
-      GroupDesc: 
-      AssetTags: 
-      ActiveRuleName: EnableGroup
-      Collectors:
-      - CollectPath: Assets/Res/PoC
-        CollectorGUID: ca09ac2518bf5db4b8928e70ff5a742e
-        CollectorType: 0
-        AddressRuleName: AddressByFileName
-        PackRuleName: PackSeparately
-        FilterRuleName: CollectAll
-        AssetTags: poc
-        UserData: 
     - GroupName: ConfigLuban
       GroupDesc: "T42 \u914D\u7F6E JSON\u3002\u5730\u5740\u662F\u6587\u4EF6\u540D\uFF0CT58
         \u6CBF\u7528\u540C\u4E00\u89C4\u5219\u6536\u96C6\u3002"
@@ -53,7 +40,7 @@ MonoBehaviour:
         AssetTags: config
         UserData: 
     - GroupName: M1Scenes
-      GroupDesc: "T52 M1 Login/Home placeholder scenes"
+      GroupDesc: T52 M1 Login/Home placeholder scenes
       AssetTags: m1
       ActiveRuleName: EnableGroup
       Collectors:
@@ -66,7 +53,7 @@ MonoBehaviour:
         AssetTags: m1
         UserData: 
     - GroupName: M1UI
-      GroupDesc: "T48-T51 UI prefabs"
+      GroupDesc: T48-T51 UI prefabs
       AssetTags: ui
       ActiveRuleName: EnableGroup
       Collectors:
@@ -77,6 +64,19 @@ MonoBehaviour:
         PackRuleName: PackSeparately
         FilterRuleName: CollectAll
         AssetTags: ui
+        UserData: 
+    - GroupName: CloudIsleArt
+      GroupDesc: ABC visual catalog; referenced dependencies
+      AssetTags: art
+      ActiveRuleName: EnableGroup
+      Collectors:
+      - CollectPath: Assets/Res/Environment/CloudIsle_v03/HomeVisualCatalog_v03.asset
+        CollectorGUID: 1b84029419c7933468fb668a241ef479
+        CollectorType: 0
+        AddressRuleName: AddressByFileName
+        PackRuleName: PackSeparately
+        FilterRuleName: CollectAll
+        AssetTags: art
         UserData: 
   - PackageName: GameLua
     PackageDesc: 

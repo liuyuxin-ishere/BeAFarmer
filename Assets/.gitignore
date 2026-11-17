@@ -1,6 +1,7 @@
 # Unity .gitignore
 # 本文件仅作用于 Assets 子目录；工程根级规则见 ../.gitignore。
 # Assets/.meta 与运行所需插件DLL保留，生成缓存和本地凭证排除。
+# Blender 与说明文档由根 .gitignore 统一排除。
 
 /[Ll]ibrary/
 /[Tt]emp/

@@ -40,7 +40,7 @@ function M.new()
       if self._busy then return end
       local user = view:GetInputText("Username")
       local pass = view:GetInputText("Password")
-      local nick = view:GetInputText("Nickname")
+      local nick = "用户"
       set_busy(true)
       show_error("注册中…")
       self._op = AccountService.register(user, pass, nick, function(code, payload)

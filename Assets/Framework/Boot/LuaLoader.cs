@@ -236,17 +236,22 @@ namespace Game.Framework.Boot
                 try
                 {
                     linked.ThrowIfCancellationRequested();
+                    // xLua 虚拟机。构造时注册 print、CS 命名空间，以及会回调 LoadModule 的 require 搜索器。
                     _luaEnv = new LuaEnv();
+                    // require("模块名") 时同步调用 LoadModule，从已校验的内存字节取出源码。
                     _luaEnv.AddLoader(LoadModule);
                     if (BeforeEntryStartAsync != null)
                         await BeforeEntryStartAsync(_luaEnv);
                     linked.ThrowIfCancellationRequested();
+                    // 执行这一句：require 入口文件，把它 return 的表放到全局 Entry。chunk 名 "boot" 只用于报错定位。
                     _luaEnv.DoString("Entry = require('" + _index.EntryModule + "')", "boot");
+                    // 按 ILuaEntry 把 Lua 表映射成 C# 可调用对象。表上必须有 Start。
                     _entry = _luaEnv.Global.Get<ILuaEntry>("Entry");
                     _entryTable = _luaEnv.Global.Get<LuaTable>("Entry");
                     if (_entry == null)
                         throw new InvalidOperationException("runtime-entry-null");
 
+                    // 真正跑入口：对应 Assets/Lua/entry.txt 的 Entry.Start(self, phase)。
                     _entrySummary = _entry.Start(phase);
                     _entryInvocations++;
                     BridgeApi.MarkEntryExecuted();
@@ -480,6 +485,7 @@ namespace Game.Framework.Boot
             LuaFunction compiled = null;
             try
             {
+                // 只把源码编译成函数并立刻丢掉，不调用它，所以模块顶层逻辑不会在预检时执行。
                 compiled = checkEnv.LoadString(Encoding.UTF8.GetString(bytes), key);
                 return null;
             }
@@ -616,6 +622,9 @@ namespace Game.Framework.Boot
             _cancelLease = null;
         }
 
+        /// <summary>
+        /// require 的同步加载器。fileName 是 require 的模块名；返回 UTF-8 源码字节，null 表示找不到。
+        /// </summary>
         byte[] LoadModule(ref string fileName)
         {
             string key = fileName ?? "";

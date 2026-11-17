@@ -71,6 +71,22 @@ namespace Game.Framework.Home
             return ToDisplayWorld(HomeInstanceKinds.Node, row.PosX, row.PosY, row.PosZ);
         }
 
+        /// <summary>v03 bounds-aware display positions; frozen business anchors and IDs are unchanged.</summary>
+        public static Vector3 ToArtDisplayWorld(HomeNodeLayout.NodeRow row)
+        {
+            switch (row.InstanceId)
+            {
+                case 2001: return new Vector3(-6.8f, 0, 3.5f);
+                case 2002: return new Vector3(-6.8f, 0, .5f);
+                case 2005: return new Vector3(-6.8f, 0, -2.5f);
+                case 2006: return new Vector3(-2.2f, 0, 4.5f);
+                case 2003: return new Vector3(-4.9f, 0, 2f);
+                case 2007: return new Vector3(-4.9f, 0, -1f);
+                case 2008: return new Vector3(-4.9f, 0, 4.3f);
+                default: var pos = ToDisplayWorld(row); pos.y = 0; return pos;
+            }
+        }
+
         public static Vector3 ToDisplayWorld(HomePlotLayout.PlotRow row)
         {
             return ToDisplayWorld(HomeInstanceKinds.Plot, row.PosX, row.PosY, row.PosZ);

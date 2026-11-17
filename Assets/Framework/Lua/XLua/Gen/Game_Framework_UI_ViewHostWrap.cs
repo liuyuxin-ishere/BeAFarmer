@@ -21,11 +21,12 @@ namespace XLua.CSObjectWrap
         {
 			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			System.Type type = typeof(Game.Framework.UI.ViewHost);
-			Utils.BeginObjectRegister(type, L, translator, 0, 8, 2, 0);
+			Utils.BeginObjectRegister(type, L, translator, 0, 9, 2, 0);
 			
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "Bind", _m_Bind);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetText", _m_SetText);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetInteractable", _m_SetInteractable);
+			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetIcon", _m_SetIcon);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "GetInputText", _m_GetInputText);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetInputText", _m_SetInputText);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetInputContentType", _m_SetInputContentType);
@@ -157,6 +158,35 @@ namespace XLua.CSObjectWrap
                     bool _interactable = LuaAPI.lua_toboolean(L, 3);
                     
                     gen_to_be_invoked.SetInteractable( _path, _interactable );
+                    
+                    
+                    
+                    return 0;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_SetIcon(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+                Game.Framework.UI.ViewHost gen_to_be_invoked = (Game.Framework.UI.ViewHost)translator.FastGetCSObj(L, 1);
+            
+            
+                
+                {
+                    string _path = LuaAPI.lua_tostring(L, 2);
+                    string _key = LuaAPI.lua_tostring(L, 3);
+                    
+                    gen_to_be_invoked.SetIcon( _path, _key );
                     
                     
                     

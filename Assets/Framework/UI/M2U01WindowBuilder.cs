@@ -28,6 +28,7 @@ namespace Game.Framework.UI
             Button(root.transform, "GatherButton", "采集", new Vector2(0.53f, 0.19f), new Vector2(0.69f, 0.34f));
             Button(root.transform, "ToolButton", "工具", new Vector2(0.70f, 0.19f), new Vector2(0.86f, 0.34f));
             Button(root.transform, "LogoutButton", "登出", new Vector2(0.02f, 0.03f), new Vector2(0.22f, 0.17f));
+            ArtUiSkin.Apply(root);
             return root;
         }
 
@@ -57,6 +58,7 @@ namespace Game.Framework.UI
             // Reserve the complete 24-item feedback area;do not hide later item codes behind Text truncation.
             Text(root.transform, "StatusLabel", "", new Vector2(0.04f, 0.02f), new Vector2(0.68f, 0.26f), 18);
             Button(root.transform, "CloseButton", "关闭", new Vector2(0.70f, 0.02f), new Vector2(0.96f, 0.12f));
+            ArtUiSkin.Apply(root);
             return root;
         }
 
@@ -116,6 +118,7 @@ namespace Game.Framework.UI
             Text(root.transform, "StatusLabel", "", new Vector2(0.04f, 0.10f), new Vector2(0.96f, 0.18f), 14);
             Button(root.transform, "GatherButton", "采集", new Vector2(0.04f, 0.02f), new Vector2(0.48f, 0.10f));
             Button(root.transform, "CloseButton", "关闭", new Vector2(0.52f, 0.02f), new Vector2(0.96f, 0.10f));
+            ArtUiSkin.Apply(root);
             return root;
         }
 
@@ -135,6 +138,7 @@ namespace Game.Framework.UI
             Text(root.transform, "StatusLabel", "", new Vector2(0.05f, 0.10f), new Vector2(0.95f, 0.18f), 18);
             Button(root.transform, "UpgradeButton", "升级", new Vector2(0.15f, 0.02f), new Vector2(0.48f, 0.10f));
             Button(root.transform, "CloseButton", "关闭", new Vector2(0.52f, 0.02f), new Vector2(0.85f, 0.10f));
+            ArtUiSkin.Apply(root);
             return root;
         }
 

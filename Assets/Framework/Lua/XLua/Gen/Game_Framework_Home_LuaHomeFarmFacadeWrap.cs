@@ -31,7 +31,7 @@ namespace XLua.CSObjectWrap
 			Utils.EndObjectRegister(type, L, translator, null, null,
 			    null, null, null);
 
-		    Utils.BeginClassRegister(type, L, __CreateInstance, 20, 0, 0);
+		    Utils.BeginClassRegister(type, L, __CreateInstance, 22, 0, 0);
 			Utils.RegisterFunc(L, Utils.CLS_IDX, "AttachHandlers", _m_AttachHandlers_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "DetachHandlers", _m_DetachHandlers_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "AttachNodeSelectHandler", _m_AttachNodeSelectHandler_xlua_st_);
@@ -50,6 +50,8 @@ namespace XLua.CSObjectWrap
             Utils.RegisterFunc(L, Utils.CLS_IDX, "TryGetPlotScreenPoint", _m_TryGetPlotScreenPoint_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "TryGetNodeScreenPoint", _m_TryGetNodeScreenPoint_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "ApplyPlotDisplays", _m_ApplyPlotDisplays_xlua_st_);
+            Utils.RegisterFunc(L, Utils.CLS_IDX, "ApplyPlotArt", _m_ApplyPlotArt_xlua_st_);
+            Utils.RegisterFunc(L, Utils.CLS_IDX, "ApplyNodeArt", _m_ApplyNodeArt_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "ApplyNodeDisplays", _m_ApplyNodeDisplays_xlua_st_);
             
 			
@@ -512,6 +514,54 @@ namespace XLua.CSObjectWrap
                     string _payload = LuaAPI.lua_tostring(L, 1);
                     
                     Game.Framework.Home.LuaHomeFarmFacade.ApplyPlotDisplays( _payload );
+                    
+                    
+                    
+                    return 0;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_ApplyPlotArt_xlua_st_(RealStatePtr L)
+        {
+		    try {
+            
+            
+            
+                
+                {
+                    string _payload = LuaAPI.lua_tostring(L, 1);
+                    
+                    Game.Framework.Home.LuaHomeFarmFacade.ApplyPlotArt( _payload );
+                    
+                    
+                    
+                    return 0;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_ApplyNodeArt_xlua_st_(RealStatePtr L)
+        {
+		    try {
+            
+            
+            
+                
+                {
+                    string _payload = LuaAPI.lua_tostring(L, 1);
+                    
+                    Game.Framework.Home.LuaHomeFarmFacade.ApplyNodeArt( _payload );
                     
                     
                     

@@ -634,6 +634,7 @@ namespace Game.Framework.UI
                 throw new InvalidOperationException("LuaEnv 未绑定，无法 require " + module);
 
             string safe = (module ?? "").Replace("'", "").Replace("\\", "");
+            // 开窗时再执行一次 require。同一 LuaEnv 会缓存已加载模块，所以入口里 require 过的文件不会重新跑顶层代码。
             object[] ret = _luaEnv.DoString("return require('" + safe + "')", "ui-require");
             if (ret == null || ret.Length == 0 || ret[0] == null)
                 throw new InvalidOperationException("controller-require-null " + module);
@@ -964,6 +965,9 @@ namespace Game.Framework.UI
 
         static Font BuiltinFont()
         {
+            var skin = ArtUiSkin.Load();
+            if (skin != null && skin.chineseFont != null)
+                return skin.chineseFont;
             var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             return font != null ? font : Resources.GetBuiltinResource<Font>("Arial.ttf");
         }

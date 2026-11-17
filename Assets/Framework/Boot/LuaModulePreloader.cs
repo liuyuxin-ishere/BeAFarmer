@@ -69,6 +69,7 @@ namespace Game.Framework.Boot
                     throw new InvalidOperationException("catalog modules empty after config filter");
 
                 LuaIndex index = LuaIndex.FromCatalog(catalog);
+                // 模块名 → 源码字节。LuaLoader 的 CustomLoader 之后只读这份拷贝，不再向资源包要文件。
                 var modules = new Dictionary<string, byte[]>(StringComparer.Ordinal);
                 for (int i = 0; i < catalog.modules.Length; i++)
                 {

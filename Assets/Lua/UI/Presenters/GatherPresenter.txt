@@ -377,6 +377,7 @@ function M.new(service, store, clock, catalog)
   end
 
   local function apply_node_displays(snapshot)
+    M.PushArtSnapshot(snapshot)
     local hf = home_facade()
     if hf == nil or hf.ApplyNodeDisplays == nil then return end
     local synced = facade_clock_synced()
@@ -451,6 +452,7 @@ function M.new(service, store, clock, catalog)
     if id == nil then
       safe_call(function()
         self._view:SetText("SelectedLabel", "点击家园采集点选择")
+        if self._view.SetIcon then self._view:SetIcon("SelectedIcon", "gather") end
         self._view:SetText("DetailLabel", "")
         self._view:SetText("CooldownLabel", "")
       end)
@@ -472,6 +474,10 @@ function M.new(service, store, clock, catalog)
     end
     safe_call(function()
       self._view:SetText("SelectedLabel", string.format("%s · %s%s", elig.name, elig.label ~= "" and elig.label or tostring(id), lockHint))
+      if self._view.SetIcon then
+        local itemByType = { [1]="4001", [2]="4004", [3]="4002", [4]="4003" }
+        self._view:SetIcon("SelectedIcon", itemByType[elig.mn and elig.mn.typeId] or "gather")
+      end
       self._view:SetText("DetailLabel", string.format("需要：%s（拥有 Lv.%d）", elig.toolName, elig.toolLv))
       self._view:SetText("CooldownLabel", elig.coolText)
     end)
@@ -781,6 +787,27 @@ function M.new(service, store, clock, catalog)
   end
 
   return self
+end
+
+-- Base geometry survives Selected/Busy overlays and remains current with the window closed.
+function M.PushArtSnapshot(snapshot)
+  local hf = home_facade()
+  if not hf or not hf.ApplyNodeArt then return end
+  local byId, parts = {}, {}
+  snapshot = type(snapshot) == "table" and snapshot or {}
+  for _, row in ipairs(snapshot.nodes or {}) do byId[row.nodeId] = row end
+  for _, mn in ipairs(Catalog.listMapNodes()) do
+    local spec, row = Catalog.getGatherNode(mn.typeId), byId[mn.instanceId]
+    local kind, deadline = 2, row and row.nextReadyTime or "0"
+    if not spec then kind = 6
+    elseif (snapshot.level or 0) < (spec.unlockLevel or 0) then kind = 0
+    elseif row and facade_clock_synced() then
+      local rem = facade_clock_remaining(deadline)
+      if rem == "0" or rem == "" then kind = bag_has_tool(snapshot.tools or {}, spec.toolId) and 1 or 5 end
+    end
+    parts[#parts + 1] = tostring(mn.instanceId) .. ":" .. tostring(kind) .. ":" .. tostring(deadline)
+  end
+  hf.ApplyNodeArt(table.concat(parts, ";"))
 end
 
 return M
