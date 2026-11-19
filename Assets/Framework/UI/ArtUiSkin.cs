@@ -52,7 +52,7 @@ namespace Game.Framework.UI
                     label.resizeTextMaxSize = label.fontSize;
                 }
             }
-            SetImage(root.GetComponent<Image>(), skin.Find("panel_window"));
+            SetImage(root.GetComponent<Image>(), skin.Find("panel_card"));
             if (root.name == "FarmWindow") AddDisplayIcon(root, "SeedIcon", "2001", new Vector2(.04f,.745f), new Vector2(.19f,.815f), "SeedLabel", .22f);
             if (root.name == "GatherWindow") AddDisplayIcon(root, "SelectedIcon", "gather", new Vector2(.04f,.40f), new Vector2(.20f,.48f), "SelectedLabel", .23f);
             if (root.name == "ToolWindow") AddDisplayIcon(root, "ToolIcon", "level", new Vector2(.05f,.40f), new Vector2(.12f,.48f), "SelectedLabel", .14f);

@@ -14,7 +14,7 @@ namespace Game.Framework.UI
             bgImage.raycastTarget = false;
             var fitter = bg.AddComponent<AspectRatioFitter>(); fitter.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent; fitter.aspectRatio = 16f / 9f;
             var panel = Box(root.transform, "Card", new Vector2(.62f,.17f), new Vector2(.93f,.83f));
-            var pi = panel.AddComponent<Image>(); pi.sprite = skin != null ? skin.Find("panel_window") : null; pi.type = Image.Type.Sliced; pi.pixelsPerUnitMultiplier = 2;
+            var pi = panel.AddComponent<Image>(); pi.sprite = skin != null ? skin.Find("panel_card") : null; pi.type = Image.Type.Sliced; pi.pixelsPerUnitMultiplier = 2;
             Label(root.transform,"Title","登录",new Vector2(.66f,.68f),new Vector2(.89f,.77f),36);
             Label(root.transform,"Welcome","欢迎回到云岛",new Vector2(.66f,.62f),new Vector2(.89f,.68f),18);
             Input(root.transform,"Username","用户名",new Vector2(.66f,.51f),new Vector2(.89f,.59f));

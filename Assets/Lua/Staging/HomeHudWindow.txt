@@ -17,6 +17,16 @@ function M.new()
   self._sub = nil
   self._gen = 0
   self._progression = nil
+  local navigation = {"BagButton", "ShopButton", "FarmButton", "GatherButton", "ToolButton"}
+
+  local function refreshControls()
+    for _, name in ipairs(navigation) do
+      self.view:SetInteractable(name, self._hasData and not self._busy)
+    end
+    self.view:SetInteractable("LogoutButton", not self._busy)
+    local status = self._busy and "正在登出…" or self._error or (not self._hasData and "等待家园数据…" or "")
+    self.view:SetText("StatusLabel", status)
+  end
 
   local function bump()
     self._gen = self._gen + 1
@@ -25,6 +35,7 @@ function M.new()
 
   local function refresh(snap)
     if not self.view then return end
+    self._hasData = type(snap) == "table"
     local playerId = "0"
     local nickname = ""
     local level = 0
@@ -52,6 +63,7 @@ function M.new()
     if self._progression then
       self._progression:showUnlocks(level)
     end
+    refreshControls()
   end
 
   function self:OnCreate(view)
@@ -83,9 +95,15 @@ function M.new()
     end)
     self._clicks[#self._clicks + 1] = view:SubscribeClick("LogoutButton", function()
       if self._busy then return end
+      local gen = self._gen
       self._busy = true
+      self._error = nil
+      refreshControls()
       self._op = AccountService.logout(function(code, _)
+        if self._gen ~= gen or not self.view then return end
         self._busy = false
+        self._error = code ~= 0 and "登出失败，请重试" or nil
+        refreshControls()
         -- Logout 已 EnterLogin；窗口由 AccountFlow 按 CurrentAddress 统一打开，禁止抢先 Open。
       end)
     end)
@@ -94,6 +112,8 @@ function M.new()
   function self:OnOpen(argsJson)
     UIWindow.OnOpen(self, argsJson)
     local gen = bump()
+    self._busy = false
+    self._error = nil
     if self._sub then
       pcall(function() self._sub.dispose() end)
       self._sub = nil

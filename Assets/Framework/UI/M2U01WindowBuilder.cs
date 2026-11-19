@@ -28,6 +28,7 @@ namespace Game.Framework.UI
             Button(root.transform, "GatherButton", "采集", new Vector2(0.53f, 0.19f), new Vector2(0.69f, 0.34f));
             Button(root.transform, "ToolButton", "工具", new Vector2(0.70f, 0.19f), new Vector2(0.86f, 0.34f));
             Button(root.transform, "LogoutButton", "登出", new Vector2(0.02f, 0.03f), new Vector2(0.22f, 0.17f));
+            Text(root.transform, "StatusLabel", "", new Vector2(0.24f, 0.03f), new Vector2(0.97f, 0.17f), 14);
             ArtUiSkin.Apply(root);
             return root;
         }

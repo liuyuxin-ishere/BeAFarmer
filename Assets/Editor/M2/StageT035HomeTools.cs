@@ -90,6 +90,7 @@ namespace Game.Editor.M2
         /// <summary>批处理：-executeMethod Game.Editor.M2.StageT035HomeTools.BakeFarmPrefabs</summary>
         public static void BakeFarmPrefabs()
         {
+            ArtReplacementTools.ValidateWindowSkin(ArtUiSkin.Load());
             EnsureM2FarmPlotResources();
             Directory.CreateDirectory(Path.Combine(Application.dataPath, "Res/UI"));
             SavePrefab(HomeHudPath, M2U01WindowBuilder.BuildHomeHud(null));

@@ -1,30 +1,16 @@
 # Farming / 云屿小筑
 
-基于 Unity、C# / xLua 和 .NET 8 服务端的家园经营游戏工程。当前为 Windows 灰盒功能版本，M2 已验收 **T001～T042（42/80）**；设施建造 T043 正在审查，尚未合入。本仓库发布客户端/服务端源码、资源、协议、配置源表与构建工具。
+基于 Unity、C# / xLua 和 .NET 8 服务端的家园经营游戏工程。Windows 试玩版已更新登录和家园美术。M2 已验收 **T001～T042（42/80）**，设施建造 T043 正在审查。本仓库提供客户端与服务端源码、资源、协议、配置源表和构建工具。
 
 ## 试玩版下载、安装与复现
 
-当前可玩包是 **T042 r5**（Windows x64，资源/配置版本 200，桥契约 `m2-bridge-0.4`）。客户端只连本机，需要在同一台电脑上先启动服务端，再打开游戏。
+当前可玩包是 **美术替换版 r5**（Windows x64，应用 0.4.0，资源和配置版本 200）。
 
-1. 安装 [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)。
-2. 克隆仓库：`git clone https://github.com/liuyuxin-ishere/BeAFarmer.git`，之后的命令都在仓库根目录执行。服务端脚本会编译 `Server/CloudIsle.Server`，并读取仓库里的 `Server/ConfigLuban`。
-3. 从 [T042 r5 Release](https://github.com/liuyuxin-ishere/BeAFarmer/releases/tag/t042-r5) 下载 `T042-r5-Player.zip` 和 `T042-r5-Publish.zip`，解压到两个目录。`Player` 里要能看到 `Farming.exe` 和 `Farming_Data`。`Publish` 里要有 `version.json`。
-4. 启动服务端。把 `-ContentRoot` 换成你解压出来的 `Publish` 目录：
+1. 从 [美术替换版 r5 Release](https://github.com/liuyuxin-ishere/BeAFarmer/releases/tag/v0.4.0-art-r5) 下载 `CloudIsle-Art-Win64-20261119-r5.zip`，完整解压到可写目录。
+2. 双击 `StartLocal.cmd`，等待本地服务和登录页启动。首次使用先注册再登录，昵称固定为“用户”。
+3. 在商店购买种子，在家园播种、浇水，成熟后收获。退出游戏时，启动脚本会保存并关闭本地服务。
 
-```powershell
-& './Tools/run_server.ps1' `
-  -ContentRoot 'D:/CloudIslePlay/Publish' `
-  -DatabasePath 'Server/Data/Playtest/playtest.db' `
-  -LogDirectory 'Server/Logs/Playtest' `
-  -BuildArtifactsDirectory 'Temp/PlaytestBuild'
-```
-
-5. 终端出现 `server started` 后，用浏览器打开 `http://localhost:18080/version.json`，确认资源和配置版本是 200。再运行解压目录中的 `Player/Farming.exe`。
-6. 在登录页填写自己的用户名、密码和昵称，先注册，再登录。没有公共账号。建议体验顺序是：商店买种、播种并浇水、成熟后收获、背包出售、升级、采集、升级工具。新号没有额外的演示金币。
-
-服务端用 Ctrl+C 停止。下次用同一个 `playtest.db` 启动，进度还在。如果只看到空场景，先确认 18080 上的 `version.json` 能打开，再重新启动客户端。日志一般在 `%USERPROFILE%/AppData/LocalLow/DefaultCompany/Farming/Player.log`。
-
-游戏 TCP 是 `127.0.0.1:17780`，资源 HTTP 是 `http://localhost:18080/`。这套包不支持朋友连到你的电脑上玩；对方需要按同样步骤在自己的电脑上运行服务端和客户端。
+包内已包含客户端、资源和本地服务，无需安装 Unity 或 .NET SDK。默认端口为 17780 和 18080，存档和日志位于解压目录的 `UserData`。旧包仍可从 [T042 r5 Release](https://github.com/liuyuxin-ishere/BeAFarmer/releases/tag/t042-r5) 下载。
 
 ## 已实现功能
 
@@ -39,7 +25,7 @@
 | 采集 | 13个稳定采集点，按等级、工具及冷却判断资格；不同点独立计时，冷却归零后手动采集，奖励由服务端提交。 |
 | 工具 | 等级及下一档条件展示，确认升级后原子扣金币/材料；支持取消与失败反馈。 |
 
-已做真实 Windows IL2CPP 客户端验证，覆盖种植、采集、经济操作的断线、进程异常退出和恢复。项目仍为灰盒，美术、文案与最终适配尚未完成；设施建造/升级、加工、订单及后续M2内容不属于当前完成范围。热更新200→201演示使用隔离配置，不会在普通200服务中自动出现。
+已做真实 Windows IL2CPP 客户端验证，覆盖种植、采集、经济操作的断线、进程异常退出和恢复。美术替换版接入 44 个 v03 模型，并更新家园灯光、阴影和窗口皮肤。家园目前采用绿色承影地面，建筑提供静态外观。热更新 200→201 演示使用隔离配置。
 
 ## 工程结构
 
@@ -84,6 +70,6 @@ $protoc = (Get-Command protoc -ErrorAction Stop).Source
 
 终端显示 `server started` 后，游戏TCP为 `127.0.0.1:17780`，资源HTTP为 `http://localhost:18080/`。打开 `http://localhost:18080/version.json` 应返回资源/配置200。然后启动 `Builds/M2/Local/Base 200/Player/Farming.exe`。服务端用Ctrl+C正常停止，同一数据库重启保留进度。
 
-登录页先填写自选用户名、密码和昵称，点击注册，成功后点击登录；没有公开的统一默认账号。建议从“商店买种→种植/浇水→自然成熟后收获→背包出售→升级解锁→采集/工具升级”体验。普通新号没有演示夹具额外准备的5000金币等资源，各功能受实际等级、材料和金币条件限制。
+登录页先填写自选用户名和密码，注册成功后再登录。昵称固定为“用户”。建议从购买种子、种植和收获开始，再尝试背包出售、采集和工具升级。各功能受实际等级、材料和金币条件限制。
 
 如果只有空场景，先检查资源服务是否已启动：启动时无法连接18080会导致版本清单加载失败，需要待服务就绪后重新打开客户端。客户端日志通常位于 `%USERPROFILE%/AppData/LocalLow/DefaultCompany/Farming/Player.log`。

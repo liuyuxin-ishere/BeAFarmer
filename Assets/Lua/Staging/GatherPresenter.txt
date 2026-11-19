@@ -452,6 +452,7 @@ function M.new(service, store, clock, catalog)
     if id == nil then
       safe_call(function()
         self._view:SetText("SelectedLabel", "点击家园采集点选择")
+        if self._view.SetIcon then self._view:SetIcon("SelectedIcon", "gather") end
         self._view:SetText("DetailLabel", "")
         self._view:SetText("CooldownLabel", "")
       end)

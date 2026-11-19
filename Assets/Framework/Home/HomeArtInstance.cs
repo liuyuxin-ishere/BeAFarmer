@@ -7,6 +7,7 @@ namespace Game.Framework.Home
     {
         HomeVisualCatalog _catalog;
         Transform _visualRoot;
+        Transform _cropAnchor;
         GameObject _crop, _lock, _fertilized, _ready, _cooldown;
         Renderer[] _soil;
         LineRenderer _outline;
@@ -65,8 +66,10 @@ namespace Game.Framework.Home
             if(typeId==0)
             {
                 _soil=catalog.Spawn("soil_empty",_visualRoot).GetComponentsInChildren<Renderer>();
-                _lock=catalog.Spawn("wood_lock_sign",_visualRoot);_lock.transform.localPosition=new Vector3(.36f,.06f,.3f);
-                _fertilized=catalog.Spawn("fertilized_marker",_visualRoot);_fertilized.transform.localPosition=new Vector3(-.36f,.06f,.3f);_fertilized.SetActive(false);
+                _cropAnchor = CreateAnchor("CropAnchor", new Vector3(0, .06f, 0));
+                _lock = catalog.Spawn("wood_lock_sign", CreateAnchor("LockMarkerAnchor", new Vector3(.36f, .06f, .3f)));
+                _fertilized = catalog.Spawn("fertilized_marker", CreateAnchor("FertilizedMarkerAnchor", new Vector3(-.36f, .06f, .3f)));
+                _fertilized.SetActive(false);
                 _locked=true;
             }
             else
@@ -82,6 +85,15 @@ namespace Game.Framework.Home
             _outline.SetPositions(new[]{new Vector3(-r,.09f,-r),new Vector3(-r,.09f,r),new Vector3(r,.09f,r),new Vector3(r,.09f,-r)});
             _outline.enabled=false;
         }
+
+        Transform CreateAnchor(string anchorName, Vector3 position)
+        {
+            var anchor = new GameObject(anchorName).transform;
+            anchor.SetParent(_visualRoot, false);
+            anchor.localPosition = position;
+            return anchor;
+        }
+
         public void SetPlotData(int baseKind,int cropId,int stage,bool watered,bool fertilized)
         {
             _locked=baseKind==0;_lock.SetActive(_locked);
@@ -90,8 +102,7 @@ namespace Game.Framework.Home
             if(key!=_cropKey)
             {
                 if(_crop!=null){_crop.SetActive(false);if(Application.isPlaying)Destroy(_crop);else DestroyImmediate(_crop);}
-                _crop=key!=null?_catalog.Spawn(key,_visualRoot):null;
-                if(_crop!=null)_crop.transform.localPosition=new Vector3(0,.06f,0);
+                _crop=key!=null?_catalog.Spawn(key,_cropAnchor):null;
                 _cropKey=key;
             }
             if(_block==null)_block=new MaterialPropertyBlock();

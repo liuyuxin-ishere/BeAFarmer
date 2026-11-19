@@ -124,6 +124,10 @@ namespace Game.Framework.Account
                 string cur = scenes.CurrentAddress ?? "";
                 if (!string.Equals(cur, address, StringComparison.Ordinal))
                 {
+                    // SceneService may recover to Login without throwing. Keep that recovery
+                    // distinguishable from a successful Home load for both UI and diagnostics.
+                    if (string.IsNullOrEmpty(_lastError))
+                        _lastError = "scene-load-failed";
                     // 失败回退不得同时展示错误 Home：目标非 Login 且当前也不是目标时，再切 Login。
                     if (!string.Equals(address, "M1_Login", StringComparison.Ordinal)
                         && !string.Equals(cur, "M1_Login", StringComparison.Ordinal)
@@ -188,7 +192,17 @@ namespace Game.Framework.Account
             if (string.Equals(currentAddress, "M1_Login", StringComparison.Ordinal))
             {
                 try { UiBridge.Close("HomeHud", (_, __) => { }); } catch { }
-                try { UiBridge.Open("Login", "", (_, __) => { }); } catch { }
+                try
+                {
+                    string error = _lastError;
+                    int epoch = Volatile.Read(ref _epoch);
+                    UiBridge.Open("Login", "", (code, _) =>
+                    {
+                        if (code == 0 && epoch == Volatile.Read(ref _epoch) && !string.IsNullOrEmpty(error))
+                            UiBridge.ShowToast("家园加载失败，请重新登录重试", 8f);
+                    });
+                }
+                catch { }
                 try { AccountBridge.HideDisconnectMask(); } catch { }
             }
         }

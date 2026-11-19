@@ -544,6 +544,7 @@ function M.new(service, store, clock, catalog)
       self._selectedSeedId = nil
       safe_call(function()
         self._view:SetText("SeedLabel", "无种子配置")
+          if self._view.SetIcon then self._view:SetIcon("SeedIcon", "") end
         if self._view.SetInteractable then
           self._view:SetInteractable("PlantModeButton", false)
         end
@@ -574,6 +575,7 @@ function M.new(service, store, clock, catalog)
         view:SetText("Title", "农场")
         view:SetText("StatusLabel", "")
         view:SetText("SeedLabel", "未选种")
+          if view.SetIcon then view:SetIcon("SeedIcon", "") end
         view:SetText("ModeLabel", "模式: 播种")
         view:SetText("CountdownLabel", "")
       end)

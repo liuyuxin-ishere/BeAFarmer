@@ -25,6 +25,7 @@ namespace Game.Editor.M2
         /// <summary>批处理：-executeMethod Game.Editor.M2.StageT026UiTools.BakeU01Prefabs</summary>
         public static void BakeU01Prefabs()
         {
+            ArtReplacementTools.ValidateWindowSkin(ArtUiSkin.Load());
             Directory.CreateDirectory(Path.Combine(Application.dataPath, "Res/UI"));
             SavePrefab(HomePath, M2U01WindowBuilder.BuildHomeHud(null));
             SavePrefab(BagPath, M2U01WindowBuilder.BuildBag(null));

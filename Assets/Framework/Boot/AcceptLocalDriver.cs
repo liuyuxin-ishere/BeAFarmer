@@ -319,8 +319,7 @@ namespace Game.Framework.Boot
             if (login == null)
                 return false;
             return TrySetInput(login, "Username", lines[0].Trim())
-                   && TrySetInput(login, "Password", lines[1].Trim())
-                   && TrySetInput(login, "Nickname", lines[2].Trim());
+                   && TrySetInput(login, "Password", lines[1].Trim());
         }
 
         bool ClickLoginChild(string child)
